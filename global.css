@@ -95,7 +95,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../imagens/textura-15.webp');
+    background-image: url('textura-15.webp');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

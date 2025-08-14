@@ -3,18 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R.O Recrutamento - Profissionais Qualificados para Residências de Alto Padrão | Itatiba e Bragança Paulista</title>
-    <meta name="description" content="A primeira empresa especializada em capacitação e encaminhamento de profissionais para residências de alto padrão em Itatiba e Bragança Paulista. Treinamento exclusivo no Centro de Treinamento.">
-    <meta name="keywords" content="empregada doméstica Itatiba, caseiro Bragança Paulista, profissionais domésticos qualificados, residências de alto padrão, treinamento doméstico, R.O Recrutamento">
-    <meta name="author" content="R.O Recrutamento">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="R.O Recrutamento - Profissionais Qualificados para Residências de Alto Padrão">
-    <meta property="og:description" content="Conectamos talentos únicos com residências excepcionais através de capacitação profissional.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://rorecrutamento.com.br">
-    <meta property="og:image" content="https://rorecrutamento.com.br/imagens/og-image.jpg">
+    <title>R.O Recrutamento - Em Manutenção</title>
+    <meta name="description" content="Site em manutenção - R.O Recrutamento">
+    <meta name="robots" content="noindex, nofollow">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -27,233 +18,331 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="global.css">
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="components/components.css">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Estilos específicos para a página de manutenção */
+        body {
+            /* Manter o padding-top para o header não sobrepor */
+            padding-top: 80px;
+            /* Não usar flex no body para não quebrar o header */
+        }
+
+        /* Container principal que vai centralizar o conteúdo */
+        .maintenance-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 80px); /* Subtrai o padding-top */
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .maintenance-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .maintenance-icon {
+            font-size: 4rem;
+            color: var(--bronze-light);
+            margin-bottom: 1.5rem;
+            animation: iconSpin 2s linear infinite;
+        }
+
+        @keyframes iconSpin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .maintenance-title {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-weight: var(--font-weight-bold);
+            background: linear-gradient(135deg, #b8763d, #d39666, #a65e2e, #d39666, #b8763d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .maintenance-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .maintenance-description {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            background: rgba(166, 94, 46, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--cor-borda);
+            box-shadow: var(--sombra-bronze);
+        }
+
+        .maintenance-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .status-text {
+            color: #2ecc71;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--cor-borda);
+        }
+
+        .contact-info h3 {
+            color: var(--bronze-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--bronze-light);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--border-radius-lg);
+            background: rgba(166, 94, 46, 0.1);
+            transition: var(--transicao);
+        }
+
+        .contact-link:hover {
+            background: rgba(166, 94, 46, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-bronze);
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(166, 94, 46, 0.2);
+            border-radius: 3px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--bronze-solid), var(--bronze-light));
+            border-radius: 3px;
+            animation: progress 4s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            50% {
+                width: 75%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px; /* Header mobile é menor */
+            }
+            
+            .maintenance-wrapper {
+                min-height: calc(100vh - 70px);
+            }
+            
+            .maintenance-title {
+                font-size: 2rem;
+            }
+            
+            .maintenance-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .contact-link {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .maintenance-container {
+                padding: 1rem;
+            }
+            
+            .maintenance-title {
+                font-size: 1.8rem;
+            }
+            
+            .maintenance-description {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- HEADER CONTAINER (será carregado via JS) -->
     <div id="header-container"></div>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>Conectamos <span class="highlight">Talentos Únicos</span> com Residências Excepcionais</h1>
-                <p>A primeira empresa especializada em capacitação e <span class="highlight">encaminhamento de profissionais</span> para residências de alto padrão</p>
-                <a href="#contato" class="btn-cobre">Conhecer Nossos Serviços</a>
-            </div>
-            <div class="hero-divider"></div>
-            <div class="hero-image">
-                <!-- Placeholder para imagem responsiva -->
-                <picture>
-                    <source media="(max-width: 768px)" srcset="/imagens/hero-mobile.jpg">
-                    <img src="/imagens/equipe-hero.png" alt="Profissionais R.O Recrutamento">
-                </picture>
-            </div>
+    <!-- Wrapper para centralizar o conteúdo -->
+    <div class="maintenance-wrapper">
+        <div class="maintenance-container">
+        
+        <!-- Ícone de manutenção -->
+        <div class="maintenance-icon">
+            <i class="fas fa-cog"></i>
         </div>
-    </section>
-
-    <!-- Seção 1 - Nossa Metodologia -->
-    <section id="metodologia" class="metodologia">
-        <div class="container">
-            <h2 class="section-title">Nossa Metodologia</h2>
-            <div class="processo-container">
-                <div class="processo-item">
-                    <div class="processo-numero">1</div>
-                    <h3>O colaborador chega até nós</h3>
-                    <p>Primeiro contato através de nossos canais</p>
-                </div>
-                <div class="processo-seta">→</div>
-                <div class="processo-item">
-                    <div class="processo-numero">2</div>
-                    <h3>Passa por treinamento introdutório no CT</h3>
-                    <p>Capacitação inicial obrigatória</p>
-                </div>
-                <div class="processo-seta">→</div>
-                <div class="processo-item">
-                    <div class="processo-numero">3</div>
-                    <h3>Entra no banco de dados</h3>
-                    <p>Perfil catalogado com competências</p>
-                </div>
-                <div class="processo-seta">→</div>
-                <div class="processo-item">
-                    <div class="processo-numero">4</div>
-                    <h3>Analisamos a melhor vaga</h3>
-                    <p>Match entre perfil e oportunidade</p>
-                </div>
-                <div class="processo-seta">→</div>
-                <div class="processo-item">
-                    <div class="processo-numero">5</div>
-                    <h3>Agendamos entrevista ou teste</h3>
-                    <p>Encontro com o proprietário</p>
-                </div>
-                <div class="processo-seta">→</div>
-                <div class="processo-item">
-                    <div class="processo-numero">6</div>
-                    <h3>Treinamento personalizado <span class="destaque" style="font-size: 1.6rem;">R.O Consultoria</span></h3>
-                    <p>Capacitação específica para a residência</p>
-                    <a href="https://roconsultoria.com.br" target="_blank" class="btn-cobre btn-small">Conheça a R.O Consultoria</a>
-                </div>
-            </div>
-            <div class="resultado-box">
-                <h3><span class="highlight" style="font-size: 2.5rem;">Resultado</span></h3>
-                <p style="font-size: 1.3rem;">Profissionais nos procuram por <span class="highlight">capacitação</span> e proprietários por profissionais mais <span class="highlight">qualificados</span>. <strong><br><br>Nenhum profissional é encaminhado sem passar pelo <span class="highlight">treinamento no CT</span>.</strong></p>
-            </div>
+        
+        <!-- Título principal -->
+        <h1 class="maintenance-title">Estamos em Manutenção</h1>
+        
+        <!-- Subtítulo -->
+        <p class="maintenance-subtitle">
+            Estamos trabalhando para melhorar sua experiência
+        </p>
+        
+        <!-- Descrição -->
+        <div class="maintenance-description">
+            <p>
+                Nossa equipe está realizando atualizações importantes para oferecer 
+                uma experiência ainda melhor na conexão entre <span class="highlight">talentos únicos</span> 
+                e <span class="highlight">residências excepcionais</span>.
+            </p>
+            <p style="margin-bottom: 0;">
+                Em breve estaremos de volta com novidades incríveis!
+            </p>
         </div>
-    </section>
-
-    <!-- Seção 2 - Nosso Centro de Treinamento -->
-    <section id="centro-treinamento" class="centro-treinamento">
-        <div class="container">
-            <h2 class="section-title">Nosso Centro de Treinamento</h2>
-            <div class="ct-content">
-                <div class="ct-info">
-                    <div class="ct-localizacao">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <p><strong>Localização:</strong> Rua Pedro Mascagni, 425 – Itatiba</p>
-                    </div>
-                    <div class="ct-image">
-                        <!-- Placeholder para foto do CT -->
-                        <picture>
-                            <source media="(max-width: 768px)" srcset="/imagens/ct-mobile.jpg">
-                            <img src="/imagens/ct-desktop.jpg" alt="Centro de Treinamento R.O Recrutamento">
-                        </picture>
-                    </div>
-                </div>
-                <div class="ct-ensino">
-                    <h3>O que é ensinado:</h3>
-                    <ul>
-                        <li><i class="fas fa-check"></i> Boas práticas profissionais</li>
-                        <li><i class="fas fa-check"></i> A arte de servir com excelência</li>
-                        <li><i class="fas fa-check"></i> Montagem de mesas sofisticadas</li>
-                        <li><i class="fas fa-check"></i> Dobraduras de têxteis</li>
-                        <li><i class="fas fa-check"></i> Postura e comunicação</li>
-                        <li><i class="fas fa-check"></i> Vestimenta adequada</li>
-                    </ul>
-                    <div class="ct-consultoria" style="font-size: 1.2rem;">
-                        <p>Oferecemos também o pacote extra da <br><strong class="destaque">R.O Consultoria</strong> para treinamento personalizado na residência.</p>
-                        <a href="https://roconsultoria.com.br" target="_blank" class="consultoria-link">
-                            <!-- Placeholder para logo R.O Consultoria -->
-                            <img src="/imagens/logo-ro-consultoria.png" alt="R.O Consultoria">
-                        </a>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Status -->
+        <div class="maintenance-status">
+            <div class="status-indicator"></div>
+            <span class="status-text">Trabalhando nas melhorias</span>
         </div>
-    </section>
-
-    <!-- Seção 3 - Problemas Atuais + Solução -->
-    <section id="solucao" class="problemas-solucao">
-        <div class="container">
-            <div class="problemas">
-                <h2 class="section-title">Problemas Comuns na Contratação Doméstica</h2>
-                <div class="problemas-grid">
-                    <div class="problema-item">
-                        <i class="fas fa-times-circle"></i>
-                        <h4>Alta Rotatividade</h4>
-                        <p>Profissionais sem preparo adequado</p>
-                    </div>
-                    <div class="problema-item">
-                        <i class="fas fa-user-slash"></i>
-                        <h4>Falta de Qualificação</h4>
-                        <p>Desconhecimento de protocolos de alto padrão</p>
-                    </div>
-                    <div class="problema-item">
-                        <i class="fas fa-clock"></i>
-                        <h4>Processo Demorado</h4>
-                        <p>Dificuldade em encontrar o profissional ideal</p>
-                    </div>
-                    <div class="problema-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <h4>Falta de Confiança</h4>
-                        <p>Insegurança na contratação e falta de suporte adequado</p>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Barra de progresso -->
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <!-- Informações de contato -->
+        <div class="contact-info">
+            <h3>
+                <i class="fas fa-headset"></i>
+                Precisa falar conosco?
+            </h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Nossa equipe continua disponível para atendê-lo
+            </p>
             
-            <div class="solucao">
-                <h2 class="section-title">Nossa Solução</h2>
-                <div class="solucao-content">
-                    <p style="font-size: 1.2rem;">A R.O Recrutamento oferece uma abordagem completa e inovadora para resolver todos esses desafios. Através de nosso processo criterioso de seleção e capacitação, garantimos que todo profissional indicado <span class="highlight">passou obrigatoriamente pelo nosso Centro de Treinamento</span>, estando um passo a frente de outros colaboradores, e também oferecendo um <span class="highlight">bom suporte</span> como agência.</p>
-                    <a href="sobrenos.html" class="btn-cobre">Saiba Mais</a>
-                </div>
+            <div class="contact-links">
+                <a href="https://wa.me/5511999999999" class="contact-link" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                </a>
+                <a href="mailto:contato@rorecrutamento.com.br" class="contact-link">
+                    <i class="fas fa-envelope"></i>
+                    E-mail
+                </a>
+                <a href="tel:+5511999999999" class="contact-link">
+                    <i class="fas fa-phone"></i>
+                    Telefone
+                </a>
+            </div>
             </div>
         </div>
-    </section>
-
-    <!-- Seção 4 - Nossa Base Sólida -->
-    <section class="base-solida">
-        <div class="container">
-            <h2 class="section-title">Nossa Base Sólida</h2>
-            <div class="base-content">
-                <div class="base-item">
-                    <i class="fas fa-user-tie"></i>
-                    <h3>Experiência do Fundador</h3>
-                    <p>Anos de vivência em residências de alto padrão, entendendo profundamente as necessidades do setor</p>
-                </div>
-                <div class="base-item">
-                    <i class="fas fa-home"></i>
-                    <h3>Conexão com a Quinta da Baroneza</h3>
-                    <p>Metodologia desenvolvida e testada no condomínio mais exclusivo da região</p>
-                </div>
-                <div class="base-item">
-                    <i class="fas fa-medal"></i>
-                    <h3>Diferenciais Únicos</h3>
-                    <p>Métodos exclusivos que garantem resultados superiores na formação de profissionais</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção 5 - A Expertise por Trás da Empresa -->
-    <section class="expertise">
-        <div class="container">
-            <h2 class="section-title">A Expertise por Trás da Empresa</h2>
-            <div class="expertise-content">
-                <div class="ricardo-info">
-                    <h3>Ricardo Oliveira</h3>
-                    <h4>
-                        <p>Fundador da <span class="highlight">R.O Recrutamento</span> e da <span class="destaque">R.O Consultoria</span> <br>
-                    </h4> Ricardo traz uma bagagem única de experiências que o qualificam como especialista em formar profissionais para residências de alto padrão. Sua trajetória inclui anos de dedicação ao setor, sempre com foco na excelência e no desenvolvimento de talentos.</p>
-                    <a href="sobrenos.html" class="btn-cobre">Saiba Mais</a>
-                </div>
-                <div class="ricardo-image">
-                    <!-- Placeholder para foto do Ricardo -->
-                    <picture>
-                        <source media="(max-width: 768px)" srcset="/imagens/foto-ricardo-2.png">
-                        <img src="/imagens/foto-ricardo-2.png" alt="Ricardo Oliveira - Fundador R.O Recrutamento">
-                    </picture>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Final -->
-    <section id="contato" class="cta-final">
-        <div class="container">
-            <h2 class="section-title">Conecte-se com a Excelência</h2>
-            <div class="cta-cards">
-                <!-- Card Colaborador -->
-                <div class="cta-card colaborador-card">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h3>Para o Colaborador</h3>
-                    <p>Se você está à procura de um novo emprego, quer se capacitar para conseguir uma vaga, venha que sua chance é agora! Preencha o formulário e aguarde nosso contato para marcarmos o treinamento.</p>
-                    <a href="#form-colaborador" class="btn-cobre">Quero me Capacitar</a>
-                </div>
-                
-                <!-- Card Proprietário -->
-                <div class="cta-card proprietario-card">
-                    <i class="fas fa-home"></i>
-                    <h3>Para o Proprietário</h3>
-                    <p>Se você tem dificuldade em encontrar profissionais qualificados para sua residência, nós temos a solução. Preencha o formulário de triagem e aguarde nosso contato com as indicações!</p>
-                    <a href="#form-proprietario" class="btn-cobre">Encontrar Profissionais</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
 
     <!-- FOOTER CONTAINER (será carregado via JS) -->
     <div id="footer-container"></div>
@@ -261,38 +350,23 @@
     <!-- Scripts -->
     <script src="components/components.js"></script>
     <script>
-        // Smooth scrolling para links internos
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+        // Animação de entrada suave
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.maintenance-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'opacity 1s ease, transform 1s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
         });
 
-        // Animação de entrada dos elementos ao scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-in');
-                }
-            });
-        }, observerOptions);
-
-        // Observar elementos para animação
-        document.querySelectorAll('.processo-item, .problema-item, .base-item, .cta-card').forEach(el => {
-            observer.observe(el);
-        });
+        // Atualização automática da página (opcional)
+        // setTimeout(() => {
+        //     window.location.reload();
+        // }, 300000); // Recarrega a cada 5 minutos
     </script>
 </body>
 </html>
