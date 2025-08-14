@@ -1,0 +1,488 @@
+/* ===================================
+   R.O RECRUTAMENTO - GLOBAL.CSS
+   Sistema de Design Unificado
+   Mobile First Approach
+   =================================== */
+
+/* ========================================
+   VARIÁVEIS CSS GLOBAIS
+   ======================================== */
+:root {
+    /* Cores Primárias */
+    --primary-bronze: linear-gradient(to right, #a65e2e, #d39666, #b8763d);
+    --bronze-solid: #a65e2e;
+    --bronze-light: #d39666;
+    --bronze-medium: #b8763d;
+    --bronze-dark: #8B4513;
+    
+    /* Cores de Texto */
+    --text-light: #fff;
+    --text-muted: #dfdfdf;
+    --text-bronze: #d39666;
+    
+    /* Cores de Fundo */
+    --dark-bg: #111;
+    --cor-fundo: #111111;
+    --cor-borda: rgba(166, 94, 46, 0.3);
+    
+    /* Tipografia */
+    --fonte-principal: 'Raleway', Arial, sans-serif;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    
+    /* Espaçamentos */
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;      /* 48px */
+    --spacing-3xl: 4rem;      /* 64px */
+    --spacing-4xl: 5rem;      /* 80px */
+    
+    /* Sombras */
+    --sombra-leve: 0 2px 10px rgba(0,0,0,0.3);
+    --sombra-media: 0 5px 20px rgba(0,0,0,0.4);
+    --sombra-forte: 0 10px 30px rgba(0,0,0,0.5);
+    --sombra-bronze: 0 5px 15px rgba(166, 94, 46, 0.4);
+    
+    /* Transições */
+    --transicao: all 0.3s ease;
+    --transicao-rapida: all 0.2s ease;
+    --transicao-lenta: all 0.5s ease;
+    
+    /* Border Radius */
+    --border-radius: 20px;
+    --border-radius-sm: 10px;
+    --border-radius-lg: 25px;
+    --border-radius-circle: 50%;
+}
+
+/* ========================================
+   RESET CSS
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+/* ========================================
+   BASE GLOBAL
+   ======================================== */
+body {
+    font-family: var(--fonte-principal);
+    color: var(--text-light);
+    background-color: var(--dark-bg);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Textura de fundo global */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../imagens/textura-15.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.30;
+    z-index: -1;
+    pointer-events: none;
+    animation: backgroundFloat 15s ease-in-out infinite;
+    filter: blur(2px);
+}
+
+@keyframes backgroundFloat {
+    0%, 100% { 
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.3;
+    }
+    25% { 
+        transform: translateY(-10px) rotate(1deg);
+        opacity: 0.4;
+    }
+    50% { 
+        transform: translateY(5px) rotate(-0.5deg);
+        opacity: 0.25;
+    }
+    75% { 
+        transform: translateY(-5px) rotate(0.8deg);
+        opacity: 0.35;
+    }
+}
+
+/* ========================================
+   TIPOGRAFIA GLOBAL
+   ======================================== */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-bold);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-light);
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-muted);
+}
+
+/* Links globais */
+a {
+    color: var(--bronze-light);
+    text-decoration: none;
+    transition: var(--transicao);
+}
+
+a:hover {
+    color: var(--bronze-solid);
+}
+
+/* ========================================
+   CLASSES DE DESTAQUE GLOBAIS
+   ======================================== */
+.highlight {
+    font-weight: var(--font-weight-extrabold);
+    background: linear-gradient(135deg, #b8763d, #d39666, #a65e2e, #d39666, #b8763d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    display: inline;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.destaque {
+    font-weight: var(--font-weight-extrabold);
+    background: linear-gradient(135deg, #c9b037, #ffe135, #a67c00, #ffed4e, #b8860b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    display: inline;
+    font-size: inherit;
+    line-height: inherit;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ========================================
+   CONTAINER GLOBAL
+   ======================================== */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+/* ========================================
+   TÍTULOS DE SEÇÃO GLOBAIS
+   ======================================== */
+.section-title {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-2xl);
+    position: relative;
+    padding-bottom: var(--spacing-md);
+    background: linear-gradient(135deg, #b8763d, #d39666, #a65e2e, #d39666, #b8763d);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease-in-out infinite;
+    font-weight: var(--font-weight-bold);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    height: 3px;
+    background: linear-gradient(to right, 
+        rgba(166, 94, 46, 0) 0%, 
+        rgba(166, 94, 46, 0.5) 20%, 
+        rgba(166, 94, 46, 1) 50%, 
+        rgba(166, 94, 46, 0.5) 80%, 
+        rgba(166, 94, 46, 0) 100%
+    );
+}
+
+/* ========================================
+   BOTÕES GLOBAIS
+   ======================================== */
+.btn-cobre {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    background: var(--primary-bronze);
+    color: #111;
+    padding: 12px 30px;
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    transition: var(--transicao);
+    box-shadow: var(--sombra-bronze);
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    font-family: var(--fonte-principal);
+    font-size: 1rem;
+}
+
+.btn-cobre:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(166, 94, 46, 0.6);
+    filter: brightness(1.1);
+    color: #111;
+}
+
+.btn-cobre:active {
+    transform: translateY(0);
+}
+
+.btn-small {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+}
+
+.btn-large {
+    padding: 16px 40px;
+    font-size: 1.1rem;
+}
+
+/* ========================================
+   CARDS GLOBAIS
+   ======================================== */
+.card-bronze {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: var(--transicao);
+}
+
+.card-bronze:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+/* ========================================
+   ANIMAÇÕES GLOBAIS
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ========================================
+   ELEMENTOS DE IMAGEM GLOBAIS
+   ======================================== */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.image-bronze {
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: var(--transicao);
+}
+
+.image-bronze:hover {
+    transform: scale(1.02);
+}
+
+/* ========================================
+   UTILITÁRIOS GLOBAIS
+   ======================================== */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mt-xs { margin-top: var(--spacing-xs); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+.mb-xs { margin-bottom: var(--spacing-xs); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+.hidden { display: none; }
+.visible { display: block; }
+
+/* ========================================
+   RESPONSIVIDADE GLOBAL
+   ======================================== */
+
+/* Tablet */
+@media (min-width: 768px) {
+    .container {
+        padding: 0 var(--spacing-xl);
+    }
+    
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 2rem; }
+    h3 { font-size: 1.75rem; }
+    
+    .section-title {
+        font-size: 2.8rem;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .container {
+        padding: 0 var(--spacing-2xl);
+    }
+    
+    h1 { font-size: 3rem; }
+    h2 { font-size: 2.5rem; }
+    h3 { font-size: 2rem; }
+    
+    .section-title {
+        font-size: 3.2rem;
+    }
+}
+
+/* Desktop Large */
+@media (min-width: 1200px) {
+    h1 { font-size: 3.5rem; }
+    
+    .section-title {
+        font-size: 3.5rem;
+    }
+}
+
+/* ========================================
+   ACESSIBILIDADE
+   ======================================== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--bronze-light);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    body::before {
+        display: none;
+    }
+    
+    .btn-cobre {
+        display: none;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+        color: black;
+    }
+    
+    img {
+        page-break-inside: avoid;
+    }
+    
+    p {
+        color: black;
+    }
+}

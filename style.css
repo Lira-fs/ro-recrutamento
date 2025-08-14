@@ -1,0 +1,617 @@
+/* ===================================
+   R.O RECRUTAMENTO - STYLE.CSS
+   Estilos específicos da página inicial
+   Requer: global.css (importar antes)
+   =================================== */
+
+/* ========================================
+   AJUSTES ESPECÍFICOS DA HOME
+   ======================================== */
+body {
+    padding-top: 80px; /* Compensa header fixo */
+}
+
+/* ========================================
+   HERO SECTION - HOME
+   ======================================== */
+.hero {
+    padding: 60px 0;
+    position: relative;
+}
+
+.hero-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding: 0 var(--spacing-md);
+}
+
+.hero-content {
+    text-align: center;
+    animation: fadeInUp 0.8s ease;
+}
+
+.hero-content h1 {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.3s forwards;
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.hero-divider {
+    width: 1px;
+    height: 450px;
+    background: linear-gradient(to bottom, transparent, #ffe600, transparent);
+    margin: 0 var(--spacing-md);
+    flex-shrink: 0;
+    display: none;
+}
+
+.hero-image {
+    width: 100%;
+    height: 500px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-bronze);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    border: 4px solid var(--cor-borda);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.6s forwards;
+}
+
+/* ========================================
+   SEÇÃO METODOLOGIA
+   ======================================== */
+.metodologia {
+    padding: 60px 0;
+}
+
+.processo-container {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.processo-item {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: var(--transicao);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.processo-item.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.processo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.processo-numero {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-bronze);
+    color: #111;
+    border-radius: var(--border-radius-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    margin: 0 auto 1rem;
+    box-shadow: var(--sombra-bronze);
+}
+
+.processo-seta {
+    display: none;
+}
+
+.resultado-box {
+    background: rgba(166, 94, 46, 0.1);
+    color: #111;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    text-align: center;
+}
+
+.resultado-box h3 {
+    color: #111;
+    margin-bottom: 1rem;
+}
+
+.resultado-box p {
+    color: var(--text-light);
+    margin-bottom: 0;
+}
+
+/* ========================================
+   CENTRO DE TREINAMENTO
+   ======================================== */
+.centro-treinamento {
+    padding: 60px 0;
+}
+
+.ct-content {
+    display: grid;
+    gap: 2rem;
+}
+
+.ct-localizacao {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.ct-localizacao i {
+    color: var(--bronze-light);
+    font-size: 1.5rem;
+}
+
+.ct-image {
+    width: 100%;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--sombra-bronze);
+    margin-bottom: 2rem;
+    border: 2px solid var(--cor-borda);
+}
+
+.ct-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.ct-ensino h3 {
+    color: var(--bronze-light);
+    margin-bottom: 1.5rem;
+}
+
+.ct-ensino ul {
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.ct-ensino li {
+    padding: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+}
+
+.ct-ensino li i {
+    color: #4CAF50;
+}
+
+.ct-consultoria {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 2px solid var(--cor-borda);
+}
+
+.consultoria-link {
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.consultoria-link img {
+    height: 40px;
+    width: auto;
+}
+
+/* ========================================
+   PROBLEMAS E SOLUÇÃO
+   ======================================== */
+.problemas-solucao {
+    padding: 60px 0;
+}
+
+.problemas {
+    margin-bottom: 4rem;
+}
+
+.problemas-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.problema-item {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: var(--transicao);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.problema-item.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.problema-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.problema-item i {
+    font-size: 3rem;
+    color: #E74C3C;
+    margin-bottom: 1rem;
+}
+
+.problema-item h4 {
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.problema-item p {
+    color: var(--text-muted);
+}
+
+.solucao-content {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+}
+
+.solucao-content p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+/* ========================================
+   BASE SÓLIDA
+   ======================================== */
+.base-solida {
+    padding: 60px 0;
+}
+
+.base-content {
+    display: grid;
+    gap: 2rem;
+}
+
+.base-item {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--cor-borda);
+    box-shadow: var(--sombra-bronze);
+    transition: var(--transicao);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.base-item.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.base-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.base-item i {
+    font-size: 3rem;
+    color: var(--bronze-light);
+    margin-bottom: 1rem;
+}
+
+.base-item h3 {
+    color: var(--bronze-light);
+    margin-bottom: 1rem;
+}
+
+.base-item p {
+    color: var(--text-muted);
+}
+
+/* ========================================
+   EXPERTISE
+   ======================================== */
+.expertise {
+    padding: 60px 0;
+    background: rgba(17, 17, 17, 0.7);
+    border-top: 1px solid var(--cor-borda);
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.expertise-content {
+    display: grid;
+    gap: 2rem;
+}
+
+.ricardo-info {
+    text-align: center;
+}
+
+.ricardo-info h3 {
+    color: var(--bronze-light);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.ricardo-info p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+.ricardo-image {
+    width: 100%;
+    max-width: 400px;
+    max-height: 500px;
+    margin: 0 auto;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+}
+
+.ricardo-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ========================================
+   CTA FINAL
+   ======================================== */
+.cta-final {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--bronze-solid) 0%, var(--bronze-dark) 100%);
+    color: var(--text-light);
+    position: relative;
+}
+
+.cta-final::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.cta-final .container {
+    position: relative;
+    z-index: 2;
+}
+
+.cta-final .section-title {
+    color: var(--text-light);
+    -webkit-text-fill-color: var(--text-light);
+}
+
+.cta-final .section-title::after {
+    background-color: var(--text-light);
+}
+
+.cta-cards {
+    display: grid;
+    gap: 2rem;
+}
+
+.cta-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: var(--transicao);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.cta-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cta-card:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cta-card i {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.cta-card h3 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+}
+
+.cta-card p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.cta-card .btn-cobre {
+    background-color: var(--text-light);
+    color: var(--text-light);
+    font-weight: var(--font-weight-bold);
+}
+
+.cta-card .btn-cobre:hover {
+    background-color: #F0F0F0;
+    color: var(--bronze-dark);
+    font-weight: var(--font-weight-bold);
+}
+
+/* ========================================
+   RESPONSIVIDADE ESPECÍFICA - TABLET
+   ======================================== */
+@media (min-width: 768px) {
+    /* Hero */
+    .hero {
+        padding: 80px 0;
+    }
+    
+    .hero-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .hero-content {
+        text-align: left;
+        flex: 1;
+    }
+    
+    .hero-divider {
+        display: block;
+        width: 2px;
+        height: 300px;
+        background: linear-gradient(to bottom, transparent, var(--bronze-light), transparent);
+        margin: 0 3rem;
+    }
+    
+    .hero-image {
+        flex: 1;
+    }
+    
+    /* Processo */
+    .processo-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .processo-seta {
+        display: block;
+        font-size: 2rem;
+        color: var(--bronze-light);
+        text-align: center;
+        align-self: center;
+    }
+    
+    /* Centro de Treinamento */
+    .ct-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+    
+    /* Problemas */
+    .problemas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Base Sólida */
+    .base-content {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    /* Expertise */
+    .expertise-content {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+    }
+    
+    .ricardo-info {
+        text-align: left;
+    }
+    
+    /* CTA Cards */
+    .cta-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE ESPECÍFICA - DESKTOP
+   ======================================== */
+@media (min-width: 1024px) {
+    /* Hero */
+    .hero {
+        padding: 100px 0;
+    }
+    
+    .hero-content h1 {
+        font-size: 3.5rem;
+    }
+    
+    /* Processo */
+    .processo-container {
+        grid-template-columns: repeat(6, 1fr);
+        align-items: center;
+    }
+    
+    .processo-item {
+        grid-column: span 1;
+    }
+    
+    .processo-seta {
+        grid-column: span 1;
+        font-size: 2.9rem;
+    }
+    
+    /* Problemas */
+    .problemas-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ========================================
+   MELHORIAS DE PERFORMANCE ESPECÍFICAS
+   ======================================== */
+img[loading="lazy"] {
+    background: rgba(166, 94, 46, 0.1);
+}

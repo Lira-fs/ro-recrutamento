@@ -1,0 +1,764 @@
+/* ===================================
+   R.O RECRUTAMENTO - PROPRIETARIOS.CSS
+   Estilos específicos da página proprietários
+   Requer: global.css (importar antes)
+   =================================== */
+
+/* ========================================
+   HERO SECTION - PROPRIETÁRIOS
+   ======================================== */
+.proprietarios-hero {
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.proprietarios-hero .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: var(--font-weight-extrabold);
+    color: var(--text-light);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-2xl);
+    line-height: 1.6;
+}
+
+.problemas-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.problema-card {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: all 0.3s ease;
+    padding: 30px 20px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.problema-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.problema-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.problema-card i {
+    font-size: 2.5rem;
+    color: var(--bronze-light);
+    margin-bottom: var(--spacing-md);
+}
+
+.problema-card h3 {
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-light);
+}
+
+.problema-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-bronze);
+    transition: var(--transicao);
+    border: 2px solid var(--cor-borda);
+}
+
+.hero-image img:hover {
+    transform: scale(1.02);
+}
+
+/* ========================================
+   SEÇÃO NOSSO PROCESSO
+   ======================================== */
+.nosso-processo {
+    padding: 80px 0;
+}
+
+.processo-timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.processo-timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--bronze-solid), var(--bronze-light));
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.processo-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-2xl);
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: all 0.6s ease;
+}
+
+.processo-step.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.processo-step:nth-child(even) {
+    flex-direction: row-reverse;
+    transform: translateX(30px);
+}
+
+.processo-step:nth-child(even).animate-in {
+    transform: translateX(0);
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-bronze);
+    color: #111;
+    border-radius: var(--border-radius-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--sombra-bronze);
+    z-index: 2;
+    position: relative;
+}
+
+.step-content {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    padding: 25px 30px;
+    margin: 0 30px;
+    flex: 1;
+    transition: var(--transicao);
+}
+
+.step-content:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.step-content h3 {
+    font-size: 1.3rem;
+    color: var(--bronze-light);
+    margin-bottom: var(--spacing-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.step-content p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.alerta-box {
+    background: rgba(166, 94, 46, 0.15);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--bronze-light);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-xl);
+    margin-top: 60px;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    box-shadow: var(--sombra-bronze);
+}
+
+.alerta-box i {
+    font-size: 2rem;
+    color: var(--bronze-light);
+    margin-top: 5px;
+}
+
+.alerta-content h3 {
+    color: var(--bronze-light);
+    font-size: 1.3rem;
+    margin-bottom: var(--spacing-sm);
+    font-weight: var(--font-weight-bold);
+}
+
+.alerta-content p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* ========================================
+   SEÇÃO TREINAMENTO PERSONALIZADO
+   ======================================== */
+.treinamento-personalizado {
+    padding: 80px 0;
+}
+
+.treinamento-intro {
+    text-align: center;
+    margin-bottom: 60px;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.treinamento-processo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+}
+
+.tp-step {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: all 0.3s ease;
+    padding: 30px 25px;
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+    max-width: 250px;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.tp-step.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tp-step:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.tp-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--primary-bronze);
+    border-radius: var(--border-radius-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--spacing-md);
+    box-shadow: var(--sombra-bronze);
+}
+
+.tp-icon i {
+    font-size: 1.8rem;
+    color: #111;
+}
+
+.tp-step h3 {
+    font-size: 1.1rem;
+    color: var(--bronze-light);
+    margin-bottom: var(--spacing-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.tp-step p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.tp-arrow {
+    font-size: 2rem;
+    color: var(--bronze-light);
+    font-weight: var(--font-weight-bold);
+}
+
+.missao-box {
+    background: rgba(166, 94, 46, 0.15);
+    backdrop-filter: blur(10px);
+    color: var(--text-light);
+    padding: var(--spacing-2xl);
+    border-radius: var(--border-radius);
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+}
+
+.missao-box h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--bronze-light);
+}
+
+.missao-box p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.cta-consultoria {
+    text-align: center;
+}
+
+.consultoria-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    flex-wrap: wrap;
+}
+
+.consultoria-divider {
+    width: 2px;
+    height: 50px;
+    background: linear-gradient(180deg, var(--bronze-solid), var(--bronze-light));
+    border-radius: 1px;
+}
+
+.consultoria-logo img {
+    height: 60px;
+    width: auto;
+    transition: var(--transicao);
+}
+
+.consultoria-logo:hover img {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   SEÇÃO COLETA DE DADOS
+   ======================================== */
+.coleta-dados {
+    padding: 80px 0;
+}
+
+.selector-intro {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 50px;
+}
+
+.funcoes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.funcao-card {
+    background: rgba(166, 94, 46, 0.1);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--cor-borda);
+    border-radius: 15px;
+    box-shadow: var(--sombra-bronze);
+    transition: all 0.3s ease;
+    padding: 30px 25px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.funcao-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.funcao-card:hover {
+    border-color: var(--bronze-light);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46, 0.15);
+}
+
+.funcao-card i {
+    font-size: 3rem;
+    color: var(--bronze-light);
+    margin-bottom: var(--spacing-md);
+    transition: var(--transicao);
+}
+
+.funcao-card:hover i {
+    transform: scale(1.1);
+}
+
+.funcao-card h3 {
+    font-size: 1.3rem;
+    color: var(--text-light);
+    margin-bottom: var(--spacing-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.funcao-card p {
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ========================================
+   CTA FINAL (se existir na página)
+   ======================================== */
+.cta-final {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--bronze-solid) 0%, var(--bronze-dark) 100%);
+    color: var(--text-light);
+    position: relative;
+}
+
+.cta-final::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.cta-final .container {
+    position: relative;
+    z-index: 2;
+}
+
+.cta-final .section-title {
+    color: var(--text-light);
+    -webkit-text-fill-color: var(--text-light);
+}
+
+.cta-final .section-title::after {
+    background-color: var(--text-light);
+}
+
+.cta-cards {
+    display: grid;
+    gap: 2rem;
+}
+
+.cta-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: var(--transicao);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.cta-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cta-card:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cta-card i {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.cta-card h3 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+}
+
+.cta-card p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.cta-card .btn-cobre {
+    background: var(--primary-bronze);
+    color: #111;
+    font-weight: var(--font-weight-bold);
+}
+
+.cta-card .btn-cobre:hover {
+    background: #F0F0F0;
+    color: var(--bronze-dark);
+    font-weight: var(--font-weight-bold);
+}
+
+/* ========================================
+   RESPONSIVIDADE ESPECÍFICA - TABLET
+   ======================================== */
+@media (max-width: 1024px) {
+    .proprietarios-hero .container {
+        gap: var(--spacing-2xl);
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .treinamento-processo {
+        gap: var(--spacing-md);
+    }
+    
+    .tp-arrow {
+        transform: rotate(90deg);
+        font-size: 1.5rem;
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE ESPECÍFICA - MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+    .proprietarios-hero {
+        padding: 80px 0 60px;
+    }
+    
+    .proprietarios-hero .container {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-2xl);
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .problemas-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .problema-card {
+        padding: 25px var(--spacing-md);
+    }
+    
+    .nosso-processo {
+        padding: 60px 0;
+    }
+    
+    .processo-timeline::before {
+        left: 30px;
+    }
+    
+    .processo-step {
+        flex-direction: row !important;
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .processo-step:nth-child(even) {
+        flex-direction: row !important;
+    }
+    
+    .step-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        margin-left: 5px;
+        margin-right: var(--spacing-md);
+    }
+    
+    .step-content {
+        margin: 0;
+        flex: 1;
+    }
+    
+    .step-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .alerta-box {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-md);
+        padding: 25px var(--spacing-md);
+    }
+    
+    .treinamento-personalizado {
+        padding: 60px 0;
+    }
+    
+    .treinamento-intro {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-2xl);
+    }
+    
+    .treinamento-processo {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .tp-step {
+        max-width: 100%;
+        min-width: auto;
+    }
+    
+    .tp-arrow {
+        transform: rotate(90deg);
+        font-size: 1.5rem;
+    }
+    
+    .missao-box {
+        padding: var(--spacing-xl) var(--spacing-md);
+    }
+    
+    .consultoria-content {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .consultoria-divider {
+        width: 50px;
+        height: 2px;
+        transform: rotate(90deg);
+    }
+    
+    .coleta-dados {
+        padding: 60px 0;
+    }
+    
+    .funcoes-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .funcao-card {
+        padding: 25px var(--spacing-md);
+    }
+    
+    .funcao-card i {
+        font-size: 2.5rem;
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE ESPECÍFICA - MOBILE SMALL
+   ======================================== */
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .problema-card {
+        padding: var(--spacing-md) var(--spacing-md);
+    }
+    
+    .problema-card i {
+        font-size: 2rem;
+    }
+    
+    .step-content {
+        padding: var(--spacing-md);
+    }
+    
+    .tp-step {
+        padding: 25px var(--spacing-md);
+    }
+    
+    .tp-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .tp-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .missao-box {
+        padding: 25px var(--spacing-md);
+    }
+    
+    .funcao-card {
+        padding: var(--spacing-md) var(--spacing-md);
+    }
+}
+
+/* ========================================
+   DELAYS PARA ANIMAÇÕES EM CASCATA
+   ======================================== */
+.problema-card:nth-child(1) { animation-delay: 0.1s; }
+.problema-card:nth-child(2) { animation-delay: 0.2s; }
+.problema-card:nth-child(3) { animation-delay: 0.3s; }
+.problema-card:nth-child(4) { animation-delay: 0.4s; }
+
+.processo-step:nth-child(1) { animation-delay: 0.1s; }
+.processo-step:nth-child(2) { animation-delay: 0.2s; }
+.processo-step:nth-child(3) { animation-delay: 0.3s; }
+.processo-step:nth-child(4) { animation-delay: 0.4s; }
+.processo-step:nth-child(5) { animation-delay: 0.5s; }
+.processo-step:nth-child(6) { animation-delay: 0.6s; }
+.processo-step:nth-child(7) { animation-delay: 0.7s; }
+
+.tp-step:nth-child(1) { animation-delay: 0.1s; }
+.tp-step:nth-child(3) { animation-delay: 0.2s; }
+.tp-step:nth-child(5) { animation-delay: 0.3s; }
+.tp-step:nth-child(7) { animation-delay: 0.4s; }
+
+.funcao-card:nth-child(1) { animation-delay: 0.1s; }
+.funcao-card:nth-child(2) { animation-delay: 0.2s; }
+.funcao-card:nth-child(3) { animation-delay: 0.3s; }
+.funcao-card:nth-child(4) { animation-delay: 0.4s; }
+.funcao-card:nth-child(5) { animation-delay: 0.5s; }
+.funcao-card:nth-child(6) { animation-delay: 0.6s; }

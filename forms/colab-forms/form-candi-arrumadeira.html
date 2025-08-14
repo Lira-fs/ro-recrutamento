@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Candidato - Arrumadeira | R.O Recrutamento</title>
+    <meta name="description" content="Cadastre-se como arrumadeira na R.O Recrutamento. Formulário para profissionais qualificados em limpeza e organização residencial de alto padrão.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS - CAMINHOS CORRETOS -->
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../components/components.css">
+    <link rel="stylesheet" href="../../style/form-style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos específicos para campos condicionais -->
+    <style>
+        /* Campos condicionais inicialmente ocultos */
+        .outros-residencia,
+        .outros-equipamentos,
+        .outros-tecnicas,
+        .outros-produtos,
+        .outros-metodos,
+        .outros-certificacoes,
+        .outros-animais,
+        .animais-details,
+        .alergia-details,
+        .restricao-details,
+        .problemas-details,
+        .veiculo-details,
+        .alto-padrao-details,
+        .referencias-section,
+        .ref1-outro,
+        .ref2-outro {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Mostrar campos quando ativados */
+        .outros-residencia.show,
+        .outros-equipamentos.show,
+        .outros-tecnicas.show,
+        .outros-produtos.show,
+        .outros-metodos.show,
+        .outros-certificacoes.show,
+        .outros-animais.show,
+        .animais-details.show,
+        .alergia-details.show,
+        .restricao-details.show,
+        .problemas-details.show,
+        .veiculo-details.show,
+        .alto-padrao-details.show,
+        .referencias-section.show,
+        .ref1-outro.show,
+        .ref2-outro.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Formulário Principal -->
+    <main class="form-main">
+        <div class="container">
+            <form id="formArrumadeira" class="candidate-form">
+                <input type="hidden" name="formulario_id" value="candi-arrumadeira">
+                
+                <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
+                <div id="treinamento-obrigatorio-container"></div>
+                <div id="dados-pessoais-container"></div>
+                <div id="contato-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL ARRUMADEIRA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Experiência Profissional - Arrumadeira
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="tempoExperiencia">Tempo total de experiência como arrumadeira <span class="required-asterisk">*</span></label>
+                            <select id="tempoExperiencia" name="tempoExperiencia" required>
+                                <option value="">Selecione</option>
+                                <option value="1-2-anos">1-2 anos</option>
+                                <option value="2-3-anos">2-3 anos</option>
+                                <option value="3-5-anos">3-5 anos</option>
+                                <option value="5-10-anos">5-10 anos</option>
+                                <option value="mais-10-anos">Mais de 10 anos</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Experiência em residência de alto padrão?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="alto-padrao-details">
+                            <div class="form-group">
+                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
+                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Tipos de residência onde já trabalhou (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="nenhuma">
+                                <span>Nenhuma antes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="apartamentos">
+                                <span>Apartamentos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="casas-campo">
+                                <span>Casas de campo (veraneio)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="mansoes">
+                                <span>Mansões (residentes)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-residencia">
+                            <div class="form-group">
+                                <label for="outrosResidenciaEspecificar">Especificar outros tipos</label>
+                                <input type="text" id="outrosResidenciaEspecificar" name="outrosResidenciaEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Possui referências profissionais verificáveis?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="possuiReferencias" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="possuiReferencias" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Referências -->
+                    <div class="referencias-section">
+                        <h3>Referências Profissionais</h3>
+                        
+                        <!-- Referência 1 -->
+                        <div class="referencia-card">
+                            <h4>Referência 1</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ref1Nome">Nome</label>
+                                    <input type="text" id="ref1Nome" name="ref1Nome">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Telefone">Telefone</label>
+                                    <input type="tel" id="ref1Telefone" name="ref1Telefone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Inicio">Período - Início</label>
+                                    <input type="month" id="ref1Inicio" name="ref1Inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Fim">Período - Fim</label>
+                                    <input type="month" id="ref1Fim" name="ref1Fim">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Relacao">Relação</label>
+                                    <select id="ref1Relacao" name="ref1Relacao">
+                                        <option value="">Selecione</option>
+                                        <option value="ex-patrao">Ex-patrão</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group ref1-outro">
+                                    <label for="ref1OutroEspecificar">Especificar relação</label>
+                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Referência 2 -->
+                        <div class="referencia-card">
+                            <h4>Referência 2</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ref2Nome">Nome</label>
+                                    <input type="text" id="ref2Nome" name="ref2Nome">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Telefone">Telefone</label>
+                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Inicio">Período - Início</label>
+                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Fim">Período - Fim</label>
+                                    <input type="month" id="ref2Fim" name="ref2Fim">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Relacao">Relação</label>
+                                    <select id="ref2Relacao" name="ref2Relacao">
+                                        <option value="">Selecione</option>
+                                        <option value="ex-patrao">Ex-patrão</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group ref2-outro">
+                                    <label for="ref2OutroEspecificar">Especificar relação</label>
+                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS TÉCNICAS ARRUMADEIRA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-broom"></i>
+                        Competências Técnicas - Arrumadeira
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Conhecimento em equipamentos de limpeza específicos (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="enceradeira">
+                                <span>Enceradeira</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="extratora-carpetes">
+                                <span>Extratora de carpetes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="aspirador-profissional">
+                                <span>Aspirador de pó profissional</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="lavadora-alta-pressao">
+                                <span>Lavadora de alta pressão</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="vaporizador">
+                                <span>Vaporizador</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="lustrador-pisos">
+                                <span>Lustrador de pisos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipamentosLimpeza" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-equipamentos">
+                            <div class="form-group">
+                                <label for="outrosEquipamentosEspecificar">Especificar outros equipamentos</label>
+                                <input type="text" id="outrosEquipamentosEspecificar" name="outrosEquipamentosEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="organizacaoClosets">Experiência em organização de closets e armários de luxo</label>
+                        <select id="organizacaoClosets" name="organizacaoClosets">
+                            <option value="nao">Não tenho experiência</option>
+                            <option value="basico">Básico (organização simples)</option>
+                            <option value="intermediario">Intermediário (técnicas de dobra e armazenamento)</option>
+                            <option value="avancado">Avançado (organização profissional completa)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="montagemCama">Experiência em montagem de camas (padrão hotelaria)</label>
+                        <select id="montagemCama" name="montagemCama">
+                            <option value="nao">Não tenho experiência</option>
+                            <option value="basico">Básico (montagem simples)</option>
+                            <option value="intermediario">Intermediário (montagem com diferentes formas)</option>
+                            <option value="avancado">Avançado (montagem padrão hotelaria nível profissional)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="tecnicasLavanderia">Conhecimento em técnicas de lavanderia para tecidos finos</label>
+                        <select id="tecnicasLavanderia" name="tecnicasLavanderia">
+                            <option value="nao">Não tenho conhecimento</option>
+                            <option value="basico">Básico (separação por cores e tipos)</option>
+                            <option value="intermediario">Intermediário (tecidos delicados)</option>
+                            <option value="avancado">Avançado (seda, linho, cashmere, alta costura)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="habilidadePassar">Habilidade em passar roupas delicadas e de alta costura</label>
+                        <select id="habilidadePassar" name="habilidadePassar">
+                            <option value="basico">Básico (roupas simples)</option>
+                            <option value="intermediario">Intermediário (camisas, vestidos)</option>
+                            <option value="avancado">Avançado (peças delicadas, alta costura)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - ESPECIALIDADES EM ORGANIZAÇÃO -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-layer-group"></i>
+                        Especialidades em Organização
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Técnicas de organização que domina (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="marie-kondo">
+                                <span>Método Marie Kondo</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="organizacao-categorias">
+                                <span>Organização por categorias</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="sistemas-padrao-logica">
+                                <span>Sistemas padrão e lógica</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="rotulagem-profissional">
+                                <span>Rotulagem profissional</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="organizacao-sazonal">
+                                <span>Organização sazonal</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="personal-organizer">
+                                <span>Personal Organizer</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tecnicasOrganizacao" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-tecnicas">
+                            <div class="form-group">
+                                <label for="outrosTecnicasEspecificar">Especificar outras técnicas</label>
+                                <input type="text" id="outrosTecnicasEspecificar" name="outrosTecnicasEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="experienciaEventos">Experiência em organização de eventos em casa <i>(festas, comemorações, casamentos...)</i></label>
+                        <select id="experienciaEventos" name="experienciaEventos">
+                            <option value="nao">Não tenho experiência</option>
+                            <option value="preparacao-pre">Preparação pré-evento</option>
+                            <option value="limpeza-pos">Limpeza pós-evento</option>
+                            <option value="ambas">Ambas</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - PRODUTOS E TÉCNICAS DE LIMPEZA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-spray-can"></i>
+                        Produtos e Técnicas de Limpeza
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Conhecimento em produtos de limpeza específicos (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="produtos-madeira">
+                                <span>Produtos para madeira</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="produtos-marmore">
+                                <span>Produtos para mármore</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="produtos-prata">
+                                <span>Produtos para prata</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="produtos-cristal">
+                                <span>Produtos para cristal</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="produtos-ecologicos">
+                                <span>Produtos ecológicos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="produtos-importados">
+                                <span>Produtos importados</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="produtosLimpeza" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-produtos">
+                            <div class="form-group">
+                                <label for="outrosProdutosEspecificar">Especificar outros produtos</label>
+                                <input type="text" id="outrosProdutosEspecificar" name="outrosProdutosEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem alergia a algum produto de limpeza?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="alergiaLimpeza" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="alergiaLimpeza" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="alergia-details">
+                        <div class="form-group">
+                            <label for="especificarAlergia">Especifique a alergia</label>
+                            <input type="text" id="especificarAlergia" name="especificarAlergia">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Métodos de limpeza que domina (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="metodosLimpeza" value="limpeza-seco">
+                                <span>Limpeza a seco</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="metodosLimpeza" value="limpeza-vapor">
+                                <span>Limpeza a vapor</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="metodosLimpeza" value="enceramento">
+                                <span>Enceramento</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="metodosLimpeza" value="cristalizacao-pisos">
+                                <span>Cristalização de pisos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="metodosLimpeza" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-metodos">
+                            <div class="form-group">
+                                <label for="outrosMetodosEspecificar">Especificar outros métodos</label>
+                                <input type="text" id="outrosMetodosEspecificar" name="outrosMetodosEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="disponibilidade-container"></div>
+                <div id="pretensoes-condicoes-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - QUALIFICAÇÕES ADICIONAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        Qualificações Adicionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Possui certificações ou cursos relevantes? (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="personal-organizer">
+                                <span>Personal Organizer</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="governanca">
+                                <span>Governança</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="hotelaria">
+                                <span>Hotelaria</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="manipulacao-quimicos">
+                                <span>Manipulação de produtos químicos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="primeiros-socorros">
+                                <span>Primeiros Socorros</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-certificacoes">
+                            <div class="form-group">
+                                <label for="outrosCertificacoesEspecificar">Especificar outras certificações</label>
+                                <input type="text" id="outrosCertificacoesEspecificar" name="outrosCertificacoesEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - SITUAÇÕES ESPECIAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-home"></i>
+                        Situações Especiais
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Tem experiência com casas que possuem animais de estimação?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaAnimais" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaAnimais" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="animais-details">
+                        <div class="form-group full-width">
+                            <label>Tipos de animais (marque todos que se aplicam):</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="caes">
+                                    <span>Cães</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="gatos">
+                                    <span>Gatos</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="passaros">
+                                    <span>Pássaros</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="outros">
+                                    <span>Outros</span>
+                                </label>
+                            </div>
+                            
+                            <div class="outros-animais">
+                                <div class="form-group">
+                                    <label for="outrosAnimaisEspecificar">Especificar outros animais</label>
+                                    <input type="text" id="outrosAnimaisEspecificar" name="outrosAnimaisEspecificar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem experiência com crianças pequenas na casa?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaCriancas" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaCriancas" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaCriancas" value="prefiro-evitar" required>
+                                <span>Prefiro evitar</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="lidaObjetosValor">Como lida com objetos de valor ou frágeis?</label>
+                        <textarea id="lidaObjetosValor" name="lidaObjetosValor" rows="3" placeholder="Descreva sua experiência e cuidados com objetos de valor..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES DE SAÚDE -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-heartbeat"></i>
+                        Informações de Saúde
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Tem alguma restrição de saúde que possa afetar o trabalho?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="restricao-details">
+                        <div class="form-group">
+                            <label for="especificarRestricao">Especifique a restrição</label>
+                            <input type="text" id="especificarRestricao" name="especificarRestricao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fuma?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem problemas nas costas ou articulações?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="problemasArticulacoes" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="problemasArticulacoes" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="problemas-details">
+                        <div class="form-group">
+                            <label for="especificarProblemas">Especifique os problemas</label>
+                            <input type="text" id="especificarProblemas" name="especificarProblemas">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Possui veículo próprio?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="veiculoProprio" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="veiculoProprio" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="veiculo-details">
+                        <div class="form-group">
+                            <label for="tipoVeiculo">Tipo de veículo</label>
+                            <input type="text" id="tipoVeiculo" name="tipoVeiculo" placeholder="Ex: Carro, Moto">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - PERGUNTAS ABERTAS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Questões Profissionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="maiorDiferencial">Qual considera ser seu maior diferencial como arrumadeira?</label>
+                        <textarea id="maiorDiferencial" name="maiorDiferencial" rows="4" placeholder="Descreva qual é o seu maior diferencial profissional..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="organizaRotina">Como organiza sua rotina de trabalho para ser mais eficiente?</label>
+                        <textarea id="organizaRotina" name="organizaRotina" rows="4" placeholder="Descreva como você organiza e planeja seu trabalho..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ADICIONAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Informações Complementares
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
+                        <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Botão de Envio -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura
+                    </button>
+                    <p style="margin-top: var(--spacing-md); color: var(--text-muted); font-size: 0.9rem;">
+                        Ao enviar este formulário, você concorda com o processamento de seus dados pessoais conforme nossa política de privacidade.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- SCRIPTS - ORDEM CORRETA -->
+    <script type="module" src="../../components/supabase-config.js"></script>
+    <script src="../../components/components.js"></script>
+    <script src="../global-section.js"></script>
+    <!-- ✅ SCRIPT ARRUMADEIRA SIMPLIFICADO - SUBSTITUIR A ÚLTIMA TAG <script> -->
+<script type="module">
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inicializando formulário Arrumadeira (usando global-section.js)...');
+    
+    // ✅ USAR FUNÇÃO GLOBAL para carregar todas as seções padrão
+    carregarTodasSecoesPadrao();
+    
+    // ✅ Aguardar seções carregarem e inicializar campos específicos
+    setTimeout(() => {
+        initializeArrumadeiraSpecificFields();
+        console.log('✅ Arrumadeira: Campos específicos inicializados');
+        console.log('ℹ️ O envio será gerenciado automaticamente pelo global-section.js');
+    }, 1000);
+});
+
+// ===== APENAS OS CAMPOS ESPECÍFICOS DA ARRUMADEIRA =====
+function initializeArrumadeiraSpecificFields() {
+    console.log('🔧 Configurando campos específicos da arrumadeira...');
+    
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA CHECKBOXES "OUTROS"
+    const setupConditionalCheckbox = (groupName, targetClass, triggerValue = 'outros') => {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value === triggerValue) {
+                    checkbox.addEventListener('change', function() {
+                        targetDiv.classList.toggle('show', this.checked);
+                    });
+                }
+            });
+        }
+    };
+
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA RADIO BUTTONS
+    const setupConditionalRadio = (radioName, targetClass, showValue = 'sim') => {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    targetDiv.classList.toggle('show', this.value === showValue);
+                });
+            });
+        }
+    };
+
+    // ✅ CONFIGURAR TODOS OS CAMPOS ESPECÍFICOS DA ARRUMADEIRA
+    setupConditionalCheckbox('tiposResidencia', 'outros-residencia');
+    setupConditionalCheckbox('equipamentosLimpeza', 'outros-equipamentos');
+    setupConditionalCheckbox('tecnicasOrganizacao', 'outros-tecnicas');
+    setupConditionalCheckbox('produtosLimpeza', 'outros-produtos');
+    setupConditionalCheckbox('metodosLimpeza', 'outros-metodos');
+    setupConditionalCheckbox('certificacoes', 'outros-certificacoes');
+    setupConditionalCheckbox('tiposAnimais', 'outros-animais');
+    
+    setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
+    setupConditionalRadio('possuiReferencias', 'referencias-section');
+    setupConditionalRadio('alergiaLimpeza', 'alergia-details');
+    setupConditionalRadio('experienciaAnimais', 'animais-details');
+    setupConditionalRadio('restricaoSaude', 'restricao-details');
+    setupConditionalRadio('problemasArticulacoes', 'problemas-details');
+    setupConditionalRadio('veiculoProprio', 'veiculo-details');
+
+    // ✅ REFERÊNCIAS "OUTRO"
+    ['ref1Relacao', 'ref2Relacao'].forEach(selectId => {
+        const select = document.getElementById(selectId);
+        const targetDiv = document.querySelector(`.${selectId.replace('Relacao', '-outro')}`);
+        
+        if (select && targetDiv) {
+            select.addEventListener('change', function() {
+                targetDiv.classList.toggle('show', this.value === 'outro');
+            });
+        }
+    });
+    
+    console.log('✅ Campos específicos da arrumadeira configurados');
+}
+</script>
+</body>
+</html>

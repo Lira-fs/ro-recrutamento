@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Candidato - Babá | R.O Recrutamento</title>
+    <meta name="description" content="Cadastre-se como babá na R.O Recrutamento. Formulário para profissionais qualificados em cuidados infantis para residências de alto padrão.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS - CAMINHOS CORRETOS -->
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../components/components.css">
+    <link rel="stylesheet" href="../../style/form-style.css">
+
+    <style>
+        /* Campos condicionais inicialmente ocultos */
+        .alto-padrao-details,
+        .referencias-section,
+        .primeiros-socorros-details,
+        .ensina-idiomas-details,
+        .outros-necessidades,
+        .outros-restricoes,
+        .outros-cursos-details,
+        .outros-atividades,
+        .restricao-details,
+        .alergias-details,
+        .veiculo-details,
+        .ref1-outro,
+        .ref2-outro {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Mostrar campos quando ativados */
+        .alto-padrao-details.show,
+        .referencias-section.show,
+        .primeiros-socorros-details.show,
+        .ensina-idiomas-details.show,
+        .outros-necessidades.show,
+        .outros-restricoes.show,
+        .outros-cursos-details.show,
+        .outros-atividades.show,
+        .restricao-details.show,
+        .alergias-details.show,
+        .veiculo-details.show,
+        .ref1-outro.show,
+        .ref2-outro.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 300px;
+            }
+        }
+</style>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Formulário Principal -->
+    <main class="form-main">
+        <div class="container">
+            <form id="formBaba" class="candidate-form" action="URL_DA_API" method="POST">
+            <input type="hidden" name="formulario_id" value="candi-baba">
+                <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
+                <div id="treinamento-obrigatorio-container"></div>
+                <div id="dados-pessoais-container"></div>
+                <div id="contato-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL BABÁ -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Experiência Profissional - Babá
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="tempoExperiencia">Tempo total de experiência como babá <span class="required-asterisk">*</span></label>
+                            <select id="tempoExperiencia" name="tempoExperiencia" required>
+                                <option value="">Selecione</option>
+                                <option value="1-2-anos">1-2 anos</option>
+                                <option value="2-3-anos">2-3 anos</option>
+                                <option value="3-5-anos">3-5 anos</option>
+                                <option value="5-10-anos">5-10 anos</option>
+                                <option value="mais-10-anos">Mais de 10 anos</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Experiência em residência de alto padrão?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="alto-padrao-details">
+                            <div class="form-group">
+                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
+                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Possui referências profissionais verificáveis?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="possuiReferencias" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="possuiReferencias" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Referências -->
+                    <div class="referencias-section">
+                        <h3>Referências Profissionais</h3>
+                        
+                        <!-- Referência 1 -->
+                        <div class="referencia-card">
+                            <h4>Referência 1</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ref1Nome">Nome</label>
+                                    <input type="text" id="ref1Nome" name="ref1Nome">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Telefone">Telefone</label>
+                                    <input type="tel" id="ref1Telefone" name="ref1Telefone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Inicio">Período - Início</label>
+                                    <input type="month" id="ref1Inicio" name="ref1Inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Fim">Período - Fim</label>
+                                    <input type="month" id="ref1Fim" name="ref1Fim">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1IdadesCriancas">Idades das crianças</label>
+                                    <input type="text" id="ref1IdadesCriancas" name="ref1IdadesCriancas" placeholder="Ex: 2, 5, 8 anos">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Relacao">Relação</label>
+                                    <select id="ref1Relacao" name="ref1Relacao">
+                                        <option value="">Selecione</option>
+                                        <option value="ex-patrao">Ex-patrão</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group ref1-outro">
+                                    <label for="ref1OutroEspecificar">Especificar relação</label>
+                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Referência 2 -->
+                        <div class="referencia-card">
+                            <h4>Referência 2</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ref2Nome">Nome</label>
+                                    <input type="text" id="ref2Nome" name="ref2Nome">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Telefone">Telefone</label>
+                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Inicio">Período - Início</label>
+                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Fim">Período - Fim</label>
+                                    <input type="month" id="ref2Fim" name="ref2Fim">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2IdadesCriancas">Idades das crianças</label>
+                                    <input type="text" id="ref2IdadesCriancas" name="ref2IdadesCriancas" placeholder="Ex: 2, 5, 8 anos">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Relacao">Relação</label>
+                                    <select id="ref2Relacao" name="ref2Relacao">
+                                        <option value="">Selecione</option>
+                                        <option value="ex-patrao">Ex-patrão</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group ref2-outro">
+                                    <label for="ref2OutroEspecificar">Especificar relação</label>
+                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA POR FAIXA ETÁRIA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-child"></i>
+                        Experiência por Faixa Etária
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Experiência comprovada com faixas etárias específicas (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="faixasEtarias" value="recem-nascidos">
+                                <span>Recém-nascidos (0-6 meses)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="faixasEtarias" value="bebes">
+                                <span>Bebês (6 meses - 1 ano)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="faixasEtarias" value="criancas-pequenas">
+                                <span>Crianças pequenas (1-3 anos)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="faixasEtarias" value="pre-escolares">
+                                <span>Pré-escolares (3-5 anos)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="faixasEtarias" value="escolares">
+                                <span>Escolares (6-12 anos)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="faixasEtarias" value="adolescentes">
+                                <span>Adolescentes (13-17 anos)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="faixaPreferencia">Faixa etária de sua preferência</label>
+                        <select id="faixaPreferencia" name="faixaPreferencia">
+                            <option value="">Selecione</option>
+                            <option value="bebes">Bebês (0-2 anos)</option>
+                            <option value="criancas-pequenas">Crianças pequenas (2-5 anos)</option>
+                            <option value="escolares">Escolares (6-12 anos)</option>
+                            <option value="adolescentes">Adolescentes</option>
+                            <option value="todas">Todas as idades</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroMaximoCriancas">Número máximo de crianças que consegue cuidar simultaneamente</label>
+                        <select id="numeroMaximoCriancas" name="numeroMaximoCriancas">
+                            <option value="">Selecione</option>
+                            <option value="1">1 criança</option>
+                            <option value="2">2 crianças</option>
+                            <option value="3">3 crianças</option>
+                            <option value="mais-3">Mais de 3</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS ESPECÍFICAS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-puzzle-piece"></i>
+                        Competências Específicas
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="conhecimentoDesenvolvimento">Conhecimento em marcos de desenvolvimento infantil</label>
+                        <select id="conhecimentoDesenvolvimento" name="conhecimentoDesenvolvimento">
+                            <option value="">Selecione</option>
+                            <option value="nao">Não tenho conhecimento formal</option>
+                            <option value="basico">Básico (conhecimento prático)</option>
+                            <option value="intermediario">Intermediário (alguns cursos)</option>
+                            <option value="avancado">Avançado (formação específica)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="atividadesLudicas">Capacidade de planejar atividades lúdicas e educativas</label>
+                        <select id="atividadesLudicas" name="atividadesLudicas">
+                            <option value="">Selecione</option>
+                            <option value="basico">Básico (brincadeiras simples)</option>
+                            <option value="intermediario">Intermediário (atividades variadas por idade)</option>
+                            <option value="avancado">Avançado (planejamento pedagógico)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Experiência com crianças com necessidades especiais (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="necessidadesEspeciais" value="nao">
+                                <span>Não tenho experiência</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="necessidadesEspeciais" value="autismo">
+                                <span>Autismo</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="necessidadesEspeciais" value="tdah">
+                                <span>TDAH</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="necessidadesEspeciais" value="deficiencia-fisica">
+                                <span>Deficiência física</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="necessidadesEspeciais" value="alergias-graves">
+                                <span>Alergias graves</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="necessidadesEspeciais" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-necessidades">
+                            <div class="form-group">
+                                <label for="outrosNecessidadesEspecificar">Especificar outras necessidades especiais</label>
+                                <input type="text" id="outrosNecessidadesEspecificar" name="outrosNecessidadesEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="prepararRefeicoes">Habilidade em preparar refeições para crianças</label>
+                        <select id="prepararRefeicoes" name="prepararRefeicoes">
+                            <option value="">Selecione</option>
+                            <option value="basico">Básico (mamadeiras, papinhas simples)</option>
+                            <option value="intermediario">Intermediário (refeições balanceadas)</option>
+                            <option value="avancado">Avançado (dietas especiais, restrições alimentares)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Conhecimento em restrições alimentares (marque todos que tem experiência):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="restricoesAlimentares" value="intolerancia-lactose">
+                                <span>Intolerância à lactose</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="restricoesAlimentares" value="alergia-gluten">
+                                <span>Alergia ao glúten</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="restricoesAlimentares" value="alergia-nozes">
+                                <span>Alergia a nozes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="restricoesAlimentares" value="diabetes-infantil">
+                                <span>Diabetes infantil</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="restricoesAlimentares" value="vegetariano-vegano">
+                                <span>Vegetariano/Vegano</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="restricoesAlimentares" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-restricoes">
+                            <div class="form-group">
+                                <label for="outrosRestricoesEspecificar">Especificar outras restrições</label>
+                                <input type="text" id="outrosRestricoesEspecificar" name="outrosRestricoesEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - QUALIFICAÇÕES E CERTIFICAÇÕES -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        Qualificações e Certificações
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Possui curso de primeiros socorros pediátricos?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="primeirosSocorros" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="primeirosSocorros" value="interesse" required>
+                                <span>Não, mas tenho interesse em fazer</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="primeirosSocorros" value="nao" required>
+                                <span>Não tenho</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="primeiros-socorros-details">
+                        <div class="form-group">
+                            <label for="dataCursoPrimeiros">Data do curso de primeiros socorros</label>
+                            <input type="date" id="dataCursoPrimeiros" name="dataCursoPrimeiros">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Outros cursos relacionados a crianças (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="pedagogia">
+                                <span>Pedagogia</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="psicologia-infantil">
+                                <span>Psicologia Infantil</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="educacao-fisica">
+                                <span>Educação Física</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="recreacao">
+                                <span>Recreação</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="bercarista">
+                                <span>Berçarista</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="auxiliar-enfermagem">
+                                <span>Auxiliar de Enfermagem</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="outrosCursos" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-cursos-details">
+                            <div class="form-group">
+                                <label for="outrosCursosEspecificar">Especificar outros cursos</label>
+                                <input type="text" id="outrosCursosEspecificar" name="outrosCursosEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="disponibilidade-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - DISPONIBILIDADE ADICIONAL BABÁ -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-home"></i>
+                        Disponibilidade Adicional - Babá
+                    </h2>
+
+                    <div class="form-group">
+                        <label>Disponibilidade para dormir no trabalho quando necessário</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="dormirTrabalho" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="dormirTrabalho" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Disponibilidade para morar no local de trabalho</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="morarLocal" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="morarLocal" value="prefiro-nao" required>
+                                <span>Prefiro não morar</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="morarLocal" value="so-essencial" required>
+                                <span>Só se for essencial</span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - ATIVIDADES E METODOLOGIAS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-gamepad"></i>
+                        Atividades e Metodologias
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Atividades que sabe desenvolver com crianças (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="leitura-historias">
+                                <span>Leitura e contação de histórias</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="atividades-artisticas">
+                                <span>Atividades artísticas (desenho, pintura)</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="atividades-musicais">
+                                <span>Atividades musicais</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="jogos-educativos">
+                                <span>Jogos educativos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="atividades-fisicas">
+                                <span>Atividades físicas/esportivas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="culinaria-infantil">
+                                <span>Culinária infantil</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="brincadeiras-recreacoes">
+                                <span>Brincadeiras e Recreações</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="idiomas">
+                                <span>Idiomas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="atividades" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-atividades">
+                            <div class="form-group">
+                                <label for="outrosAtividadesEspecificar">Especificar outras atividades</label>
+                                <input type="text" id="outrosAtividadesEspecificar" name="outrosAtividadesEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="lidaBirras">Como lida com birras e comportamentos desafiadores?</label>
+                        <textarea id="lidaBirras" name="lidaBirras" rows="4" placeholder="Descreva sua abordagem para lidar com birras e comportamentos desafiadores..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="pretensoes-condicoes-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - IDIOMAS E COMUNICAÇÃO -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-globe"></i>
+                        Idiomas e Comunicação
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nivelIngles">Inglês</label>
+                            <select id="nivelIngles" name="nivelIngles">
+                                <option value="">Não falo</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                                <option value="fluente">Fluente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nivelEspanhol">Espanhol</label>
+                            <select id="nivelEspanhol" name="nivelEspanhol">
+                                <option value="">Não falo</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                                <option value="fluente">Fluente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nivelFrances">Francês</label>
+                            <select id="nivelFrances" name="nivelFrances">
+                                <option value="">Não falo</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                                <option value="fluente">Fluente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="outrosIdiomas">Outros idiomas</label>
+                            <input type="text" id="outrosIdiomas" name="outrosIdiomas" placeholder="Ex: Italiano (básico), Alemão (intermediário)">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem experiência em ensinar idiomas para crianças?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="ensinaIdiomas" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="ensinaIdiomas" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="ensina-idiomas-details">
+                        <div class="form-group">
+                            <label for="quaisIdiomasEnsina">Quais idiomas ensina?</label>
+                            <input type="text" id="quaisIdiomasEnsina" name="quaisIdiomasEnsina" placeholder="Ex: Inglês, Espanhol">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES COMPLEMENTARES -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informações Complementares
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Tem alguma restrição de saúde que possa afetar o trabalho?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="restricao-details">
+                        <div class="form-group">
+                            <label for="especificarRestricao">Especifique a restrição</label>
+                            <input type="text" id="especificarRestricao" name="especificarRestricao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fuma?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem alergia a algum alimento, medicamento ou animal?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="temAlergias" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="temAlergias" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="alergias-details">
+                        <div class="form-group">
+                            <label for="especificarAlergias">Especifique as alergias</label>
+                            <input type="text" id="especificarAlergias" name="especificarAlergias">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Possui veículo próprio?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="veiculoProprio" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="veiculoProprio" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="veiculo-details">
+                        <div class="form-group">
+                            <label for="tipoVeiculo">Tipo de veículo</label>
+                            <input type="text" id="tipoVeiculo" name="tipoVeiculo" placeholder="Ex: Carro, Moto">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="situacoesEmergencia">Como lida com situações de emergência envolvendo crianças?</label>
+                        <textarea id="situacoesEmergencia" name="situacoesEmergencia" rows="4" placeholder="Descreva como você lidaria com situações de emergência..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - PERGUNTAS ABERTAS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Questões Profissionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="porqueEscolheuBaba">Por que escolheu trabalhar como babá?</label>
+                        <textarea id="porqueEscolheuBaba" name="porqueEscolheuBaba" rows="4" placeholder="Descreva o que te motivou a escolher esta profissão..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="estiloCuidar">Como descreveria seu estilo de cuidar de crianças?</label>
+                        <textarea id="estiloCuidar" name="estiloCuidar" rows="4" placeholder="Descreva sua abordagem e filosofia de cuidado infantil..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
+                        <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Botão de Envio -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura
+                    </button>
+                    <p style="margin-top: var(--spacing-md); color: var(--text-muted); font-size: 0.9rem;">
+                        Ao enviar este formulário, você concorda com o processamento de seus dados pessoais conforme nossa política de privacidade.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- SCRIPTS - ORDEM CORRETA -->
+     <script src="../../components/supabase-config.js"></script>
+    <script src="../../components/components.js"></script>
+    <script src="../global-section.js"></script>
+    <!-- ✅ SCRIPTS LIMPOS - SUBSTITUIR TODA A PARTE DE BAIXO -->
+
+<!-- SCRIPTS - ORDEM CORRETA -->
+<script src="../../components/components.js"></script>
+<script src="../global-section.js"></script>
+
+<!-- ✅ CONFIGURAÇÃO SUPABASE -->
+<script type="module" src="../../components/supabase-config.js"></script>
+
+    <!-- ✅ SCRIPTS CORRIGIDOS - SUBSTITUIR PARTE DE BAIXO -->
+
+<!-- SCRIPTS - ORDEM CORRETA -->
+<script src="../../components/components.js"></script>
+<script src="../global-section.js"></script>
+
+<!-- ✅ CONFIGURAÇÃO SUPABASE - INLINE PARA GARANTIR CARREGAMENTO -->
+<script type="module">
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inicializando formulário Babá...');
+    
+    // Carregar seções universais
+    loadFormSection('dados-pessoais', 'dados-pessoais-container');
+    loadFormSection('treinamento-obrigatorio', 'treinamento-obrigatorio-container');
+    loadFormSection('contato', 'contato-container');
+    loadFormSection('pretensoes-condicoes', 'pretensoes-condicoes-container');
+    loadFormSection('disponibilidade', 'disponibilidade-container');
+    
+    // Aguardar seções carregarem
+    setTimeout(() => {
+        initializeBabaSpecificFields();
+        initializeFormSubmission();
+    }, 1000);
+});
+
+// ===== FUNÇÃO PARA INICIALIZAR CAMPOS ESPECÍFICOS =====
+function initializeBabaSpecificFields() {
+    console.log('🔧 Inicializando campos específicos da babá...');
+    
+    // Campos condicionais - checkboxes "outros"
+    const setupConditionalCheckbox = (groupName, targetClass) => {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value === 'outros') {
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            targetDiv.classList.add('show');
+                        } else {
+                            targetDiv.classList.remove('show');
+                        }
+                    });
+                }
+            });
+        }
+    };
+
+    // Campos condicionais - radio buttons
+    const setupConditionalRadio = (radioName, targetClass, showValue = 'sim') => {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === showValue) {
+                        targetDiv.classList.add('show');
+                    } else {
+                        targetDiv.classList.remove('show');
+                    }
+                });
+            });
+        }
+    };
+
+    // Configurar campos específicos da babá
+    setupConditionalCheckbox('necessidadesEspeciais', 'outros-necessidades');
+    setupConditionalCheckbox('restricoesAlimentares', 'outros-restricoes');
+    setupConditionalCheckbox('outrosCursos', 'outros-cursos-details');
+    setupConditionalCheckbox('atividades', 'outros-atividades');
+    
+    setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
+    setupConditionalRadio('possuiReferencias', 'referencias-section');
+    setupConditionalRadio('primeirosSocorros', 'primeiros-socorros-details', 'sim');
+    setupConditionalRadio('ensinaIdiomas', 'ensina-idiomas-details');
+    setupConditionalRadio('restricaoSaude', 'restricao-details');
+    setupConditionalRadio('temAlergias', 'alergias-details');
+    setupConditionalRadio('veiculoProprio', 'veiculo-details');
+    
+    // Referência "outro"
+    const setupReferenceOther = (selectId, targetClass) => {
+        const select = document.getElementById(selectId);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (select && targetDiv) {
+            select.addEventListener('change', function() {
+                if (this.value === 'outro') {
+                    targetDiv.classList.add('show');
+                } else {
+                    targetDiv.classList.remove('show');
+                }
+            });
+        }
+    };
+
+    setupReferenceOther('ref1Relacao', 'ref1-outro');
+    setupReferenceOther('ref2Relacao', 'ref2-outro');
+    
+    console.log('✅ Campos específicos configurados');
+}
+
+// ===== FUNÇÃO PARA INICIALIZAR ENVIO DO FORMULÁRIO =====
+function initializeFormSubmission() {
+    const form = document.getElementById('formBaba');
+    
+    if (!form) {
+        console.error('❌ Formulário não encontrado!');
+        return;
+    }
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('📤 Enviando formulário da babá...');
+        
+        // 1. Validar treinamento
+        if (!isTrainingAccepted()) {
+            alert('❌ Você deve aceitar o treinamento obrigatório para continuar.');
+            return;
+        }
+        
+        // 2. Mostrar loading
+        const submitBtn = form.querySelector('.btn-submit');
+        const textoOriginal = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        submitBtn.disabled = true;
+        
+        try {
+            // 3. Coletar e estruturar dados
+            const dadosCompletos = coletarDadosBaba(form);
+            console.log('📋 Dados coletados:', dadosCompletos);
+            
+            // 4. Enviar para Supabase
+            const { data, error } = await supabase
+                .from('candidatos')
+                .insert([dadosCompletos]);
+            
+            if (error) {
+                throw error;
+            }
+            
+            // 5. Sucesso! - USAR MODAL UNIVERSAL
+            console.log('✅ Candidato salvo:', data);
+            showSuccessModal('candi-baba');
+            
+        } catch (error) {
+            console.error('❌ Erro ao enviar:', error);
+            alert(`❌ Erro ao enviar candidatura: ${error.message}\n\nTente novamente ou entre em contato conosco.`);
+        } finally {
+            // 6. Restaurar botão
+            submitBtn.innerHTML = textoOriginal;
+            submitBtn.disabled = false;
+        }
+    });
+    
+    console.log('✅ Sistema de envio configurado');
+}
+
+// ===== FUNÇÃO PARA COLETAR DADOS ESTRUTURADOS - CORRIGIDA =====
+function coletarDadosBaba(form) {
+    const formData = new FormData(form);
+    
+    // ✅ FUNÇÃO AUXILIAR PARA VALIDAR REGIME DE TRABALHO
+    function validarRegimeTrabalho(valor) {
+        const regimesValidos = ['clt', 'mei', 'freelancer'];
+        return regimesValidos.includes(valor) ? valor : null;
+    }
+    
+    // ✅ FUNÇÃO AUXILIAR PARA CONVERTER SALÁRIO
+    function converterSalario(valor) {
+        if (!valor) return null;
+        try {
+            return parseFloat(valor.replace(/[^\d,]/g, '').replace(',', '.'));
+        } catch {
+            return null;
+        }
+    }
+    
+    // Dados universais
+    const dadosUniversais = {
+        formulario_id: 'candi-baba',
+        nome_completo: formData.get('nomeCompleto'),
+        data_nascimento: formData.get('dataNascimento') || null,
+        cpf: formData.get('cpf'),
+        rg: formData.get('rg'),
+        estado_civil: formData.get('estadoCivil'),
+        telefone: formData.get('telefone'),
+        whatsapp: formData.get('whatsapp'),
+        email: formData.get('email'),
+        endereco: formData.get('endereco'),
+        cep: formData.get('cep'),
+        possui_cnh: formData.get('possuiCnh') === 'sim',
+        categoria_cnh: formData.get('categoriaCnh') || null,
+        vencimento_cnh: formData.get('vencimentoCnh') || null,
+        tem_filhos: formData.get('temFilhos') === 'sim',
+        quantos_filhos: formData.get('quantosFilhos') ? parseInt(formData.get('quantosFilhos')) : null,
+        idades_filhos: formData.get('idadesFilhos') || null,
+        aceita_treinamento: formData.get('aceitaTreinamento') === 'sim',
+        turno_treinamento: formData.get('turnoTreinamento') || null,
+        inicio_imediato: formData.get('inicioImediato') === 'sim',
+        data_disponivel: formData.get('dataDisponivel') || null,
+        eventos_noturnos: formData.get('eventosNoturnos') || null,
+        fim_semana: formData.get('fimSemana') || null,
+        dormir_fim_semana: formData.get('dormirFimSemana') || null,
+        viagens: formData.get('viagens') || null,
+        passaporte: formData.get('passaporte') || null,
+        vencimento_passaporte: formData.get('vencimentoPassaporte') || null,
+        pretensao_salarial: converterSalario(formData.get('pretensaoSalarial')),
+        regime_trabalho: validarRegimeTrabalho(formData.get('regimeTrabalho')), // ✅ VALIDAÇÃO
+        salario_negociavel: formData.get('negociavel') === 'sim',
+        tempo_experiencia: formData.get('tempoExperiencia') || null,
+        experiencia_alto_padrao: formData.get('experienciaAltoPadrao') === 'sim',
+        tempo_alto_padrao: formData.get('tempoAltoPadrao') || null,
+        possui_referencias: formData.get('possuiReferencias') === 'sim',
+        restricao_saude: formData.get('restricaoSaude') === 'sim',
+        especificar_restricao: formData.get('especificarRestricao') || null,
+        fuma: formData.get('fuma') === 'sim',
+        veiculo_proprio: formData.get('veiculoProprio') === 'sim',
+        tipo_veiculo: formData.get('tipoVeiculo') || null,
+        observacoes_adicionais: formData.get('observacoesAdicionais') || null
+    };
+    
+    // Dados específicos da babá (JSON)
+    const dadosEspecificos = {
+        faixas_etarias: formData.getAll('faixasEtarias'),
+        faixa_preferencia: formData.get('faixaPreferencia'),
+        numero_maximo_criancas: formData.get('numeroMaximoCriancas'),
+        conhecimento_desenvolvimento: formData.get('conhecimentoDesenvolvimento'),
+        atividades_ludicas: formData.get('atividadesLudicas'),
+        necessidades_especiais: formData.getAll('necessidadesEspeciais'),
+        outros_necessidades: formData.get('outrosNecessidadesEspecificar'),
+        preparar_refeicoes: formData.get('prepararRefeicoes'),
+        restricoes_alimentares: formData.getAll('restricoesAlimentares'),
+        outros_restricoes: formData.get('outrosRestricoesEspecificar'),
+        primeiros_socorros: formData.get('primeirosSocorros'),
+        data_curso_primeiros: formData.get('dataCursoPrimeiros'),
+        outros_cursos: formData.getAll('outrosCursos'),
+        outros_cursos_especificar: formData.get('outrosCursosEspecificar'),
+        dormir_trabalho: formData.get('dormirTrabalho'),
+        morar_local: formData.get('morarLocal'),
+        atividades: formData.getAll('atividades'),
+        outros_atividades: formData.get('outrosAtividadesEspecificar'),
+        lida_birras: formData.get('lidaBirras'),
+        nivel_ingles: formData.get('nivelIngles'),
+        nivel_espanhol: formData.get('nivelEspanhol'),
+        nivel_frances: formData.get('nivelFrances'),
+        outros_idiomas: formData.get('outrosIdiomas'),
+        ensina_idiomas: formData.get('ensinaIdiomas') === 'sim',
+        quais_idiomas_ensina: formData.get('quaisIdiomasEnsina'),
+        tem_alergias: formData.get('temAlergias') === 'sim',
+        especificar_alergias: formData.get('especificarAlergias'),
+        situacoes_emergencia: formData.get('situacoesEmergencia'),
+        porque_escolheu_baba: formData.get('porqueEscolheuBaba'),
+        estilo_cuidar: formData.get('estiloCuidar')
+    };
+    
+    // Referências (JSON)
+    const referencias = [];
+    if (dadosUniversais.possui_referencias) {
+        if (formData.get('ref1Nome')) {
+            referencias.push({
+                nome: formData.get('ref1Nome'),
+                telefone: formData.get('ref1Telefone'),
+                periodo_inicio: formData.get('ref1Inicio'),
+                periodo_fim: formData.get('ref1Fim'),
+                idades_criancas: formData.get('ref1IdadesCriancas'),
+                relacao: formData.get('ref1Relacao'),
+                outro_especificar: formData.get('ref1OutroEspecificar')
+            });
+        }
+        if (formData.get('ref2Nome')) {
+            referencias.push({
+                nome: formData.get('ref2Nome'),
+                telefone: formData.get('ref2Telefone'),
+                periodo_inicio: formData.get('ref2Inicio'),
+                periodo_fim: formData.get('ref2Fim'),
+                idades_criancas: formData.get('ref2IdadesCriancas'),
+                relacao: formData.get('ref2Relacao'),
+                outro_especificar: formData.get('ref2OutroEspecificar')
+            });
+        }
+    }
+    
+    console.log('📊 Dados estruturados para envio:', {
+        ...dadosUniversais,
+        dados_especificos: dadosEspecificos,
+        referencias: referencias
+    });
+    
+    return {
+        ...dadosUniversais,
+        dados_especificos: dadosEspecificos,
+        referencias: referencias
+    };
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Centro de Treinamento - R.O Recrutamento | Formação Profissional de Excelência</title>
+    <meta name="description" content="Conheça nosso Centro de Treinamento em Itatiba. Formamos profissionais qualificados para residências de alto padrão com treinamento especializado e metodologia exclusiva.">
+    <meta name="keywords" content="centro de treinamento doméstico, curso empregada doméstica Itatiba, treinamento profissional residencial, R.O Recrutamento CT, capacitação profissional">
+    <meta name="author" content="R.O Recrutamento">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Nosso Centro de Treinamento - R.O Recrutamento">
+    <meta property="og:description" content="Centro de Treinamento especializado em formar profissionais para residências de alto padrão. Metodologia exclusiva e resultados comprovados.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rorecrutamento.com.br/nosso-ct">
+    <meta property="og:image" content="https://rorecrutamento.com.br/imagens/og-ct.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="style/ct.css">
+    <link rel="stylesheet" href="components/components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER CONTAINER -->
+    <div id="header-container"></div>
+
+    <!-- Hero Section -->
+    <section class="ct-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Por Que Temos um <span class="highlight">Centro de Treinamento?</span></h1>
+                <p>O Nosso CT é estratégico, nos dedicamos ao máximo para poder contribuir com aquele colaborador que está comprometido consigo mesmo em querer melhorar, em buscar novas oportunidades, e do outro lado, queremos resolver o problema dos contratantes em não achar profissionais qualificados para suas devidas vagas! Lá é o nosso cantinho de passar o aprendizado que tivemos durante anos, para frente, <span class="highlight">moldando profissionais únicos!</span></p>
+            </div>
+            
+            <div class="hero-carousel">
+                <div class="carousel-container">
+                    <div class="carousel-slide active">
+                        <img src="/imagens/ct-slide-1.jpg" alt="Centro de Treinamento R.O - Sala de Aula" loading="lazy">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="/imagens/ct-slide-2.jpg" alt="Centro de Treinamento R.O - Área Prática" loading="lazy">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="/imagens/ct-slide-3.jpg" alt="Centro de Treinamento R.O - Cozinha Didática" loading="lazy">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="/imagens/ct-slide-4.jpg" alt="Centro de Treinamento R.O - Mesa de Treinamento" loading="lazy">
+                    </div>
+                </div>
+                
+                <!-- Controles do Carrossel -->
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev" onclick="changeSlide(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn next" onclick="changeSlide(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Indicadores -->
+                <div class="carousel-indicators">
+                    <span class="indicator active" onclick="currentSlide(1)"></span>
+                    <span class="indicator" onclick="currentSlide(2)"></span>
+                    <span class="indicator" onclick="currentSlide(3)"></span>
+                    <span class="indicator" onclick="currentSlide(4)"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção 1 - O que fazemos no CT -->
+    <section class="atividades-ct">
+        <div class="container">
+            <h2 class="section-title">O que Fazemos no Nosso CT?</h2>
+            
+            <div class="atividades-grid">
+                <div class="atividade-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Treinamentos para Novos Profissionais</h3>
+                    <p>Formamos colaboradores que estão iniciando na área com metodologia especializada e conhecimento técnico.</p>
+                </div>
+                
+                <div class="atividade-card">
+                    <div class="card-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Reciclagem Profissional</h3>
+                    <p>Para quem já está na área e deseja se aprimorar, oferecemos cursos de atualização e aperfeiçoamento.</p>
+                </div>
+                
+                <div class="atividade-card">
+                    <div class="card-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Coração da Agência</h3>
+                    <p>Aqui fazemos toda triagem e escolhemos a dedo os profissionais que farão parte do nosso time de excelência.</p>
+                </div>
+            </div>
+            
+            <div class="assuntos-abordados">
+                <h3>Assuntos Abordados em Nossos Treinamentos:</h3>
+                <div class="assuntos-lista">
+                    <div class="assunto-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Planejamento</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Explicação de Cada Função</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-star"></i>
+                        <span>Boas Práticas do Mercado</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-cogs"></i>
+                        <span>Padrão e Lógica</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-sort-amount-up"></i>
+                        <span>Organização</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Vestimenta Adequada</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Educação e Etiqueta</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-concierge-bell"></i>
+                        <span>Como Servir</span>
+                    </div>
+                    <div class="assunto-item">
+                        <i class="fas fa-utensils"></i>
+                        <span>Montagem de Mesa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção 2 - R.O Consultoria -->
+    <section class="ro-consultoria-extensao">
+        <div class="container">
+            <div class="consultoria-content">
+                <div class="consultoria-info">
+                    <h2 class="consultoria-title">Extensão dos Treinamentos</h2>
+                    <h3 class="consultoria-subtitle">Nossa Outra Empresa <span class="destaque">R.O Consultoria</span></h3>
+                    
+                    <p>A extensão do CT, empresa parceira da R.O Recrutamento, estendemos os treinamentos de forma personalizada até a residência do contratante. Estudamos e moldamos o treinamento para que seja adaptável para cada casa, moldando o tipo de profissional que o contratante busca, dando uma verdadeira <span class="highlight">CONSULTORIA</span> para os domésticos.</p>
+                    
+                    <a href="https://roconsultoria.com.br" target="_blank" class="btn-consultoria">
+                        <i class="fas fa-external-link-alt"></i>
+                        Conheça Nossa Abordagem
+                    </a>
+                </div>
+                
+                <div class="consultoria-logo">
+                    <img src="/imagens/logo-ro-consultoria-grande.png" alt="R.O Consultoria - Extensão do Centro de Treinamento" loading="lazy">
+                </div>
+            </div>
+            
+            <div class="consultoria-features">
+                <div class="feature-item">
+                    <i class="fas fa-home"></i>
+                    <h4>Treinamento in Loco</h4>
+                    <p>Levamos o conhecimento até a residência do contratante</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-user-cog"></i>
+                    <h4>Personalização Total</h4>
+                    <p>Adaptamos o treinamento para cada perfil de casa</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-handshake"></i>
+                    <h4>Consultoria Especializada</h4>
+                    <p>Orientação profissional completa e exclusiva</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção 3 - Nossa Localização -->
+    <section class="nossa-localizacao">
+        <div class="container">
+            <h2 class="section-title">Nossa Localização</h2>
+            <h3 class="localizacao-subtitle">Venha Nos Conhecer!</h3>
+            
+            <div class="localizacao-content">
+                <div class="endereco-info">
+                    <div class="endereco-card">
+                        <div class="endereco-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="endereco-details">
+                            <h4>Centro de Treinamento R.O</h4>
+                            <p class="endereco-rua">Rua Pedro Mascagni, 425</p>
+                            <p class="endereco-cidade">Itatiba - SP</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contato-info">
+                        <div class="contato-item">
+                            <i class="fas fa-phone"></i>
+                            <span>Telefone para Agendamento</span>
+                        </div>
+                        <div class="contato-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Funcionamento: Segunda a Sexta</span>
+                        </div>
+                        <div class="contato-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Treinamentos Sob Agendamento</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cta-visita">
+                        <h4>Pronto para Conhecer Nosso CT?</h4>
+                        <p>Entre em contato conosco e agende sua visita. Venha ver de perto como trabalhamos para formar os melhores profissionais do mercado!</p>
+                        <a href="#contato" class="btn-cobre">
+                            <i class="fas fa-calendar-plus"></i>
+                            Agendar Visita
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mapa-container">
+                    <div class="mapa-placeholder">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3660.8234567890123!2d-46.8234567!3d-23.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRua%20Pedro%20Mascagni%2C%20425%20-%20Itatiba!5e0!3m2!1spt-BR!2sbr!4v1234567890"
+                            width="100%" 
+                            height="300" 
+                            style="border:0; border-radius: 15px;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Localização Centro de Treinamento R.O - Rua Pedro Mascagni, 425, Itatiba">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CONTAINER -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="components/components.js"></script>
+    <script>
+        // Carrossel de Imagens
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            // Remove classe active de todos os slides e indicadores
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Adiciona classe active ao slide e indicador atual
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            currentSlideIndex += direction;
+            
+            if (currentSlideIndex >= totalSlides) {
+                currentSlideIndex = 0;
+            } else if (currentSlideIndex < 0) {
+                currentSlideIndex = totalSlides - 1;
+            }
+            
+            showSlide(currentSlideIndex);
+        }
+
+        function currentSlide(index) {
+            currentSlideIndex = index - 1;
+            showSlide(currentSlideIndex);
+        }
+
+        // Auto-play do carrossel
+        function autoSlide() {
+            changeSlide(1);
+        }
+
+        // Iniciar auto-play (muda a cada 5 segundos)
+        setInterval(autoSlide, 5000);
+
+        // Pausar auto-play quando o usuário interage
+        const carouselContainer = document.querySelector('.carousel-container');
+        let autoPlayInterval = setInterval(autoSlide, 5000);
+
+        carouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(autoPlayInterval);
+        });
+
+        carouselContainer.addEventListener('mouseleave', () => {
+            autoPlayInterval = setInterval(autoSlide, 5000);
+        });
+
+        // Animação de entrada dos elementos ao scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observar elementos para animação
+        document.querySelectorAll('.atividade-card, .assunto-item, .feature-item, .endereco-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scrolling para links internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

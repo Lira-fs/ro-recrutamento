@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Candidato - Casal de Caseiros | R.O Recrutamento</title>
+    <meta name="description" content="Cadastre-se como casal de caseiros na R.O Recrutamento. Formulário para casais qualificados em manutenção e gestão de propriedades de alto padrão.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS - CAMINHOS CORRETOS -->
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../components/components.css">
+    <link rel="stylesheet" href="../../style/form-style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Estilos específicos para novos campos -->
+    <style>
+        /* Estilos para campos específicos do casal */
+        .casal-subtitle {
+            color: var(--bronze-light);
+            font-size: 1.3rem;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--cor-borda);
+        }
+
+        .casal-subtitle i {
+            color: var(--bronze-light);
+            font-size: 1.2rem;
+        }
+
+        .habilidades-extras {
+            background: rgba(0, 0, 0, 0.2);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-sm);
+            margin-top: var(--spacing-lg);
+            border: 1px solid var(--cor-borda);
+        }
+
+        .habilidades-extras h4 {
+            color: var(--bronze-light);
+            margin-bottom: var(--spacing-md);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .habilidades-extras h4 i {
+            color: var(--bronze-light);
+        }
+
+        .preferencia-field {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: var(--border-radius-sm);
+            border-left: 3px solid #e74c3c;
+        }
+
+        .preferencia-field label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .preferencia-field input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .checkbox-grid-small {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-xs);
+        }
+
+        .pets-details {
+            display: none;
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(166, 94, 46, 0.1);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--bronze-light);
+        }
+
+        .pets-details.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .jardim-details, .piscina-details {
+            display: none;
+            margin-top: var(--spacing-sm);
+        }
+
+        .jardim-details.show, .piscina-details.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .coqueteis-nivel {
+            display: none;
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(166, 94, 46, 0.1);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .coqueteis-nivel.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .trabalhou-juntos-tempo {
+            display: none;
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(166, 94, 46, 0.1);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--bronze-light);
+        }
+
+        .trabalhou-juntos-tempo.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .habilidades-cozinha {
+            display: none;
+            margin-top: var(--spacing-md);
+        }
+
+        .habilidades-cozinha.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Responsividade para novos campos */
+        @media (min-width: 768px) {
+            .checkbox-grid-small {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .checkbox-grid-small {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .casal-subtitle {
+                font-size: 1.1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-xs);
+            }
+
+            .habilidades-extras {
+                padding: var(--spacing-md);
+            }
+
+            .habilidades-extras h4 {
+                font-size: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-xs);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Formulário Principal -->
+    <main class="form-main">
+        <div class="container">
+            <form id="formCasalCaseiros" class="candidate-form">
+            <input type="hidden" name="formulario_id" value="candi-casal">
+                
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="treinamento-obrigatorio-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - DADOS DO CASAL -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i>
+                        Dados do Casal
+                    </h2>
+                    
+                    <!-- Dados Pessoais - ELE -->
+                    <div class="casal-section">
+                        <h3 class="casal-subtitle">
+                            <i class="fas fa-male"></i>
+                            Dados Pessoais - Candidato (Ele)
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="nomeCompletoEle">Nome Completo <span class="required-asterisk">*</span></label>
+                                <input type="text" id="nomeCompletoEle" name="nomeCompletoEle" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="dataNascimentoEle">Data de Nascimento <span class="required-asterisk">*</span></label>
+                                <input type="date" id="dataNascimentoEle" name="dataNascimentoEle" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cpfEle">CPF <span class="required-asterisk">*</span></label>
+                                <input type="text" id="cpfEle" name="cpfEle" placeholder="000.000.000-00" required>
+                            </div>
+                            
+                            
+                            <div class="form-group">
+                                <label for="telefoneEle">Telefone <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="telefoneEle" name="telefoneEle" placeholder="(11) 99999-9999" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="whatsappEle">WhatsApp <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="whatsappEle" name="whatsappEle" placeholder="(11) 99999-9999" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="emailEle">E-mail <span class="required-asterisk">*</span></label>
+                                <input type="email" id="emailEle" name="emailEle" required>
+                            </div>
+                        </div>
+
+                        <!-- CNH - ELE -->
+                        <div class="form-subsection">
+                            <div class="form-group">
+                                <label>Possui CNH?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="possuiCnhEle" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="possuiCnhEle" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="cnh-details-ele">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="categoriaCnhEle">Categoria</label>
+                                        <select id="categoriaCnhEle" name="categoriaCnhEle">
+                                            <option value="">Selecione</option>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                            <option value="D">D</option>
+                                            <option value="E">E</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados Pessoais - ELA -->
+                    <div class="casal-section">
+                        <h3 class="casal-subtitle">
+                            <i class="fas fa-female"></i>
+                            Dados Pessoais - Candidata (Ela)
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="nomeCompletoEla">Nome Completo <span class="required-asterisk">*</span></label>
+                                <input type="text" id="nomeCompletoEla" name="nomeCompletoEla" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="dataNascimentoEla">Data de Nascimento <span class="required-asterisk">*</span></label>
+                                <input type="date" id="dataNascimentoEla" name="dataNascimentoEla" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cpfEla">CPF <span class="required-asterisk">*</span></label>
+                                <input type="text" id="cpfEla" name="cpfEla" placeholder="000.000.000-00" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="telefoneEla">Telefone <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="telefoneEla" name="telefoneEla" placeholder="(11) 99999-9999" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="whatsappEla">WhatsApp <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="whatsappEla" name="whatsappEla" placeholder="(11) 99999-9999" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="emailEla">E-mail <span class="required-asterisk">*</span></label>
+                                <input type="email" id="emailEla" name="emailEla" required>
+                            </div>
+                        </div>
+
+                        <!-- CNH - ELA -->
+                        <div class="form-subsection">
+                            <div class="form-group">
+                                <label>Possui CNH?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="possuiCnhEla" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="possuiCnhEla" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="cnh-details-ela">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="categoriaCnhEla">Categoria</label>
+                                        <select id="categoriaCnhEla" name="categoriaCnhEla">
+                                            <option value="">Selecione</option>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                            <option value="D">D</option>
+                                            <option value="E">E</option>
+                                        </select>
+                                    </div>
+                            
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações Gerais do Casal -->
+                    <div class="casal-section">
+                        <h3 class="casal-subtitle">
+                            <i class="fas fa-heart"></i>
+                            Informações Gerais do Casal
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="estadoCivil">Estado Civil <span class="required-asterisk">*</span></label>
+                                <select id="estadoCivil" name="estadoCivil" required>
+                                    <option value="">Selecione</option>
+                                    <option value="casados">Casados</option>
+                                    <option value="uniao-estavel">União Estável</option>
+                                    <option value="namorando">Namorando</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tempoJuntos">Há quanto tempo estão juntos? <span class="required-asterisk">*</span></label>
+                                <input type="text" id="tempoJuntos" name="tempoJuntos" placeholder="Ex: 5 anos" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="enderecoCompleto">Endereço Completo <span class="required-asterisk">*</span></label>
+                                <input type="text" id="enderecoCompleto" name="enderecoCompleto" placeholder="Rua, número, bairro, cidade, estado" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cep">CEP <span class="required-asterisk">*</span></label>
+                                <input type="text" id="cep" name="cep" placeholder="00000-000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-subsection">
+                            <div class="form-group">
+                                <label>Possuem filhos?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="temFilhos" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="temFilhos" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="filhos-details">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="quantosFilhos">Quantos filhos?</label>
+                                        <input type="number" id="quantosFilhos" name="quantosFilhos" min="1" max="10">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="idadesFilhos">Idades dos filhos</label>
+                                        <input type="text" id="idadesFilhos" name="idadesFilhos" placeholder="Ex: 5, 8, 12 anos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-subsection">
+                            <div class="form-group">
+                                <label>Possuem veículo próprio?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="veiculoProprio" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="veiculoProprio" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="veiculo-details">
+                                <div class="form-group">
+                                    <label for="tipoVeiculo">Tipo de veículo</label>
+                                    <input type="text" id="tipoVeiculo" name="tipoVeiculo" placeholder="Ex: Carro, Moto...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NOVA SEÇÃO: DISPONIBILIDADE PARA MORAR -->
+                        <div class="form-subsection">
+                            <div class="form-group">
+                                <label>Disponível para morar na residência?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="morarResidencia" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="morarResidencia" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- NOVA SEÇÃO: PETS (aparece somente se escolher "sim" para morar) -->
+                            <div class="pets-details">
+                                <div class="form-group">
+                                    <label>Possuem animais de estimação?</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="possuiPets" value="nao">
+                                            <span>Não</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="possuiPets" value="sim">
+                                            <span>Sim</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="pet-especificar">
+                                    <div class="form-group">
+                                        <label for="tipoPet">Especifique qual(is) animal(is)</label>
+                                        <input type="text" id="tipoPet" name="tipoPet" placeholder="Ex: 1 gato, 2 cachorros pequenos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Experiência Profissional
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>O casal já trabalhou juntos como caseiros?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="trabalharamJuntos" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="trabalharamJuntos" value="nao-interesse" required>
+                                <span>Não, mas têm interesse/preparo para isso</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="trabalharamJuntos" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- CAMPO CONDICIONAL: Tempo trabalhando juntos (somente se marcou "sim") -->
+                    <div class="trabalhou-juntos-tempo">
+                        <div class="form-group">
+                            <label for="tempoCaseiros">Por quanto tempo trabalharam juntos como caseiros?</label>
+                            <input type="text" id="tempoCaseiros" name="tempoCaseiros" placeholder="Ex: 3 anos">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Experiência em residência de alto padrão?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaAltoPadrao" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaAltoPadrao" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="alto-padrao-details">
+                        <div class="form-group">
+                            <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
+                            <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Possuem referências profissionais verificáveis?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="possuiReferencias" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="possuiReferencias" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Referências -->
+                    <div class="referencias-section">
+                        <h3>Referências Profissionais</h3>
+                        
+                        <!-- Referência 1 -->
+                        <div class="referencia-card">
+                            <h4>Referência 1</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ref1Nome">Nome</label>
+                                    <input type="text" id="ref1Nome" name="ref1Nome">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Telefone">Telefone</label>
+                                    <input type="tel" id="ref1Telefone" name="ref1Telefone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Inicio">Período - Início</label>
+                                    <input type="month" id="ref1Inicio" name="ref1Inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Fim">Período - Fim</label>
+                                    <input type="month" id="ref1Fim" name="ref1Fim">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref1Relacao">Relação</label>
+                                    <select id="ref1Relacao" name="ref1Relacao">
+                                        <option value="">Selecione</option>
+                                        <option value="ex-patrao">Ex-patrão</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group ref1-outro">
+                                    <label for="ref1OutroEspecificar">Especificar relação</label>
+                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Referência 2 -->
+                        <div class="referencia-card">
+                            <h4>Referência 2</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ref2Nome">Nome</label>
+                                    <input type="text" id="ref2Nome" name="ref2Nome">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Telefone">Telefone</label>
+                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Inicio">Período - Início</label>
+                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Fim">Período - Fim</label>
+                                    <input type="month" id="ref2Fim" name="ref2Fim">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ref2Relacao">Relação</label>
+                                    <select id="ref2Relacao" name="ref2Relacao">
+                                        <option value="">Selecione</option>
+                                        <option value="ex-patrao">Ex-patrão</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group ref2-outro">
+                                    <label for="ref2OutroEspecificar">Especificar relação</label>
+                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-cogs"></i>
+                        Competências do Casal
+                    </h2>
+                    
+                    <!-- Competências - ELE -->
+                    <div class="casal-section">
+                        <h3 class="casal-subtitle">
+                            <i class="fas fa-tools"></i>
+                            Competências - Ele
+                        </h3>
+                        
+                        <div class="form-group full-width">
+                            <label>Competências e conhecimentos (marque todos que se aplicam):</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="eletrica">
+                                    <span>Elétrica</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="hidraulica">
+                                    <span>Hidráulica</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="jardinagem">
+                                    <span>Jardinagem</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="manutencao-geral">
+                                    <span>Manutenção geral</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="piscina">
+                                    <span>Piscina</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="seguranca-patrimonial">
+                                    <span>Segurança patrimonial</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEle" value="automacao-residencial">
+                                    <span>Automação residencial</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- NOVAS HABILIDADES ESPECÍFICAS - ELE -->
+                        <div class="habilidades-extras">
+                            <h4><i class="fas fa-fire"></i> Habilidades Gastronômicas</h4>
+                            
+                            <div class="form-group">
+                                <label>Sabe fazer churrasco?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="sabeFazerChurrasco" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="sabeFazerChurrasco" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="sabeFazerChurrasco" value="razoavel" required>
+                                        <span>Pouca experiência</span>
+                                    </label>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Sabe assar pizza?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="sabeAssarPizza" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="sabeAssarPizza" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="sabeAssarPizza" value="razoavel" required>
+                                        <span>Pouca experiência</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sabe montar aperitivos?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="montarAperitivos" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="montarAperitivos" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="montarAperitivos" value="razoavel" required>
+                                        <span>Pouca experiência</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sabe fazer serviços de barman?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="servicosBarman" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="servicosBarman" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="coqueteis-nivel">
+                                <div class="form-group">
+                                    <label>Nível de conhecimento em coquetéis:</label>
+                                    <div class="checkbox-grid-small">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="nivelCoqueteis" value="basicos">
+                                            <span>Coquetéis básicos</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="nivelCoqueteis" value="intermediarios">
+                                            <span>Coquetéis intermediários</span>
+                                        </label>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="nivelCoqueteis" value="avancados">
+                                            <span>Coquetéis avançados</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="habilidades-extras">
+                            <h4><i class="fas fa-leaf"></i> Cuidados Externos</h4>
+                            
+                            <div class="form-group">
+                                <label>Tem experiência em cuidar de jardim?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="experienciaJardim" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="experienciaJardim" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="experienciaJardim" value="prefiro-nao" required>
+                                        <span>Prefiro não me comprometer</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="jardim-details">
+                                <div class="preferencia-field">
+                                    <label for="detalhesJardim">Especifique sua experiência com jardim</label>
+                                    <input type="text" id="detalhesJardim" name="detalhesJardim" placeholder="Ex: poda, plantio, irrigação...">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sabe cuidar de piscina?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="cuidarPiscina" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="cuidarPiscina" value="sim" required>
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="cuidarPiscina" value="prefiro-nao" required>
+                                        <span>Prefiro não me comprometer</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="piscina-details">
+                                <div class="preferencia-field">
+                                    <label for="detalhesPiscina">Especifique sua experiência com piscina</label>
+                                    <input type="text" id="detalhesPiscina" name="detalhesPiscina" placeholder="Ex: limpeza, tratamento químico, manutenção...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="outrosConhecimentosEle">Outros conhecimentos (Ele)</label>
+                            <input type="text" id="outrosConhecimentosEle" name="outrosConhecimentosEle" placeholder="Especifique outros conhecimentos...">
+                        </div>
+                    </div>
+
+                    <!-- Competências - ELA -->
+                    <div class="casal-section">
+                        <h3 class="casal-subtitle">
+                            <i class="fas fa-home"></i>
+                            Competências - Ela
+                        </h3>
+                        
+                        <div class="form-group full-width">
+                            <label>Competências e conhecimentos (marque todos que se aplicam):</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEla" value="limpeza-geral">
+                                    <span>Limpeza geral</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEla" value="lavanderia-passadoria">
+                                    <span>Lavanderia e passadoria</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEla" value="Montagem-Cama">
+                                    <span>Montagem de cama padrão hotelaria</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEla" value="organização-closet-armarios">
+                                    <span>Organização de Closet e armários</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEla" value="organizacao-casa">
+                                    <span>Organização da casa</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="competenciasEla" value="atendimento-contratantes">
+                                    <span>Atendimento aos contratantes</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- PERGUNTA INICIAL SOBRE COZINHAR -->
+                        <div class="form-group">
+                            <label>Sabe cozinhar?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sabeCozinhar" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sabeCozinhar" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- NOVAS HABILIDADES ESPECÍFICAS - ELA (COZINHA) - CONDICIONAL -->
+                        <div class="habilidades-extras habilidades-cozinha">
+                            <h4><i class="fas fa-utensils"></i> Habilidades Culinárias Específicas</h4>
+                            
+                            <div class="form-group full-width">
+                                <label>Especifique suas habilidades na cozinha (marque todos que se aplicam):</label>
+                                <div class="checkbox-grid-small">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="habilidadesCozinha" value="culinaria-brasileira">
+                                        <span>Culinária brasileira</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="habilidadesCozinha" value="culinaria-internacional">
+                                        <span>Culinária internacional</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="habilidadesCozinha" value="massas-caseiras">
+                                        <span>Massas caseiras</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="habilidadesCozinha" value="paes-caseiros">
+                                        <span>Pães caseiros</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="habilidadesCozinha" value="pratos-vegetarianos">
+                                        <span>Pratos vegetarianos/veganos</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="habilidadesCozinha" value="comida-fitness">
+                                        <span>Comida fitness/diet</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tem conhecimento em confeitaria?</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="conheceConfeitaria" value="nao" required>
+                                        <span>Não</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="conheceConfeitaria" value="basico" required>
+                                        <span>Básico</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="conheceConfeitaria" value="intermediario" required>
+                                        <span>Intermediário</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="conheceConfeitaria" value="avancado" required>
+                                        <span>Avançado</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="especialidadesCulinarias">Especialize outras habilidades culinárias</label>
+                                <input type="text" id="especialidadesCulinarias" name="especialidadesCulinarias" placeholder="Ex: sobremesas específicas, técnicas especiais...">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="outrosConhecimentosEla">Outros conhecimentos (Ela)</label>
+                            <input type="text" id="outrosConhecimentosEla" name="outrosConhecimentosEla" placeholder="Especifique outros conhecimentos...">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - DISPONIBILIDADE -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        Disponibilidade
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Disponibilidade para início imediato?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="inicioImediato" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="inicioImediato" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="data-disponivel">
+                            <div class="form-group">
+                                <label for="dataDisponivel">Data disponível para início</label>
+                                <input type="date" id="dataDisponivel" name="dataDisponivel">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Disponibilidade para morar no trabalho?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="morarTrabalho" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="morarTrabalho" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Disponibilidade para trabalhar aos finais de semana/feriados?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="fimSemana" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="fimSemana" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - REGIME E PRETENSÃO -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-dollar-sign"></i>
+                        Regime de Trabalho e Pretensão Salarial
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="regimeDesejado">Regime desejado</label>
+                            <select id="regimeDesejado" name="regimeDesejado">
+                                <option value="">Selecione</option>
+                                <option value="clt">CLT (Carteira assinada)</option>
+                                <option value="mei">MEI</option>
+                                <option value="temporario">Temporário</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="regime-outro">
+                            <div class="form-group">
+                                <label for="regimeOutroEspecificar">Especificar outro regime</label>
+                                <input type="text" id="regimeOutroEspecificar" name="regimeOutroEspecificar">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="pretensaoSalarialCasal">Pretensão salarial mensal para o casal (bruto)</label>
+                            <input type="text" id="pretensaoSalarialCasal" name="pretensaoSalarialCasal" placeholder="R$ 0.000,00">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - OBJETIVO E DISPONIBILIDADE -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-target"></i>
+                        Objetivo e Motivação
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="porqueJuntos">Por que desejam atuar juntos nesta função?</label>
+                        <textarea id="porqueJuntos" name="porqueJuntos" rows="4" placeholder="Descreva o que os motiva a trabalhar juntos como caseiros..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="diferencialCasal">O que consideram ser os diferenciais de vocês como casal?</label>
+                        <textarea id="diferencialCasal" name="diferencialCasal" rows="4" placeholder="Descreva os principais diferenciais e qualidades do casal..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES COMPLEMENTARES -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informações Complementares
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Possuem alguma restrição de saúde?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="restricao-details">
+                        <div class="form-group">
+                            <label for="especificarRestricao">Especifique a restrição de saúde</label>
+                            <input type="text" id="especificarRestricao" name="especificarRestricao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fumam?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fumam" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fumam" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Consomem bebida alcoólica?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="consumemAlcool" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="consumemAlcool" value="socialmente" required>
+                                <span>Socialmente</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="consumemAlcool" value="frequentemente" required>
+                                <span>Frequentemente</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
+                        <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para a candidatura do casal..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Botão de Envio -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura do Casal
+                    </button>
+                    <p style="margin-top: var(--spacing-md); color: var(--text-muted); font-size: 0.9rem;">
+                        Ao enviar este formulário, vocês concordam com o processamento de seus dados pessoais conforme nossa política de privacidade.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- SCRIPTS - ORDEM CORRETA -->
+     <script type="module" src="../../components/supabase-config.js"></script>
+    <script src="../../components/components.js"></script>
+    <script src="../global-section.js"></script>
+    <!-- ✅ SCRIPT CASAL SIMPLIFICADO - SUBSTITUIR A ÚLTIMA TAG <script> -->
+<script type="module">
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inicializando formulário Casal (usando global-section.js)...');
+    
+    // ✅ USAR FUNÇÃO GLOBAL APENAS para treinamento (casal tem estrutura própria)
+    carregarSecao('treinamento-obrigatorio', 'treinamento-obrigatorio-container');
+    
+    // ✅ Aguardar seções carregarem e inicializar campos específicos
+    setTimeout(() => {
+        initializeCasalSpecificFields();
+        console.log('✅ Casal: Campos específicos inicializados');
+        console.log('ℹ️ O envio será gerenciado automaticamente pelo global-section.js');
+    }, 1000);
+});
+
+// ===== CAMPOS ESPECÍFICOS DO CASAL (mais complexos) =====
+function initializeCasalSpecificFields() {
+    console.log('🔧 Configurando campos específicos do casal...');
+    
+    // ✅ MÁSCARAS PARA CPF E TELEFONES (específico do casal)
+    const aplicarMascaraCpf = (campo) => {
+        if (campo) {
+            campo.addEventListener('input', function(e) {
+                let valor = e.target.value.replace(/\D/g, '');
+                e.target.value = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            });
+        }
+    };
+    
+    const aplicarMascaraTelefone = (campo) => {
+        if (campo) {
+            campo.addEventListener('input', function(e) {
+                let valor = e.target.value.replace(/\D/g, '');
+                e.target.value = valor.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            });
+        }
+    };
+
+    const aplicarMascaraCep = (campo) => {
+        if (campo) {
+            campo.addEventListener('input', function(e) {
+                let valor = e.target.value.replace(/\D/g, '');
+                e.target.value = valor.replace(/(\d{5})(\d{3})/, '$1-$2');
+            });
+        }
+    };
+    
+    // Aplicar máscaras nos campos do casal
+    aplicarMascaraCpf(document.getElementById('cpfEle'));
+    aplicarMascaraCpf(document.getElementById('cpfEla'));
+    aplicarMascaraTelefone(document.getElementById('telefoneEle'));
+    aplicarMascaraTelefone(document.getElementById('whatsappEle'));
+    aplicarMascaraTelefone(document.getElementById('telefoneEla'));
+    aplicarMascaraTelefone(document.getElementById('whatsappEla'));
+    aplicarMascaraCep(document.getElementById('cep'));
+
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA RADIO BUTTONS
+    const setupConditionalRadio = (radioName, targetClass, showValue = 'sim') => {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    targetDiv.classList.toggle('show', this.value === showValue);
+                });
+            });
+        }
+    };
+
+    // ✅ CONFIGURAR CAMPOS CONDICIONAIS DO CASAL
+    setupConditionalRadio('possuiCnhEle', 'cnh-details-ele');
+    setupConditionalRadio('possuiCnhEla', 'cnh-details-ela');
+    setupConditionalRadio('temFilhos', 'filhos-details');
+    setupConditionalRadio('veiculoProprio', 'veiculo-details');
+    setupConditionalRadio('morarResidencia', 'pets-details');
+    setupConditionalRadio('possuiPets', 'pet-especificar');
+    setupConditionalRadio('trabalharamJuntos', 'trabalhou-juntos-tempo');
+    setupConditionalRadio('servicosBarman', 'coqueteis-nivel');
+    setupConditionalRadio('sabeCozinhar', 'habilidades-cozinha');
+    setupConditionalRadio('experienciaJardim', 'jardim-details');
+    setupConditionalRadio('cuidarPiscina', 'piscina-details');
+    setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
+    setupConditionalRadio('possuiReferencias', 'referencias-section');
+    setupConditionalRadio('inicioImediato', 'data-disponivel', 'nao');
+    setupConditionalRadio('restricaoSaude', 'restricao-details');
+
+    // ✅ REGIME OUTRO
+    const regimeDesejado = document.getElementById('regimeDesejado');
+    const regimeOutro = document.querySelector('.regime-outro');
+    if (regimeDesejado && regimeOutro) {
+        regimeDesejado.addEventListener('change', function() {
+            regimeOutro.classList.toggle('show', this.value === 'outro');
+        });
+    }
+
+    // ✅ REFERÊNCIAS "OUTRO"
+    ['ref1Relacao', 'ref2Relacao'].forEach(selectId => {
+        const select = document.getElementById(selectId);
+        const targetDiv = document.querySelector(`.${selectId.replace('Relacao', '-outro')}`);
+        
+        if (select && targetDiv) {
+            select.addEventListener('change', function() {
+                targetDiv.classList.toggle('show', this.value === 'outro');
+            });
+        }
+    });
+    
+    console.log('✅ Campos específicos do casal configurados');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaga: Governanta - R.O Recrutamento</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../components/components.css">
+    <link rel="stylesheet" href="../../style/form-style.css">
+</head>
+<body>
+    <!-- Header será importado via JS -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <main class="form-main">
+        <div class="container">
+            <form id="vagaCopeiroForm" class="candidate-form" novalidate>
+
+                <input type="hidden" name="formulario_id" value="vaga-governanta">
+
+                <!-- SEÇÃO: ACEITAR TERMOS (Importada) -->
+                <div id="aceitar-termos-container"></div>
+
+                <!-- SEÇÃO: DADOS DO PROPRIETÁRIO (Importada) -->
+                <div id="dados-proprietario-container"></div>
+
+                <!-- SEÇÃO: CARACTERÍSTICAS DA RESIDÊNCIA (Importada) -->
+                <div id="caracteristicas-residencia-container"></div>
+
+               <!--SESSÃO ESPECÍFICA DO COPEIRO-->
+
+                <!-- SEÇÃO: DETALHES DA VAGA (Importada) -->
+                <div id="detalhes-vaga-container"></div>
+
+                <!-- SEÇÃO: OFERTA SALARIAL (Importada) -->
+                <div id="oferta-salarial-container"></div>
+
+                <!-- SEÇÃO: REQUISITOS BÁSICOS (Importada) -->
+                <div id="requisitos-basicos-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA: GOVERNANTA -->
+<section class="form-section">
+    <h2 class="section-title">
+        <i class="fas fa-crown"></i>
+        Requisitos Específicos para Governanta
+    </h2>
+    
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Coordenação de equipe doméstica obrigatória?</label>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="coordenacaoEquipe" value="sim" required>
+                    <span>Sim, obrigatório</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="coordenacaoEquipe" value="desejavel" required>
+                    <span>Desejável</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="coordenacaoEquipe" value="nao" required>
+                    <span>Não necessário</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Conhecimento em etiqueta e protocolo social?</label>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="etiquetaProtocolo" value="sim" required>
+                    <span>Sim, obrigatório</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="etiquetaProtocolo" value="desejavel" required>
+                    <span>Desejável</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="etiquetaProtocolo" value="nao" required>
+                    <span>Não necessário</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Preparação e organização de eventos sociais?</label>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="organizacaoEventos" value="sim" required>
+                    <span>Sim, obrigatório</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="organizacaoEventos" value="desejavel" required>
+                    <span>Desejável</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="organizacaoEventos" value="nao" required>
+                    <span>Não necessário</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group full-width">
+            <label for="perfilDesejadoGovernanta">O que busca no perfil de uma governanta?</label>
+            <textarea id="perfilDesejadoGovernanta" name="perfilDesejadoGovernanta" rows="4" placeholder="Descreva as características e habilidades de gestão que considera importantes..."></textarea>
+        </div>
+
+        <div class="form-group full-width">
+            <label for="caracteristicasEvitarGovernanta">O que devemos evitar?</label>
+            <textarea id="caracteristicasEvitarGovernanta" name="caracteristicasEvitarGovernanta" rows="3" placeholder="Descreva comportamentos ou características que devem ser evitadas..."></textarea>
+        </div>
+    </div>
+</section>
+
+                <!-- OBSERVAÇÕES ADICIONAIS -->
+                <div id="observacoes-adicionais-container"></div>
+
+                <!-- TREINAMENTO PERSONALIZADO -->
+                <div id="treinamento-personalizado-container"></div>
+
+                <!-- Submit Button -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                        Cadastrar Vaga de Governanta
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer será importado via JS -->
+    <div id="footer-container"></div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-check-circle success-icon"></i>
+                    <h2>Vaga Cadastrada com Sucesso!</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Sua vaga para <strong>Governanta</strong> foi cadastrada em nossa plataforma.</p>
+                    <p>Nossa equipe analisará os candidatos disponíveis e entrará em contato em até <strong>24 horas</strong>.</p>
+                    <div class="next-steps">
+                        <h3>Próximos passos:</h3>
+                        <ul>
+                            <li>Análise dos candidatos compatíveis</li>
+                            <li>Pré-seleção baseada nos seus critérios</li>
+                            <li>Contato com os candidatos escolhidos</li>
+                            <li>Agendamento de entrevistas ou testes.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal()" class="btn-primary">
+                        <i class="fas fa-home"></i>
+                        Voltar ao Início
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <!-- JavaScript -->
+     <script type="module" src="../../components/supabase-config.js"></script>
+    <script src="../global-section-prop.js"></script>
+    <script src="../../components/components.js"></script>
+    <script>     
+// ===================================
+// SCRIPT PARA FORM-PROP-GOVERNANTA.HTML
+// Substituir todo o <script> existente no HTML
+// ===================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Carregando formulário de vaga - Governanta');
+    
+    // Carregar header e footer (se existirem)
+    if (typeof loadHeader === 'function') {
+        loadHeader('header-container');
+    }
+    if (typeof loadFooter === 'function') {
+        loadFooter('footer-container');
+    }
+    
+    // Carregar todas as seções padrão
+    loadOwnerFormSection('aceitar-termos', 'aceitar-termos-container');
+    loadOwnerFormSection('dados-proprietario', 'dados-proprietario-container');
+    loadOwnerFormSection('caracteristicas-residencia', 'caracteristicas-residencia-container');
+    loadOwnerFormSection('detalhes-vaga', 'detalhes-vaga-container');
+    loadOwnerFormSection('oferta-salarial', 'oferta-salarial-container');
+    loadOwnerFormSection('requisitos-basicos', 'requisitos-basicos-container');
+    loadOwnerFormSection('observacoes-adicionais', 'observacoes-adicionais-container');
+    loadOwnerFormSection('treinamento-personalizado', 'treinamento-personalizado-container');
+    
+    // Aguardar seções carregarem e configurar formulário
+    setTimeout(function() {
+        setupFormSubmission();
+        initializeSpecificSections();
+    }, 500);
+});
+
+// ===================================
+// COLETA DE DADOS ESPECÍFICOS - GOVERNANTA
+// ===================================
+function collectSpecificFormData(form) {
+    const formData = new FormData(form);
+    
+    return {
+        coordenacao_equipe: formData.get('coordenacaoEquipe'),
+        etiqueta_protocolo: formData.get('etiquetaProtocolo'),
+        organizacao_eventos: formData.get('organizacaoEventos'),
+        perfil_desejado: formData.get('perfilDesejadoGovernanta'),
+        caracteristicas_evitar: formData.get('caracteristicasEvitarGovernanta')
+    };
+}
+
+// ===================================
+// CONFIGURAR ENVIO DO FORMULÁRIO
+// ===================================
+function setupFormSubmission() {
+    const form = document.getElementById('vagaCopeiroForm');
+    if (!form) {
+        console.error('❌ Formulário não encontrado');
+        return;
+    }
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('📤 Submit do formulário de governanta iniciado');
+        
+        // Validar termos aceitos
+        if (!isTermsAccepted()) {
+            alert('❌ Você deve aceitar os termos de serviço para continuar.');
+            return;
+        }
+        
+        // Validar campos obrigatórios
+        if (!validateRequiredFields('vagaCopeiroForm')) {
+            alert('❌ Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+        
+        try {
+            // Coletar dados básicos
+            const basicData = collectBasicVagaFormData('vagaCopeiroForm');
+            if (!basicData) {
+                throw new Error('Erro ao coletar dados do formulário');
+            }
+            
+            // Definir tipo de formulário
+            basicData.formulario_id = 'vaga-governanta';
+            
+            // Coletar dados específicos da governanta
+            const specificData = collectSpecificFormData(form);
+            
+            // Montar dados finais
+            const vagaData = {
+                ...basicData,
+                dados_especificos: specificData,
+                status: 'ativa'
+            };
+            
+            console.log('📋 Dados da vaga de governanta preparados:', vagaData);
+            
+            // Enviar para Supabase
+            const result = await submitVagaToSupabase(vagaData);
+            
+            if (result.success) {
+                console.log('✅ Vaga de governanta cadastrada com sucesso!');
+                showSuccessModal();
+            } else {
+                console.error('❌ Erro ao cadastrar vaga:', result.error);
+                showErrorModal(result.error);
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro no envio:', error);
+            showErrorModal(error.message || 'Erro desconhecido ao processar formulário');
+        }
+    });
+    
+    console.log('✅ Envio do formulário de governanta configurado');
+}
+
+// ===================================
+// INICIALIZAR FUNCIONALIDADES ESPECÍFICAS
+// ===================================
+function initializeSpecificSections() {
+    // Não há campos condicionais específicos para governanta
+    // Apenas log para confirmar inicialização
+    console.log('✅ Funcionalidades específicas da governanta inicializadas');
+}
+
+// ===================================
+// FECHAR MODAL
+// ===================================
+function closeModal() {
+    const successModal = document.getElementById('successModal');
+    const errorModal = document.getElementById('errorModal');
+    
+    if (successModal) {
+        successModal.style.display = 'none';
+        window.location.href = '/';
+    }
+    
+    if (errorModal) {
+        errorModal.style.display = 'none';
+    }
+    
+    document.body.style.overflow = 'auto';
+}
+    </script>
+</body>
+</html>

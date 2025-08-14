@@ -1,0 +1,833 @@
+// R.O RECRUTAMENTO - API CORINGA EXPANDIDA
+// Recebe dados de TODOS os formularios (Candidatos + Vagas) e direciona para planilhas especificas
+
+// CONFIGURACAO DAS PLANILHAS
+const PLANILHAS_CONFIG = {
+  // CANDIDATOS
+  'candi-arrumadeira': '1qxdRE8tbOMzubEuoLsSkkpwzu91zmIgRONNSMVXdwJM',
+  'candi-copeiro': '1WKR7QUi7LK9_OsmGcK6NlgONPD71keErTwwVU1N9-do',
+  'candi-baba': 'SEU_ID_AQUI',
+  'candi-caseiro': '1kuLC51Grc6qASVQHMnQuZJZZz6OMEH7fOtnM6Fqn_r0',
+  'candi-cozinheira': 'SEU_ID_AQUI',
+  'candi-governanta': 'SEU_ID_AQUI',
+  'candi-casal': 'SEU_ID_AQUI',
+  
+  // VAGAS
+  'vaga-arrumadeira': 'SEU_ID_AQUI',
+  'vaga-copeiro': 'SEU_ID_AQUI',
+  'vaga-baba': 'SEU_ID_AQUI',
+  'vaga-caseiro': 'SEU_ID_AQUI',
+  'vaga-cozinheira': 'SEU_ID_AQUI',
+  'vaga-governanta': 'SEU_ID_AQUI',
+  'vaga-casal': 'SEU_ID_AQUI'
+};
+
+// FUNCAO PRINCIPAL - RECEBE TODOS OS FORMULARIOS
+function doPost(e) {
+  try {
+    console.log('=== API DEBUG INICIO ===');
+    console.log('FORMULARIO_ID RECEBIDO:', e.parameter.formulario_id);
+    console.log('NOME RECEBIDO:', e.parameter.nomeCompleto);
+    
+    const dadosFormulario = e.parameter;
+    const tipoFormulario = dadosFormulario.formulario_id;
+    const timestamp = new Date();
+    
+    console.log('TIPO PROCESSADO:', tipoFormulario);
+    
+    // VALIDAR SE FORMULARIO E RECONHECIDO
+    if (!tipoFormulario) {
+      console.log('ERRO: formulario_id ausente');
+      return criarResposta(false, 'FORM_ID_MISSING', 'Campo formulario_id nao encontrado');
+    }
+    
+    if (!PLANILHAS_CONFIG[tipoFormulario]) {
+      console.log('ERRO: tipo nao reconhecido:', tipoFormulario);
+      return criarResposta(false, 'FORM_NOT_FOUND', 'Formulario "' + tipoFormulario + '" nao reconhecido');
+    }
+    
+    // OBTER PLANILHA DE DESTINO
+    const planilhaId = PLANILHAS_CONFIG[tipoFormulario];
+    console.log('PLANILHA SELECIONADA:', planilhaId);
+    console.log('PARA TIPO:', tipoFormulario);
+    
+    // PROCESSAR DADOS CONFORME TIPO
+    let dadosProcessados;
+    if (tipoFormulario.startsWith('candi-')) {
+      dadosProcessados = processarDadosCandidato(dadosFormulario, tipoFormulario, timestamp);
+    } else if (tipoFormulario.startsWith('vaga-')) {
+      dadosProcessados = processarDadosVaga(dadosFormulario, tipoFormulario, timestamp);
+    } else {
+      console.log('ERRO: tipo invalido');
+      return criarResposta(false, 'INVALID_TYPE', 'Tipo de formulario invalido');
+    }
+    
+    // INSERIR NA PLANILHA
+    const resultado = inserirNaPlanilha(planilhaId, dadosProcessados);
+    
+    console.log('RESULTADO INSERCAO:', resultado);
+    
+    if (resultado.sucesso) {
+      console.log('=== SUCESSO ===');
+      console.log('INSERIDO NA LINHA:', resultado.linha);
+      return criarResposta(true, 'SUCCESS', 'Dados salvos com sucesso', {
+        formulario: tipoFormulario,
+        linha: resultado.linha,
+        timestamp: timestamp.toISOString()
+      });
+    } else {
+      console.log('ERRO INSERCAO:', resultado.erro);
+      return criarResposta(false, 'SHEET_ERROR', resultado.erro);
+    }
+    
+  } catch (error) {
+    console.error('ERRO GERAL:', error);
+    return criarResposta(false, 'INTERNAL_ERROR', error.toString());
+  }
+}
+
+// PROCESSAR DADOS DE CANDIDATOS
+function processarDadosCandidato(dados, tipo, timestamp) {
+  console.log('🔍 PROCESSANDO CANDIDATO:', tipo);
+  console.log('🔍 DADOS RECEBIDOS:', Object.keys(dados).length, 'campos');
+
+  // Estrutura base para candidatos (20 campos)
+  const dadosBase = [
+    timestamp,
+    dados.nomeCompleto || '',
+    dados.dataNascimento || '',
+    dados.cpf || '',
+    dados.rg || '',
+    dados.estadoCivil || '',
+    dados.nacionalidade || '',
+    dados.telefone || '',
+    dados.whatsapp || '',
+    dados.email || '',
+    dados.endereco || '',
+    dados.cep || '',
+    dados.possuiCnh || '',
+    dados.categoriaCnh || '',
+    dados.vencimentoCnh || '',
+    dados.temFilhos || '',
+    dados.quantosFilhos || '',
+    dados.idadesFilhos || '',
+    dados.aceitaTreinamento || '',
+    dados.turnoTreinamento || '',
+  ];
+  
+  console.log('✅ PROCESSANDO TIPO:', tipo);
+  
+  // ADICIONAR CAMPOS ESPECIFICOS POR TIPO
+  if (tipo === 'candi-copeiro') {
+    console.log('✅ PROCESSANDO COPEIRO');
+    dadosBase.push(
+      dados.conhecimentoVinhos || '',
+      dados.habilidadeCoqueteis || '',
+      dados.montagemMesas || '',
+      dados.decoracaoMesa || '',
+      dados.gestaoEstoque || '',
+      dados.etiquetaProtocolo || '',
+      processarArray(dados.tiposEventos),
+      dados.outrosEventosEspecificar || '',
+      dados.frequenciaEventos || '',
+      processarArray(dados.certificacoes)
+    );
+    
+  } else if (tipo === 'candi-caseiro') {
+    console.log('✅ PROCESSANDO CASEIRO');
+    dadosBase.push(
+      dados.tempoExperiencia || '',
+      dados.experienciaAltoPadrao || '',
+      dados.tempoAltoPadrao || '',
+      dados.possuiReferencias || '',
+      dados.ref1Nome || '',
+      dados.ref1Telefone || '',
+      dados.ref1Inicio || '',
+      dados.ref1Fim || '',
+      dados.ref1Relacao || '',
+      dados.ref1OutroEspecificar || '',
+      dados.ref2Nome || '',
+      dados.ref2Telefone || '',
+      dados.ref2Inicio || '',
+      dados.ref2Fim || '',
+      dados.ref2Relacao || '',
+      dados.ref2OutroEspecificar || '',
+      dados.manutencaoEletrica || '',
+      dados.manutencaoHidraulica || '',
+      dados.cuidadosJardim || '',
+      dados.cuidadosPiscina || '',
+      dados.experienciaSeguranca || '',
+      dados.automacaoResidencial || '',
+      processarArray(dados.equipamentosJardinagem),
+      dados.outrosEquipamentosJardimEspecificar || '',
+      dados.morarLocal || '',
+      processarArray(dados.certificacoes),
+      dados.outrosCertificacoesEspecificar || '',
+      dados.restricaoSaude || '',
+      dados.especificarRestricao || '',
+      dados.fuma || '',
+      dados.consumeAlcool || '',
+      dados.veiculoProprio || '',
+      dados.tipoVeiculo || '',
+      dados.situacoesEmergencia || '',
+      dados.porqueContratar || ''
+    );
+    
+  } else if (tipo === 'candi-cozinheira') {
+    console.log('✅ PROCESSANDO COZINHEIRA');
+    dadosBase.push(
+      dados.tempoExperiencia || '',
+      dados.experienciaAltoPadrao || '',
+      dados.tempoAltoPadrao || '',
+      processarArray(dados.tiposEstabelecimento),
+      dados.outrosEstabelecimentosEspecificar || '',
+      dados.possuiReferencias || '',
+      dados.ref1Nome || '',
+      dados.ref1Telefone || '',
+      dados.ref1Inicio || '',
+      dados.ref1Fim || '',
+      dados.ref1TipoCozinha || '',
+      dados.ref1Relacao || '',
+      dados.ref1OutroEspecificar || '',
+      dados.ref2Nome || '',
+      dados.ref2Telefone || '',
+      dados.ref2Inicio || '',
+      dados.ref2Fim || '',
+      dados.ref2TipoCozinha || '',
+      dados.ref2Relacao || '',
+      dados.ref2OutroEspecificar || '',
+      processarArray(dados.culinarias),
+      dados.outrosCulinariasEspecificar || '',
+      dados.brasileiraRegionalEspecificar || '',
+      dados.culinariaFavorita || '',
+      dados.nivelBrasileira || '',
+      dados.nivelItaliana || '',
+      dados.nivelFrancesa || '',
+      dados.nivelAsiatica || '',
+      processarArray(dados.dietasEspeciais),
+      dados.outrosDietasEspecificar || '',
+      processarArray(dados.alergiasAlimentares),
+      dados.outrasAlergiasEspecificar || '',
+      dados.adaptaReceitas || '',
+      processarArray(dados.tecnicasCoccao),
+      dados.outrosTecnicasCoccaoEspecificar || '',
+      dados.experienciaSobremesas || '',
+      processarArray(dados.habilidadesEspecificas),
+      dados.outrosHabilidadesEspecificar || '',
+      dados.planejamentoCardapios || '',
+      dados.gestaoEstoque || '',
+      processarArray(dados.certificacoes),
+      dados.outrosCertificacoesEspecificar || '',
+      dados.restricaoSaude || '',
+      dados.especificarRestricao || '',
+      dados.alergiaAlimento || '',
+      dados.especificarAlergiaAlimento || '',
+      dados.fuma || '',
+      dados.veiculoProprio || '',
+      dados.tipoVeiculo || '',
+      dados.pratoEspecialidade || '',
+      dados.atualizacaoTendencias || ''
+    );
+    
+  } else if (tipo === 'candi-governanta') {
+    console.log('✅ PROCESSANDO GOVERNANTA');
+    dadosBase.push(
+      dados.tempoExperiencia || '',
+      dados.experienciaAltoPadrao || '',
+      dados.tempoAltoPadrao || '',
+      dados.coordenouEquipes || '',
+      dados.tamanhoEquipe || '',
+      dados.responRotinaCompras || '',
+      processarArray(dados.tiposResidencia),
+      dados.outrosResidenciaEspecificar || '',
+      dados.possuiReferencias || '',
+      dados.ref1Nome || '',
+      dados.ref1Telefone || '',
+      dados.ref1Inicio || '',
+      dados.ref1Fim || '',
+      dados.ref1Relacao || '',
+      dados.ref1OutroEspecificar || '',
+      dados.ref2Nome || '',
+      dados.ref2Telefone || '',
+      dados.ref2Inicio || '',
+      dados.ref2Fim || '',
+      dados.ref2Relacao || '',
+      dados.ref2OutroEspecificar || '',
+      dados.organizacaoLideranca || '',
+      dados.controleEstoque || '',
+      dados.organizacaoRotina || '',
+      dados.atendimentoMoradores || '',
+      dados.planejamentoRefeicoes || '',
+      dados.etiquetaProtocolo || '',
+      dados.preparacaoEventos || '',
+      processarArray(dados.certificacoes),
+      dados.outrosCertificacoesEspecificar || '',
+      dados.organizaEquipe || '',
+      dados.participouEventos || '',
+      dados.descricaoEventos || '',
+      dados.porquePessoaCerta || '',
+      dados.diferencialGovernanta || '',
+      dados.restricaoSaude || '',
+      dados.especificarRestricao || '',
+      dados.fuma || '',
+      dados.alergiaLimpeza || '',
+      dados.especificarAlergia || ''
+    );
+    
+  } else if (tipo === 'candi-arrumadeira') {
+    console.log('✅ PROCESSANDO ARRUMADEIRA');
+    dadosBase.push(
+      dados.tempoExperiencia || '',
+      dados.experienciaAltoPadrao || '',
+      dados.tempoAltoPadrao || '',
+      processarArray(dados.tiposResidencia),
+      dados.outrosResidenciaEspecificar || '',
+      dados.possuiReferencias || '',
+      dados.ref1Nome || '',
+      dados.ref1Telefone || '',
+      dados.ref1Inicio || '',
+      dados.ref1Fim || '',
+      dados.ref1Relacao || '',
+      dados.ref1OutroEspecificar || '',
+      dados.ref2Nome || '',
+      dados.ref2Telefone || '',
+      dados.ref2Inicio || '',
+      dados.ref2Fim || '',
+      dados.ref2Relacao || '',
+      dados.ref2OutroEspecificar || '',
+      processarArray(dados.equipamentosLimpeza),
+      dados.outrosEquipamentosEspecificar || '',
+      dados.organizacaoClosets || '',
+      dados.montagemCama || '',
+      dados.tecnicasLavanderia || '',
+      dados.habilidadePassar || '',
+      processarArray(dados.tecnicasOrganizacao),
+      dados.outrosTecnicasEspecificar || '',
+      dados.experienciaEventos || '',
+      processarArray(dados.produtosLimpeza),
+      dados.outrosProdutosEspecificar || '',
+      dados.alergiaLimpeza || '',
+      dados.especificarAlergia || '',
+      processarArray(dados.metodosLimpeza),
+      dados.outrosMetodosEspecificar || '',
+      processarArray(dados.certificacoes),
+      dados.outrosCertificacoesEspecificar || '',
+      dados.experienciaAnimais || '',
+      processarArray(dados.tiposAnimais),
+      dados.outrosAnimaisEspecificar || '',
+      dados.experienciaCriancas || '',
+      dados.lidaObjetosValor || '',
+      dados.restricaoSaude || '',
+      dados.especificarRestricao || '',
+      dados.fuma || '',
+      dados.problemasArticulacoes || '',
+      dados.especificarProblemas || '',
+      dados.veiculoProprio || '',
+      dados.tipoVeiculo || '',
+      dados.maiorDiferencial || '',
+      dados.organizaRotina || ''
+    );
+    
+  } else if (tipo === 'candi-baba') {
+    console.log('✅ PROCESSANDO BABA');
+    dadosBase.push(
+      dados.tempoExperiencia || '',
+      dados.experienciaAltoPadrao || '',
+      dados.tempoAltoPadrao || '',
+      dados.possuiReferencias || '',
+      dados.ref1Nome || '',
+      dados.ref1Telefone || '',
+      dados.ref1Inicio || '',
+      dados.ref1Fim || '',
+      dados.ref1IdadesCriancas || '',
+      dados.ref1Relacao || '',
+      dados.ref1OutroEspecificar || '',
+      dados.ref2Nome || '',
+      dados.ref2Telefone || '',
+      dados.ref2Inicio || '',
+      dados.ref2Fim || '',
+      dados.ref2IdadesCriancas || '',
+      dados.ref2Relacao || '',
+      dados.ref2OutroEspecificar || '',
+      processarArray(dados.faixasEtarias),
+      dados.faixaPreferencia || '',
+      dados.numeroMaximoCriancas || '',
+      dados.conhecimentoDesenvolvimento || '',
+      dados.atividadesLudicas || '',
+      processarArray(dados.necessidadesEspeciais),
+      dados.outrosNecessidadesEspecificar || '',
+      dados.prepararRefeicoes || '',
+      processarArray(dados.restricoesAlimentares),
+      dados.outrosRestricoesEspecificar || '',
+      dados.primeirosSocorros || '',
+      dados.dataCursoPrimeiros || '',
+      processarArray(dados.outrosCursos),
+      dados.outrosCursosEspecificar || '',
+      dados.dormirTrabalho || '',
+      dados.morarLocal || '',
+      processarArray(dados.atividades),
+      dados.outrosAtividadesEspecificar || '',
+      dados.lidaBirras || '',
+      dados.nivelIngles || '',
+      dados.nivelEspanhol || '',
+      dados.nivelFrances || '',
+      dados.outrosIdiomas || '',
+      dados.ensinaIdiomas || '',
+      dados.quaisIdiomasEnsina || '',
+      dados.restricaoSaude || '',
+      dados.especificarRestricao || '',
+      dados.fuma || '',
+      dados.temAlergias || '',
+      dados.especificarAlergias || '',
+      dados.veiculoProprio || '',
+      dados.tipoVeiculo || '',
+      dados.situacoesEmergencia || '',
+      dados.porqueEscolheuBaba || '',
+      dados.estiloCuidar || ''
+    );
+    
+  } else if (tipo === 'candi-casal') {
+    console.log('✅ PROCESSANDO CASAL');
+    dadosBase.push(
+      // DADOS ELE
+      dados.nomeCompletoEle || '',
+      dados.dataNascimentoEle || '',
+      dados.cpfEle || '',
+      dados.telefoneEle || '',
+      dados.whatsappEle || '',
+      dados.emailEle || '',
+      dados.possuiCnhEle || '',
+      dados.categoriaCnhEle || '',
+      
+      // DADOS ELA
+      dados.nomeCompletoEla || '',
+      dados.dataNascimentoEla || '',
+      dados.cpfEla || '',
+      dados.telefoneEla || '',
+      dados.whatsappEla || '',
+      dados.emailEla || '',
+      dados.possuiCnhEla || '',
+      dados.categoriaCnhEla || '',
+      
+      // DADOS GERAIS DO CASAL
+      dados.estadoCivil || '',
+      dados.tempoJuntos || '',
+      dados.enderecoCompleto || '',
+      dados.cep || '',
+      dados.temFilhos || '',
+      dados.quantosFilhos || '',
+      dados.idadesFilhos || '',
+      dados.veiculoProprio || '',
+      dados.tipoVeiculo || '',
+      dados.morarResidencia || '',
+      dados.possuiPets || '',
+      dados.tipoPet || '',
+      
+      // EXPERIENCIA PROFISSIONAL
+      dados.trabalharamJuntos || '',
+      dados.tempoCaseiros || '',
+      dados.experienciaAltoPadrao || '',
+      dados.tempoAltoPadrao || '',
+      dados.possuiReferencias || '',
+      dados.ref1Nome || '',
+      dados.ref1Telefone || '',
+      dados.ref1Inicio || '',
+      dados.ref1Fim || '',
+      dados.ref1Relacao || '',
+      dados.ref1OutroEspecificar || '',
+      dados.ref2Nome || '',
+      dados.ref2Telefone || '',
+      dados.ref2Inicio || '',
+      dados.ref2Fim || '',
+      dados.ref2Relacao || '',
+      dados.ref2OutroEspecificar || '',
+      
+      // COMPETENCIAS ELE
+      processarArray(dados.competenciasEle),
+      dados.sabeFazerChurrasco || '',
+      dados.sabeAssarPizza || '',
+      dados.montarAperitivos || '',
+      dados.servicosBarman || '',
+      processarArray(dados.nivelCoqueteis),
+      dados.experienciaJardim || '',
+      dados.detalhesJardim || '',
+      dados.cuidarPiscina || '',
+      dados.detalhesPiscina || '',
+      dados.outrosConhecimentosEle || '',
+      
+      // COMPETENCIAS ELA
+      processarArray(dados.competenciasEla),
+      dados.sabeCozinhar || '',
+      processarArray(dados.habilidadesCozinha),
+      dados.conheceConfeitaria || '',
+      dados.especialidadesCulinarias || '',
+      dados.outrosConhecimentosEla || '',
+      
+      // DISPONIBILIDADE
+      dados.inicioImediato || '',
+      dados.dataDisponivel || '',
+      dados.morarTrabalho || '',
+      dados.fimSemana || '',
+      
+      // REGIME E PRETENSAO
+      dados.regimeDesejado || '',
+      dados.regimeOutroEspecificar || '',
+      dados.pretensaoSalarialCasal || '',
+      
+      // OBJETIVO E MOTIVACAO
+      dados.porqueJuntos || '',
+      dados.diferencialCasal || '',
+      
+      // INFORMACOES COMPLEMENTARES
+      dados.restricaoSaude || '',
+      dados.especificarRestricao || '',
+      dados.fumam || '',
+      dados.consumemAlcool || ''
+    );
+    
+  } else {
+    // TIPO NÃO RECONHECIDO - ADICIONAR CAMPOS VAZIOS PARA MANTER ESTRUTURA
+    console.error('❌ TIPO NÃO RECONHECIDO:', tipo);
+    console.log('⚠️ Adicionando campos vazios para manter compatibilidade');
+    // Adicionar 10 campos vazios como fallback (estrutura mínima)
+    for (let i = 0; i < 10; i++) {
+      dadosBase.push('');
+    }
+  }
+  
+  // Adicionar campos universais finais (16 campos)
+  dadosBase.push(
+    dados.pretensaoSalarial || '',
+    dados.regimeTrabalho || '',
+    dados.negociavel || '',
+    dados.inicioImediato || '',
+    dados.dataDisponivel || '',
+    dados.eventosNoturnos || '',
+    dados.fimSemana || '',
+    dados.dormirFimSemana || '',
+    dados.viagens || '',
+    dados.passaporte || '',
+    dados.vencimentoPassaporte || '',
+    dados.maiorDiferencial || '',
+    dados.organizaRotina || '',
+    dados.observacoesAdicionais || '',
+    'Novo',
+    tipo
+  );
+  
+  console.log('🔍 DADOS FINAIS:', dadosBase.length, 'colunas');
+  return dadosBase;
+}
+
+// PROCESSAR DADOS DE VAGAS
+function processarDadosVaga(dados, tipo, timestamp) {
+  console.log('🔍 PROCESSANDO VAGA:', tipo);
+  console.log('🔍 DADOS RECEBIDOS:', Object.keys(dados).length, 'campos');
+  
+  // Estrutura base para vagas (33 campos)
+  const dadosBase = [
+    timestamp,
+    dados.aceitaTermos || '',
+    dados.nome || '',
+    dados.sobrenome || '',
+    dados.email || '',
+    dados.cidade || '',
+    dados.condominio || '',
+    dados.ruaNumero || '',
+    dados.telefonePrincipal || '',
+    dados.telefoneOpcional || '',
+    dados.tipoResidencia || '',
+    dados.frequenciaVeraneio || '',
+    dados.temPets || '',
+    dados.tiposPets || '',
+    dados.cuidadosPets || '',
+    dados.estiloCasa || '',
+    dados.inicioUrgente || '',
+    dados.regimeTrabalho || '',
+    dados.folgasSemana || '',
+    dados.horarioTrabalho || '',
+    dados.horarioFimSemana || '',
+    dados.fimSemanaMensalFolga || '',
+    dados.dormirTrabalho || '',
+    dados.restricoesVaga || '',
+    dados.salarioOferecido || '',
+    processarArray(dados.beneficios),
+    dados.outrosBeneficios || '',
+    dados.cnhObrigatoria || '',
+    dados.experienciaObrigatoria || '',
+    dados.experienciaMinima || '',
+    dados.temIdadeMinima || '',
+    dados.idadeMinima || '',
+    dados.referenciasObrigatorias || ''
+  ];
+  
+  console.log('✅ PROCESSANDO VAGA TIPO:', tipo);
+  
+  // Adicionar campos especificos baseado no tipo
+  if (tipo === 'vaga-copeiro') {
+    console.log('✅ PROCESSANDO VAGA COPEIRO');
+    dadosBase.push(
+      dados.conhecimentoChurrasco || '',
+      dados.conhecimentoCoqueteis || '',
+      dados.responsavelLoucaria || '',
+      dados.tipoJornada || '',
+      dados.perfilDesejado || '',
+      dados.caracteristicasEvitar || ''
+    );
+    
+  } else if (tipo === 'vaga-baba') {
+    console.log('✅ PROCESSANDO VAGA BABA');
+    dadosBase.push(
+      dados.quantidadeCriancas || '',
+      dados.idadesCriancas || '',
+      dados.formacaoNecessaria || '',
+      dados.cuidadosEspeciais || '',
+      dados.especificarCuidados || '',
+      dados.prepararRefeicoes || '',
+      dados.dormirTrabalho || '',
+      dados.acompanharViagens || '',
+      dados.outroIdioma || '',
+      dados.especificarIdioma || '',
+      dados.perfilDesejadoBaba || '',
+      dados.caracteristicasEvitarBaba || ''
+    );
+
+  } else if (tipo === 'vaga-caseiro') {
+    console.log('✅ PROCESSANDO VAGA CASEIRO');
+    dadosBase.push(
+      dados.cuidarJardim || '',
+      dados.cuidarPiscina || '',
+      dados.morarResidencia || '',
+      dados.saberChurrasco || '',
+      dados.saberDrinks || '',
+      dados.perfilDesejadoCaseiro || '',
+      dados.caracteristicasEvitarCaseiro || ''
+    );
+
+  } else if (tipo === 'vaga-cozinheira') {
+    console.log('✅ PROCESSANDO VAGA COZINHEIRA');
+    dadosBase.push(
+      dados.tipoCulinaria || '',
+      dados.dietaEspecial || '',
+      dados.especificarDieta || '',
+      dados.saberConfeitaria || '',
+      dados.generoVaga || '',
+      dados.perfilDesejadoCozinheira || '',
+      dados.caracteristicasEvitarCozinheira || ''
+    );
+
+  } else if (tipo === 'vaga-governanta') {
+    console.log('✅ PROCESSANDO VAGA GOVERNANTA');
+    dadosBase.push(
+      dados.coordenacaoEquipe || '',
+      dados.etiquetaProtocolo || '',
+      dados.organizacaoEventos || '',
+      dados.perfilDesejadoGovernanta || '',
+      dados.caracteristicasEvitarGovernanta || ''
+    );
+
+  } else if (tipo === 'vaga-arrumadeira') {
+    console.log('✅ PROCESSANDO VAGA ARRUMADEIRA');
+    dadosBase.push(
+      dados.organizacaoCloset || '',
+      dados.lavarPassar || '',
+      dados.perfilDesejadoArrumadeira || '',
+      dados.caracteristicasEvitarArrumadeira || ''
+    );
+
+  } else if (tipo === 'vaga-casal') {
+    console.log('✅ PROCESSANDO VAGA CASAL');
+    dadosBase.push(
+      // ELE
+      dados.eleCuidarJardim || '',
+      dados.eleCuidarPiscina || '',
+      dados.eleSaberChurrasco || '',
+      dados.eleSaberDrinks || '',
+      
+      // ELA
+      dados.elaSaberCozinhar || '',
+      dados.tipoCulinariaCasal || '',
+      dados.elaLavarPassar || '',
+      dados.elaLimpezaGeral || '',
+      
+      // AMBOS
+      dados.casalMorarResidencia || '',
+      dados.casalDormirFimSemana || '',
+      dados.perfilDesejadoCasal || '',
+      dados.caracteristicasEvitarCasal || ''
+    );
+    
+  } else {
+    // TIPO NÃO RECONHECIDO - ADICIONAR CAMPOS VAZIOS PARA MANTER ESTRUTURA
+    console.error('❌ TIPO DE VAGA NÃO RECONHECIDO:', tipo);
+    console.log('⚠️ Adicionando campos vazios para manter compatibilidade');
+    // Adicionar 6 campos vazios como fallback
+    for (let i = 0; i < 6; i++) {
+      dadosBase.push('');
+    }
+  }
+  
+  // Adicionar campos finais (5 campos)
+  dadosBase.push(
+    dados.interesseTreinamento || '',
+    dados.observacoes || '',
+    dados.contatoPreferido || '',
+    processarArray(dados.horarioContato),
+    'Nova',
+    tipo
+  );
+  
+  console.log('🔍 DADOS FINAIS VAGA:', dadosBase.length, 'colunas');
+  return dadosBase;
+}
+
+// INSERIR DADOS NA PLANILHA
+function inserirNaPlanilha(planilhaId, dados) {
+  try {
+    console.log('=== DEBUG INSERIR PLANILHA ===');
+    console.log('PLANILHA ID RECEBIDO:', planilhaId);
+    console.log('TIPO DO ID:', typeof planilhaId);
+    console.log('TAMANHO DO ID:', planilhaId?.length);
+    console.log('DADOS PARA INSERIR:', dados.length, 'colunas');
+    console.log('ID VÁLIDO?', planilhaId && planilhaId.length > 10);
+    
+    // Teste se existe
+    if (!planilhaId) {
+      throw new Error('ID da planilha está null/undefined');
+    }
+    
+    if (typeof planilhaId !== 'string') {
+      throw new Error('ID da planilha não é string: ' + typeof planilhaId);
+    }
+    
+    // Verificar se é placeholder
+    if (planilhaId === 'SEU_ID_AQUI') {
+      throw new Error('ID da planilha não configurado (ainda é placeholder)');
+    }
+    
+    console.log('TENTANDO ABRIR PLANILHA...');
+    const spreadsheet = SpreadsheetApp.openById(planilhaId);
+    
+    console.log('PLANILHA ABERTA COM SUCESSO:', spreadsheet.getName());
+    const sheet = spreadsheet.getActiveSheet();
+    console.log('ABA ATIVA:', sheet.getName());
+    
+    // Encontrar próxima linha vazia
+    const proximaLinha = sheet.getLastRow() + 1;
+    console.log('INSERINDO NA LINHA:', proximaLinha);
+    
+    // Inserir dados
+    sheet.getRange(proximaLinha, 1, 1, dados.length).setValues([dados]);
+    
+    console.log('✅ DADOS INSERIDOS COM SUCESSO');
+    console.log('   Linha:', proximaLinha);
+    console.log('   Planilha:', spreadsheet.getName());
+    console.log('   Colunas inseridas:', dados.length);
+    
+    return {
+      sucesso: true,
+      linha: proximaLinha,
+      planilha: spreadsheet.getName()
+    };
+    
+  } catch (error) {
+    console.error('❌ ERRO AO INSERIR NA PLANILHA:', error.toString());
+    console.error('   Planilha ID:', planilhaId);
+    console.error('   Número de colunas:', dados ? dados.length : 'undefined');
+    
+    return {
+      sucesso: false,
+      erro: error.toString()
+    };
+  }
+}
+
+// FUNCAO AUXILIAR - PROCESSAR ARRAYS (checkboxes)
+function processarArray(campo) {
+  if (Array.isArray(campo)) {
+    return campo.join(', ');
+  }
+  return campo || '';
+}
+
+// FUNCAO AUXILIAR - CRIAR RESPOSTA PADRONIZADA
+function criarResposta(sucesso, codigo, mensagem, dados) {
+  const resposta = {
+    success: sucesso,
+    code: codigo,
+    message: mensagem,
+    timestamp: new Date().toISOString()
+  };
+  
+  if (dados) {
+    resposta.data = dados;
+  }
+  
+  return ContentService
+    .createTextOutput(JSON.stringify(resposta))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// FUNCAO AUXILIAR - VALIDAR CAMPOS OBRIGATORIOS
+function validarCamposObrigatorios(dados, tipo) {
+  const camposObrigatorios = ['email', 'formulario_id'];
+  
+  // Adicionar campos especificos por tipo
+  if (tipo.startsWith('candi-')) {
+    if (tipo === 'candi-casal') {
+      camposObrigatorios.push('nomeCompletoEle', 'nomeCompletoEla', 'emailEle', 'emailEla');
+    } else {
+      camposObrigatorios.push('nomeCompleto', 'telefone');
+    }
+  } else if (tipo.startsWith('vaga-')) {
+    camposObrigatorios.push('nome', 'telefonePrincipal');
+  }
+  
+  const camposFaltando = [];
+  for (let i = 0; i < camposObrigatorios.length; i++) {
+    const campo = camposObrigatorios[i];
+    if (!dados[campo] || dados[campo].trim() === '') {
+      camposFaltando.push(campo);
+    }
+  }
+  
+  return camposFaltando;
+}
+
+// FUNCAO DE TESTE - MANTER PARA DEBUG
+function testeAbrirPlanilhaDebug() {
+  try {
+    console.log('=== TESTE DEBUG PLANILHAS ===');
+    
+    // Testar com ID que SABEMOS que funciona
+    const idCopeiro = '1WKR7QUi7LK9_OsmGcK6NlgONPD71keErTwwVU1N9-do';
+    console.log('Testando ID copeiro:', idCopeiro);
+    
+    const sheetCopeiro = SpreadsheetApp.openById(idCopeiro);
+    console.log('SUCESSO copeiro:', sheetCopeiro.getName());
+    
+    // Testar com outros IDs configurados
+    const config = PLANILHAS_CONFIG;
+    Object.keys(config).forEach(tipo => {
+      const id = config[tipo];
+      console.log('Testando', tipo, ':', id);
+      
+      if (id === 'SEU_ID_AQUI') {
+        console.log('SKIP', tipo, ': ID não configurado ainda');
+        return;
+      }
+      
+      try {
+        const sheetTeste = SpreadsheetApp.openById(id);
+        console.log('SUCESSO', tipo, ':', sheetTeste.getName());
+      } catch (err) {
+        console.error('ERRO', tipo, ':', err.toString());
+      }
+    });
+    
+    console.log('=== FIM TESTE DEBUG ===');
+    
+  } catch (error) {
+    console.error('ERRO NO TESTE:', error.toString());
+  }
+}
