@@ -90,13 +90,21 @@ const secoes = {
             <div class="form-grid">
                 <div class="form-group">
                     <label for="telefone">Telefone Principal <span class="required-asterisk">*</span></label>
-                    <input type="tel" id="telefone" name="telefone" placeholder="(11) 99999-9999" required>
+                    <!-- Campo visível (mascarado) - CORRIGIR O NAME -->
+                    <input type="tel" id="telefone" name="telefone_display" placeholder="(11) 99999-9999" required>
+                    <!-- Campo escondido (vai para o banco com DDI) -->
+                    <input type="hidden" id="telefone_hidden" name="telefone">
                 </div>
                 
                 <div class="form-group">
                     <label for="whatsapp">WhatsApp <span class="required-asterisk">*</span></label>
-                    <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 99999-9999" required>
+                    <!-- Campo visível (mascarado) - CORRIGIR O NAME -->
+                    <input type="tel" id="whatsapp" name="whatsapp_display" placeholder="(11) 99999-9999" required>
+                    <!-- Campo escondido (vai para o banco com DDI) -->
+                    <input type="hidden" id="whatsapp_hidden" name="whatsapp">
                 </div>
+            </div>
+
                 
                 <div class="form-group full-width">
                     <label for="email">E-mail <span class="required-asterisk">*</span></label>
@@ -514,7 +522,19 @@ function configurarMascaraCPF() {
     if (cpfInput) {
         cpfInput.addEventListener('input', function(e) {
             let valor = e.target.value.replace(/\D/g, '');
-            valor = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            
+            // Limitar a 11 dígitos
+            valor = valor.slice(0, 11);
+            
+            // Aplicar máscara apenas se tiver dígitos suficientes
+            if (valor.length > 9) {
+                valor = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            } else if (valor.length > 6) {
+                valor = valor.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            } else if (valor.length > 3) {
+                valor = valor.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            }
+            
             e.target.value = valor;
         });
     }
@@ -524,18 +544,108 @@ function configurarMascaraCPF() {
  * Configura máscaras de telefone
  */
 function configurarMascarasTelefone() {
+    console.log('🔧 Configurando máscaras de telefone...');
+    
     const telefoneInputs = ['telefone', 'whatsapp'];
     
     telefoneInputs.forEach(id => {
         const input = document.getElementById(id);
-        if (input) {
+        const hiddenInput = document.getElementById(id + '_hidden');
+
+        if (input && hiddenInput) {
+            console.log(`✅ Configurando máscara para: ${id}`);
+            
+            // Evento de input para aplicar máscara em tempo real
             input.addEventListener('input', function(e) {
-                let valor = e.target.value.replace(/\D/g, '');
-                valor = valor.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-                e.target.value = valor;
+                // Remove tudo que não for número
+                let cru = e.target.value.replace(/\D/g, '');
+                
+                // Limita a 11 dígitos (DDD + número)
+                cru = cru.slice(0, 11);
+
+                // Aplica máscara para exibição
+                let formatado = '';
+                if (cru.length > 0) {
+                    if (cru.length <= 2) {
+                        formatado = `(${cru}`;
+                    } else if (cru.length <= 7) {
+                        formatado = `(${cru.slice(0, 2)}) ${cru.slice(2)}`;
+                    } else {
+                        formatado = `(${cru.slice(0, 2)}) ${cru.slice(2, 7)}-${cru.slice(7)}`;
+                    }
+                }
+                
+                e.target.value = formatado;
+
+                // Salva no campo hidden com DDI do Brasil (55)
+                const valorParaBanco = cru.length >= 10 ? '55' + cru : '';
+                hiddenInput.value = valorParaBanco;
+                
+                // Debug - removar depois de testar
+                console.log(`📱 ${id}: "${formatado}" → "${valorParaBanco}"`);
             });
+
+            // Evento blur para garantir formatação final
+            input.addEventListener('blur', function(e) {
+                const cru = e.target.value.replace(/\D/g, '');
+                const valorFinal = cru.length >= 10 ? '55' + cru : '';
+                hiddenInput.value = valorFinal;
+                
+                console.log(`🎯 ${id} final: "${valorFinal}"`);
+            });
+
+            // Permite colar números sem formatação
+            input.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    e.target.dispatchEvent(new Event('input'));
+                }, 10);
+            });
+
+        } else {
+            console.warn(`⚠️ Elementos não encontrados para: ${id}`);
         }
     });
+}
+
+// Função para validar telefones antes do envio
+function validarTelefones() {
+    const telefone = document.getElementById('telefone_hidden').value;
+    const whatsapp = document.getElementById('whatsapp_hidden').value;
+    
+    console.log('📋 Validando telefones:', { telefone, whatsapp });
+    
+    if (!telefone || telefone.length < 12) {
+        alert('❌ Telefone principal deve ter pelo menos 10 dígitos');
+        return false;
+    }
+    
+    if (!whatsapp || whatsapp.length < 12) {
+        alert('❌ WhatsApp deve ter pelo menos 10 dígitos');
+        return false;
+    }
+    
+    return true;
+}
+
+// Função para debug - ver os valores antes do envio
+function debugTelefones() {
+    const telefoneDisplay = document.getElementById('telefone').value;
+    const telefoneHidden = document.getElementById('telefone_hidden').value;
+    const whatsappDisplay = document.getElementById('whatsapp').value;
+    const whatsappHidden = document.getElementById('whatsapp_hidden').value;
+    
+    console.log('🔍 DEBUG TELEFONES:');
+    console.log('Telefone Display:', telefoneDisplay);
+    console.log('Telefone Hidden:', telefoneHidden);
+    console.log('WhatsApp Display:', whatsappDisplay);
+    console.log('WhatsApp Hidden:', whatsappHidden);
+    
+    return {
+        telefoneDisplay,
+        telefoneHidden,
+        whatsappDisplay,
+        whatsappHidden
+    };
 }
 
 /**
@@ -995,27 +1105,50 @@ function validarFormulario(form) {
     
     const erros = [];
     
-    // Campos obrigatórios
+    // 1. Campos obrigatórios
     const camposObrigatorios = form.querySelectorAll('[required]');
     camposObrigatorios.forEach(campo => {
         if (!campo.value || campo.value.trim() === '') {
-            const nome = campo.name || campo.id || 'Campo sem nome';
+            const nome = campo.getAttribute('name') || campo.id || 'Campo sem nome';
             erros.push(`Campo "${nome}" é obrigatório`);
         }
     });
     
-    // Validar formulario_id
+    // 2. CORRIGIR: Validar formulario_id (com underscore)
     const formularioId = form.querySelector('input[name="formulario_id"]');
     if (!formularioId || !formularioId.value) {
         erros.push('Tipo de formulário não identificado');
-    } else if (!TIPOS_CANDIDATOS.includes(formularioId.value)) {
-        erros.push(`Tipo de candidato inválido: ${formularioId.value}`);
+        console.error('❌ Campo formulario_id não encontrado no formulário');
+    } else {
+        // Verificar se o tipo é válido
+        const tiposValidos = [
+            'candi-baba', 'candi-cozinheira', 'candi-domestica', 'candi-passadeira',
+            'candi-caseiro', 'candi-copeiro', 'candi-governanta', 'candi-arrumadeira', 'candi-casal',
+            'vaga-baba', 'vaga-cozinheira', 'vaga-domestica', 'vaga-passadeira',
+            'vaga-arrumadeira', 'vaga-caseiro', 'vaga-governanta', 'vaga-copeiro'
+        ];
+        
+        if (!tiposValidos.includes(formularioId.value)) {
+            erros.push(`Tipo de formulário inválido: ${formularioId.value}`);
+        }
+        
+        console.log(`✅ Formulário identificado como: ${formularioId.value}`);
     }
     
-    // Validar email
+    // 3. Validar email
     const email = form.querySelector('input[name="email"]');
     if (email && email.value && !validarEmail(email.value)) {
         erros.push('Email inválido');
+    }
+    
+    // 4. Validar CPF se for candidato
+   // 4. Validar CPF - apenas formato
+    const cpf = form.querySelector('input[name="cpf"]');
+    if (cpf && cpf.value) {
+        const cpfLimpo = cpf.value.replace(/[^\d]/g, '');
+        if (cpfLimpo.length !== 11) {
+            erros.push('CPF deve ter 11 dígitos');
+        }
     }
     
     if (erros.length > 0) {
@@ -1026,6 +1159,33 @@ function validarFormulario(form) {
     
     console.log('✅ Formulário válido');
     return true;
+}
+
+function garantirFormularioId(form) {
+    let formularioId = form.querySelector('input[name="formulario_id"]');
+    
+    if (!formularioId) {
+        console.warn('⚠️ Campo formulario_id não encontrado, criando automaticamente...');
+        
+        // Tentar detectar o tipo pelo ID do form ou classe
+        let tipo = detectarTipoFormulario(form);
+        
+        if (tipo) {
+            // Criar o campo hidden
+            formularioId = document.createElement('input');
+            formularioId.type = 'hidden';
+            formularioId.name = 'formulario_id';
+            formularioId.value = tipo;
+            form.appendChild(formularioId);
+            
+            console.log(`✅ Campo formulario_id criado com valor: ${tipo}`);
+        } else {
+            console.error('❌ Não foi possível detectar o tipo do formulário');
+            throw new Error('Tipo de formulário não identificado');
+        }
+    }
+    
+    return formularioId.value;
 }
 
 /**
@@ -1106,13 +1266,89 @@ function estruturarDadosSupabase(formData) {
     const dadosEspecificos = extrairDadosEspecificos(formData);
     
     // Referências
-    const referencias = extrairReferencias(formData, formularioId);
+    const referencias = extrairReferencias(formData, formData.formulario_id);
     
     return {
         ...dadosUniversais,
         dados_especificos: dadosEspecificos,
         referencias: referencias
     };
+}
+
+// ========================================
+// 📝 FUNÇÕES DE VALIDAÇÃO FALTANDO
+// ========================================
+
+/**
+ * Valida CPF brasileiro
+ */
+function validarCPF(cpf) {
+    if (!cpf) return false;
+    
+    // Remover caracteres não numéricos
+    cpf = cpf.toString().replace(/[^\d]/g, '');
+    
+    console.log('CPF limpo para validação:', cpf); // Debug
+    
+    // Verificar se tem 11 dígitos
+    if (cpf.length !== 11) {
+        console.log('CPF não tem 11 dígitos:', cpf.length);
+        return false;
+    }
+    
+    // Verificar se todos os dígitos são iguais (CPFs inválidos)
+    if (/^(\d)\1{10}$/.test(cpf)) {
+        console.log('CPF com todos dígitos iguais');
+        return false;
+    }
+    
+    // Resto da validação...
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+        soma += parseInt(cpf[i]) * (10 - i);
+    }
+    let digito1 = (soma * 10) % 11;
+    if (digito1 === 10) digito1 = 0;
+    if (digito1 !== parseInt(cpf[9])) return false;
+    
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+        soma += parseInt(cpf[i]) * (11 - i);
+    }
+    let digito2 = (soma * 10) % 11;
+    if (digito2 === 10) digito2 = 0;
+    
+    return digito2 === parseInt(cpf[10]);
+}
+
+/**
+ * Valida email
+ */
+function validarEmail(email) {
+    if (!email) return false;
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email.trim());
+}
+
+/**
+ * Valida regime de trabalho
+ */
+function validarRegimeTrabalho(valor) {
+    const regimesValidos = ['clt', 'mei', 'freelancer'];
+    return regimesValidos.includes(valor) ? valor : null;
+}
+
+/**
+ * Converte salário para número
+ */
+function converterSalario(valor) {
+    if (!valor) return null;
+    try {
+        const numero = valor.replace(/[^\d,]/g, '').replace(',', '.');
+        return parseFloat(numero) || null;
+    } catch {
+        return null;
+    }
 }
 
 /**
@@ -1328,139 +1564,139 @@ function extrairDadosGovernanta(formData) {
  */
 function extrairDadosArrumadeira(formData) {
     return {
-         // Experiência profissional
-        tipos_residencia: arraySeguro(formData.tiposResidencia),
-        outros_residencia_especificar: formData.outrosResidenciaEspecificar || null,
-        
-        // Competências técnicas
-        equipamentos_limpeza: arraySeguro(formData.equipamentosLimpeza),
-        outros_equipamentos_especificar: formData.outrosEquipamentosEspecificar || null,
-        organizacao_closets: formData.organizacaoClosets || null,
-        montagem_cama: formData.montagemCama || null,
-        tecnicas_lavanderia: formData.tecnicasLavanderia || null,
-        habilidade_passar: formData.habilidadePassar || null,
-        
-        // Especialidades em organização
-        tecnicas_organizacao: arraySeguro(formData.tecnicasOrganizacao),
-        outros_tecnicas_especificar: formData.outrosTecnicasEspecificar || null,
-        experiencia_eventos: formData.experienciaEventos || null,
-        
-        // Produtos e técnicas de limpeza
-        produtos_limpeza: arraySeguro(formData.produtosLimpeza),
-        outros_produtos_especificar: formData.outrosProdutosEspecificar || null,
-        alergia_limpeza: formData.alergiaLimpeza === 'sim',
-        especificar_alergia: formData.especificarAlergia || null,
-        metodos_limpeza: arraySeguro(formData.metodosLimpeza),
-        outros_metodos_especificar: formData.outrosMetodosEspecificar || null,
-        
-        // Qualificações
-        certificacoes_arrumadeira: arraySeguro(formData.certificacoes),
-        outros_certificacoes_especificar: formData.outrosCertificacoesEspecificar || null,
-        
-        // Situações especiais
-        experiencia_animais: formData.experienciaAnimais === 'sim',
-        tipos_animais: arraySeguro(formData.tiposAnimais),
-        outros_animais_especificar: formData.outrosAnimaisEspecificar || null,
-        experiencia_criancas: formData.experienciaCriancas || null,
-        lida_objetos_valor: formData.lidaObjetosValor || null,
-        
-        // Informações de saúde
-        problemas_articulacoes: formData.problemasArticulacoes === 'sim',
-        especificar_problemas: formData.especificarProblemas || null,
-        
-        // Questões profissionais
-        maior_diferencial: formData.maiorDiferencial || null,
-        organiza_rotina: formData.organizaRotina || null
-    };
-}
+            // Experiência profissional
+            tipos_residencia: arraySeguro(formData.tiposResidencia),
+            outros_residencia_especificar: formData.outrosResidenciaEspecificar || null,
+            
+            // Competências técnicas
+            equipamentos_limpeza: arraySeguro(formData.equipamentosLimpeza),
+            outros_equipamentos_especificar: formData.outrosEquipamentosEspecificar || null,
+            organizacao_closets: formData.organizacaoClosets || null,
+            montagem_cama: formData.montagemCama || null,
+            tecnicas_lavanderia: formData.tecnicasLavanderia || null,
+            habilidade_passar: formData.habilidadePassar || null,
+            
+            // Especialidades em organização
+            tecnicas_organizacao: arraySeguro(formData.tecnicasOrganizacao),
+            outros_tecnicas_especificar: formData.outrosTecnicasEspecificar || null,
+            experiencia_eventos: formData.experienciaEventos || null,
+            
+            // Produtos e técnicas de limpeza
+            produtos_limpeza: arraySeguro(formData.produtosLimpeza),
+            outros_produtos_especificar: formData.outrosProdutosEspecificar || null,
+            alergia_limpeza: formData.alergiaLimpeza === 'sim',
+            especificar_alergia: formData.especificarAlergia || null,
+            metodos_limpeza: arraySeguro(formData.metodosLimpeza),
+            outros_metodos_especificar: formData.outrosMetodosEspecificar || null,
+            
+            // Qualificações
+            certificacoes_arrumadeira: arraySeguro(formData.certificacoes),
+            outros_certificacoes_especificar: formData.outrosCertificacoesEspecificar || null,
+            
+            // Situações especiais
+            experiencia_animais: formData.experienciaAnimais === 'sim',
+            tipos_animais: arraySeguro(formData.tiposAnimais),
+            outros_animais_especificar: formData.outrosAnimaisEspecificar || null,
+            experiencia_criancas: formData.experienciaCriancas || null,
+            lida_objetos_valor: formData.lidaObjetosValor || null,
+            
+            // Informações de saúde
+            problemas_articulacoes: formData.problemasArticulacoes === 'sim',
+            especificar_problemas: formData.especificarProblemas || null,
+            
+            // Questões profissionais
+            maior_diferencial: formData.maiorDiferencial || null,
+            organiza_rotina: formData.organizaRotina || null
+        };
+    }
 
-/**
- * Extrai dados específicos do casal (placeholder para futuras implementações)
- */
-function extrairDadosCasal(formData) {
-    console.log('📊 Extraindo dados específicos do casal...');
-    
+    /**
+     * Extrai dados específicos do casal (placeholder para futuras implementações)
+     */
+    function extrairDadosCasal(formData) {
+        console.log('📊 Extraindo dados específicos do casal...');
+        
     return {
-        // ===== DADOS PESSOAIS - ELE =====
-        nome_completo_ele: formData.get('nomeCompletoEle') || null,
-        data_nascimento_ele: formData.get('dataNascimentoEle') || null,
-        cpf_ele: formData.get('cpfEle') || null,
-        telefone_ele: formData.get('telefoneEle') || null,
-        whatsapp_ele: formData.get('whatsappEle') || null,
-        email_ele: formData.get('emailEle') || null,
-        possui_cnh_ele: formData.get('possuiCnhEle') === 'sim',
-        categoria_cnh_ele: formData.get('categoriaCnhEle') || null,
-        
-        // ===== DADOS PESSOAIS - ELA =====
-        nome_completo_ela: formData.get('nomeCompletoEla') || null,
-        data_nascimento_ela: formData.get('dataNascimentoEla') || null,
-        cpf_ela: formData.get('cpfEla') || null,
-        telefone_ela: formData.get('telefoneEla') || null,
-        whatsapp_ela: formData.get('whatsappEla') || null,
-        email_ela: formData.get('emailEla') || null,
-        possui_cnh_ela: formData.get('possuiCnhEla') === 'sim',
-        categoria_cnh_ela: formData.get('categoriaCnhEla') || null,
-        
-        // ===== INFORMAÇÕES GERAIS DO CASAL =====
-        estado_civil_casal: formData.get('estadoCivil') || null,
-        tempo_juntos: formData.get('tempoJuntos') || null,
-        endereco_completo: formData.get('enderecoCompleto') || null,
-        cep: formData.get('cep') || null,
-        morar_residencia: formData.get('morarResidencia') === 'sim',
-        possui_pets: formData.get('possuiPets') === 'sim',
-        tipo_pet: formData.get('tipoPet') || null,
-        
-        // ===== EXPERIÊNCIA PROFISSIONAL =====
-        trabalhou_juntos: formData.get('trabalharamJuntos') === 'sim',
-        tempo_caseiros: formData.get('tempoCaseiros') || null,
-        experiencia_alto_padrao: formData.get('experienciaAltoPadrao') === 'sim',
-        tempo_alto_padrao: formData.get('tempoAltoPadrao') || null,
-        
-        // ===== COMPETÊNCIAS - ELE =====
-        competencias_ele: arraySeguro(formData.getAll('competenciasEle')),
-        sabe_fazer_churrasco: formData.get('sabeFazerChurrasco') || null,
-        sabe_assar_pizza: formData.get('sabeAssarPizza') || null,
-        montar_aperitivos: formData.get('montarAperitivos') || null,
-        servicos_barman: formData.get('servicosBarman') === 'sim',
-        nivel_coqueteis: arraySeguro(formData.getAll('nivelCoqueteis')),
-        experiencia_jardim: formData.get('experienciaJardim') || null,
-        detalhes_jardim: formData.get('detalhesJardim') || null,
-        cuidar_piscina: formData.get('cuidarPiscina') || null,
-        detalhes_piscina: formData.get('detalhesPiscina') || null,
-        outros_conhecimentos_ele: formData.get('outrosConhecimentosEle') || null,
-        
-        // ===== COMPETÊNCIAS - ELA =====
-        competencias_ela: arraySeguro(formData.getAll('competenciasEla')),
-        sabe_cozinhar: formData.get('sabeCozinhar') === 'sim',
-        habilidades_cozinha: arraySeguro(formData.getAll('habilidadesCozinha')),
-        conhece_confeitaria: formData.get('conheceConfeitaria') || null,
-        especialidades_culinarias: formData.get('especialidadesCulinarias') || null,
-        outros_conhecimentos_ela: formData.get('outrosConhecimentosEla') || null,
-        
-        // ===== DISPONIBILIDADE =====
-        morar_trabalho: formData.get('morarTrabalho') === 'sim',
-        fim_semana: formData.get('fimSemana') === 'sim',
-        dormir_fim_semana: formData.get('dormirFimSemana') || null,
-        viagens: formData.get('viagens') || null,
-        
-        // ===== REGIME E PRETENSÃO =====
-        regime_desejado: formData.get('regimeDesejado') || null,
-        regime_outro_especificar: formData.get('regimeOutroEspecificar') || null,
-        pretensao_salarial_casal: converterSalario(formData.get('pretensaoSalarialCasal')),
-        salario_negociavel: formData.get('salarioNegociavel') === 'sim',
-        
-        // ===== OBJETIVO E MOTIVAÇÃO =====
-        porque_juntos: formData.get('porqueJuntos') || null,
-        diferencial_casal: formData.get('diferencialCasal') || null,
-        
-        // ===== INFORMAÇÕES COMPLEMENTARES =====
-        fumam: formData.get('fumam') === 'sim',
-        consomem_alcool: formData.get('consumemAlcool') || null,
-        restricao_saude: formData.get('restricaoSaude') === 'sim',
-        especificar_restricao: formData.get('especificarRestricao') || null,
-        
-        // ===== OBSERVAÇÕES =====
-        observacoes_adicionais: formData.get('observacoesAdicionais') || null
+    // ===== DADOS PESSOAIS - ELE =====
+    nome_completo_ele: formData.nomeCompletoEle || null,
+    data_nascimento_ele: formData.dataNascimentoEle || null,
+    cpf_ele: formData.cpfEle || null,
+    telefone_ele: formData.telefoneEle || null,
+    whatsapp_ele: formData.whatsappEle || null,
+    email_ele: formData.emailEle || null,
+    possui_cnh_ele: formData.possuiCnhEle === 'sim',
+    categoria_cnh_ele: formData.categoriaCnhEle || null,
+    
+    // ===== DADOS PESSOAIS - ELA =====
+    nome_completo_ela: formData.nomeCompletoEla || null,
+    data_nascimento_ela: formData.dataNascimentoEla || null,
+    cpf_ela: formData.cpfEla || null,
+    telefone_ela: formData.telefoneEla || null,
+    whatsapp_ela: formData.whatsappEla || null,
+    email_ela: formData.emailEla || null,
+    possui_cnh_ela: formData.possuiCnhEla === 'sim',
+    categoria_cnh_ela: formData.categoriaCnhEla || null,
+    
+    // ===== INFORMAÇÕES GERAIS DO CASAL =====
+    estado_civil_casal: formData.estadoCivil || null,
+    tempo_juntos: formData.tempoJuntos || null,
+    endereco_completo: formData.enderecoCompleto || null,
+    cep: formData.cep || null,
+    morar_residencia: formData.morarResidencia === 'sim',
+    possui_pets: formData.possuiPets === 'sim',
+    tipo_pet: formData.tipoPet || null,
+    
+    // ===== EXPERIÊNCIA PROFISSIONAL =====
+    trabalhou_juntos: formData.trabalharamJuntos === 'sim',
+    tempo_caseiros: formData.tempoCaseiros || null,
+    experiencia_alto_padrao: formData.experienciaAltoPadrao === 'sim',
+    tempo_alto_padrao: formData.tempoAltoPadrao || null,
+    
+    // ===== COMPETÊNCIAS - ELE =====
+    competencias_ele: arraySeguro(formData.competenciasEle),
+    sabe_fazer_churrasco: formData.sabeFazerChurrasco || null,
+    sabe_assar_pizza: formData.sabeAssarPizza || null,
+    montar_aperitivos: formData.montarAperitivos || null,
+    servicos_barman: formData.servicosBarman === 'sim',
+    nivel_coqueteis: arraySeguro(formData.nivelCoqueteis),
+    experiencia_jardim: formData.experienciaJardim || null,
+    detalhes_jardim: formData.detalhesJardim || null,
+    cuidar_piscina: formData.cuidarPiscina || null,
+    detalhes_piscina: formData.detalhesPiscina || null,
+    outros_conhecimentos_ele: formData.outrosConhecimentosEle || null,
+    
+    // ===== COMPETÊNCIAS - ELA =====
+    competencias_ela: arraySeguro(formData.competenciasEla),
+    sabe_cozinhar: formData.sabeCozinhar === 'sim',
+    habilidades_cozinha: arraySeguro(formData.habilidadesCozinha),
+    conhece_confeitaria: formData.conheceConfeitaria || null,
+    especialidades_culinarias: formData.especialidadesCulinarias || null,
+    outros_conhecimentos_ela: formData.outrosConhecimentosEla || null,
+    
+    // ===== DISPONIBILIDADE =====
+    morar_trabalho: formData.morarTrabalho === 'sim',
+    fim_semana: formData.fimSemana === 'sim',
+    dormir_fim_semana: formData.dormirFimSemana || null,
+    viagens: formData.viagens || null,
+    
+    // ===== REGIME E PRETENSÃO =====
+    regime_desejado: formData.regimeDesejado || null,
+    regime_outro_especificar: formData.regimeOutroEspecificar || null,
+    pretensao_salarial_casal: converterSalario(formData.pretensaoSalarialCasal),
+    salario_negociavel: formData.salarioNegociavel === 'sim',
+    
+    // ===== OBJETIVO E MOTIVAÇÃO =====
+    porque_juntos: formData.porqueJuntos || null,
+    diferencial_casal: formData.diferencialCasal || null,
+    
+    // ===== INFORMAÇÕES COMPLEMENTARES =====
+    fumam: formData.fumam === 'sim',
+    consomem_alcool: formData.consumemAlcool || null,
+    restricao_saude: formData.restricaoSaude === 'sim',
+    especificar_restricao: formData.especificarRestricao || null,
+    
+    // ===== OBSERVAÇÕES =====
+    observacoes_adicionais: formData.observacoesAdicionais || null
     };
 }
 
@@ -1474,100 +1710,100 @@ function extrairReferencias(formData, formularioId) {
     
     // ===== CASAL - REFERÊNCIAS SEPARADAS =====
     if (formularioId === 'candi-casal') {
-        
-        // REFERÊNCIAS DELE
-        if (formData.get('refEle1Nome')) {
-            referencias.push({
-                pessoa: 'ele',
-                tipo: 'referencia_1',
-                nome: formData.get('refEle1Nome'),
-                telefone: formData.get('refEle1Telefone'),
-                periodo_inicio: formData.get('refEle1Inicio'),
-                periodo_fim: formData.get('refEle1Fim'),
-                relacao: formData.get('refEle1Relacao'),
-                outro_especificar: formData.get('refEle1OutroEspecificar') || null,
-                motivo_saida: formData.get('refEle1MotivoSaida') || null
-            });
-        }
-        
-        if (formData.get('refEle2Nome')) {
-            referencias.push({
-                pessoa: 'ele',
-                tipo: 'referencia_2',
-                nome: formData.get('refEle2Nome'),
-                telefone: formData.get('refEle2Telefone'),
-                periodo_inicio: formData.get('refEle2Inicio'),
-                periodo_fim: formData.get('refEle2Fim'),
-                relacao: formData.get('refEle2Relacao'),
-                outro_especificar: formData.get('refEle2OutroEspecificar') || null,
-                motivo_saida: formData.get('refEle2MotivoSaida') || null
-            });
-        }
-        
-        // REFERÊNCIAS DELA
-        if (formData.get('refEla1Nome')) {
-            referencias.push({
-                pessoa: 'ela',
-                tipo: 'referencia_1',
-                nome: formData.get('refEla1Nome'),
-                telefone: formData.get('refEla1Telefone'),
-                periodo_inicio: formData.get('refEla1Inicio'),
-                periodo_fim: formData.get('refEla1Fim'),
-                relacao: formData.get('refEla1Relacao'),
-                outro_especificar: formData.get('refEla1OutroEspecificar') || null,
-                motivo_saida: formData.get('refEla1MotivoSaida') || null
-            });
-        }
-        
-        if (formData.get('refEla2Nome')) {
-            referencias.push({
-                pessoa: 'ela',
-                tipo: 'referencia_2',
-                nome: formData.get('refEla2Nome'),
-                telefone: formData.get('refEla2Telefone'),
-                periodo_inicio: formData.get('refEla2Inicio'),
-                periodo_fim: formData.get('refEla2Fim'),
-                relacao: formData.get('refEla2Relacao'),
-                outro_especificar: formData.get('refEla2OutroEspecificar') || null,
-                motivo_saida: formData.get('refEla2MotivoSaida') || null
-            });
-        }
-        
-    } else {
-        // ===== OUTROS FORMULÁRIOS - PADRÃO =====
-        if (formData.get('possuiReferencias') === 'sim') {
-            
-            // Referência 1
-            if (formData.get('ref1Nome')) {
-                referencias.push({
-                    tipo: 'referencia_1',
-                    nome: formData.get('ref1Nome'),
-                    telefone: formData.get('ref1Telefone'),
-                    periodo_inicio: formData.get('ref1Inicio'),
-                    periodo_fim: formData.get('ref1Fim'),
-                    idades_criancas: formData.get('ref1IdadesCriancas') || null,
-                    relacao: formData.get('ref1Relacao'),
-                    outro_especificar: formData.get('ref1OutroEspecificar') || null,
-                    motivo_saida: formData.get('ref1MotivoSaida') || null
-                });
-            }
-            
-            // Referência 2
-            if (formData.get('ref2Nome')) {
-                referencias.push({
-                    tipo: 'referencia_2',
-                    nome: formData.get('ref2Nome'),
-                    telefone: formData.get('ref2Telefone'),
-                    periodo_inicio: formData.get('ref2Inicio'),
-                    periodo_fim: formData.get('ref2Fim'),
-                    idades_criancas: formData.get('ref2IdadesCriancas') || null,
-                    relacao: formData.get('ref2Relacao'),
-                    outro_especificar: formData.get('ref2OutroEspecificar') || null,
-                    motivo_saida: formData.get('ref2MotivoSaida') || null
-                });
-            }
-        }
-    }
+   
+   // REFERÊNCIAS DELE
+   if (formData.refEle1Nome) {
+       referencias.push({
+           pessoa: 'ele',
+           tipo: 'referencia_1',
+           nome: formData.refEle1Nome,
+           telefone: formData.refEle1Telefone,
+           periodo_inicio: formData.refEle1Inicio,
+           periodo_fim: formData.refEle1Fim,
+           relacao: formData.refEle1Relacao,
+           outro_especificar: formData.refEle1OutroEspecificar || null,
+           motivo_saida: formData.refEle1MotivoSaida || null
+       });
+   }
+   
+   if (formData.refEle2Nome) {
+       referencias.push({
+           pessoa: 'ele',
+           tipo: 'referencia_2',
+           nome: formData.refEle2Nome,
+           telefone: formData.refEle2Telefone,
+           periodo_inicio: formData.refEle2Inicio,
+           periodo_fim: formData.refEle2Fim,
+           relacao: formData.refEle2Relacao,
+           outro_especificar: formData.refEle2OutroEspecificar || null,
+           motivo_saida: formData.refEle2MotivoSaida || null
+       });
+   }
+   
+   // REFERÊNCIAS DELA
+   if (formData.refEla1Nome) {
+       referencias.push({
+           pessoa: 'ela',
+           tipo: 'referencia_1',
+           nome: formData.refEla1Nome,
+           telefone: formData.refEla1Telefone,
+           periodo_inicio: formData.refEla1Inicio,
+           periodo_fim: formData.refEla1Fim,
+           relacao: formData.refEla1Relacao,
+           outro_especificar: formData.refEla1OutroEspecificar || null,
+           motivo_saida: formData.refEla1MotivoSaida || null
+       });
+   }
+   
+   if (formData.refEla2Nome) {
+       referencias.push({
+           pessoa: 'ela',
+           tipo: 'referencia_2',
+           nome: formData.refEla2Nome,
+           telefone: formData.refEla2Telefone,
+           periodo_inicio: formData.refEla2Inicio,
+           periodo_fim: formData.refEla2Fim,
+           relacao: formData.refEla2Relacao,
+           outro_especificar: formData.refEla2OutroEspecificar || null,
+           motivo_saida: formData.refEla2MotivoSaida || null
+       });
+   }
+   
+} else {
+   // ===== OUTROS FORMULÁRIOS - PADRÃO =====
+   if (formData.possuiReferencias === 'sim') {
+       
+       // Referência 1
+       if (formData.ref1Nome) {
+           referencias.push({
+               tipo: 'referencia_1',
+               nome: formData.ref1Nome,
+               telefone: formData.ref1Telefone,
+               periodo_inicio: formData.ref1Inicio,
+               periodo_fim: formData.ref1Fim,
+               idades_criancas: formData.ref1IdadesCriancas || null,
+               relacao: formData.ref1Relacao,
+               outro_especificar: formData.ref1OutroEspecificar || null,
+               motivo_saida: formData.ref1MotivoSaida || null
+           });
+       }
+       
+       // Referência 2
+       if (formData.ref2Nome) {
+           referencias.push({
+               tipo: 'referencia_2',
+               nome: formData.ref2Nome,
+               telefone: formData.ref2Telefone,
+               periodo_inicio: formData.ref2Inicio,
+               periodo_fim: formData.ref2Fim,
+               idades_criancas: formData.ref2IdadesCriancas || null,
+               relacao: formData.ref2Relacao,
+               outro_especificar: formData.ref2OutroEspecificar || null,
+               motivo_saida: formData.ref2MotivoSaida || null
+           });
+       }
+   }
+}
     
     console.log(`✅ ${referencias.length} referências extraídas para ${formularioId}`);
     return referencias;

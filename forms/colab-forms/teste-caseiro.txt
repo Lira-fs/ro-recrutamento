@@ -1,0 +1,329 @@
+// 🚀 AUTO-COMPLETE CORRIGIDO - AGUARDA CAMPOS CONDICIONAIS
+// Cole este código no console do navegador (F12) e execute
+
+function preencherFormularioCaseiroCorrigido() {
+    console.log('🚀 Iniciando preenchimento com aguardo de campos condicionais...');
+    
+    // ===== FUNÇÕES AUXILIARES MELHORADAS =====
+    const aguardarCampo = (selector, timeout = 3000) => {
+        return new Promise((resolve) => {
+            const elemento = document.querySelector(selector);
+            if (elemento) {
+                resolve(elemento);
+                return;
+            }
+            
+            const observer = new MutationObserver(() => {
+                const elemento = document.querySelector(selector);
+                if (elemento) {
+                    observer.disconnect();
+                    resolve(elemento);
+                }
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true
+            });
+            
+            setTimeout(() => {
+                observer.disconnect();
+                resolve(null);
+            }, timeout);
+        });
+    };
+    
+    const preencherCampoSeguro = async (id, valor) => {
+        let campo = document.getElementById(id);
+        
+        if (!campo) {
+            console.log(`⏳ Aguardando campo: ${id}`);
+            campo = await aguardarCampo(`#${id}`);
+        }
+        
+        if (campo) {
+            campo.value = valor;
+            campo.dispatchEvent(new Event('input', { bubbles: true }));
+            campo.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log(`✅ ${id}: ${valor}`);
+            return true;
+        } else {
+            console.warn(`⚠️ Campo não encontrado após aguardar: ${id}`);
+            return false;
+        }
+    };
+    
+    const selecionarRadioSeguro = async (name, value) => {
+        let radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        
+        if (!radio) {
+            console.log(`⏳ Aguardando radio: ${name}=${value}`);
+            radio = await aguardarCampo(`input[name="${name}"][value="${value}"]`);
+        }
+        
+        if (radio) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log(`✅ ${name}: ${value}`);
+            return true;
+        } else {
+            console.warn(`⚠️ Radio não encontrado: ${name}=${value}`);
+            return false;
+        }
+    };
+    
+    const selecionarSelectSeguro = async (id, value) => {
+        let select = document.getElementById(id);
+        
+        if (!select) {
+            console.log(`⏳ Aguardando select: ${id}`);
+            select = await aguardarCampo(`#${id}`);
+        }
+        
+        if (select) {
+            select.value = value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log(`✅ ${id}: ${value}`);
+            return true;
+        } else {
+            console.warn(`⚠️ Select não encontrado: ${id}`);
+            return false;
+        }
+    };
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // ===== SEQUÊNCIA DE PREENCHIMENTO =====
+    async function executarPreenchimento() {
+        try {
+            // 1. TREINAMENTO (FUNDAMENTAL - DESBLOQUEIA O RESTO)
+            console.log('📚 1. Configurando treinamento...');
+            await selecionarRadioSeguro('aceitaTreinamento', 'sim');
+            await delay(500);
+            await selecionarSelectSeguro('turnoTreinamento', 'manha');
+            await delay(1000);
+
+            // 2. DADOS PESSOAIS
+            console.log('👤 2. Preenchendo dados pessoais...');
+            await preencherCampoSeguro('nomeCompleto', 'João Silva Santos');
+            await preencherCampoSeguro('dataNascimento', '1985-03-15');
+            await preencherCampoSeguro('cpf', '123.456.789-10');
+            await preencherCampoSeguro('rg', '12.345.678-9');
+            await selecionarSelectSeguro('estadoCivil', 'casado');
+            await preencherCampoSeguro('nacionalidade', 'Brasileira');
+            await delay(500);
+
+            // 3. CONTATO
+            console.log('📞 3. Preenchendo contatos...');
+            await preencherCampoSeguro('telefone', '(11) 99999-8888');
+            await preencherCampoSeguro('whatsapp', '(11) 98888-7777');
+            await preencherCampoSeguro('email', 'joao.santos@email.com');
+            await preencherCampoSeguro('endereco', 'Rua das Flores, 123 - Vila Esperança, São Paulo, SP');
+            await preencherCampoSeguro('cep', '01234-567');
+            await delay(500);
+
+            // 4. CNH (CONDICIONAL)
+            console.log('🚗 4. Configurando CNH...');
+            await selecionarRadioSeguro('possuiCnh', 'sim');
+            await delay(300); // Aguardar campo condicional aparecer
+            await selecionarSelectSeguro('categoriaCnh', 'B');
+            await delay(300);
+
+            // 5. FILHOS (CONDICIONAL)
+            console.log('👨‍👩‍👧‍👦 5. Configurando filhos...');
+            await selecionarRadioSeguro('temFilhos', 'sim');
+            await delay(300); // Aguardar campos condicionais
+            await preencherCampoSeguro('quantosFilhos', '2');
+            await preencherCampoSeguro('idadesFilhos', '8 e 12 anos');
+            await delay(500);
+
+            // 6. EXPERIÊNCIA PROFISSIONAL
+            console.log('💼 6. Experiência profissional...');
+            await selecionarSelectSeguro('tempoExperiencia', '3-5-anos');
+            await selecionarRadioSeguro('experienciaAltoPadrao', 'sim');
+            await delay(300);
+            await preencherCampoSeguro('tempoAltoPadrao', '2 anos');
+            await delay(500);
+
+            // 7. REFERÊNCIAS (OBRIGATÓRIAS)
+            console.log('📋 7. Preenchendo referências...');
+            await preencherCampoSeguro('ref1Nome', 'Maria Silva');
+            await preencherCampoSeguro('ref1Telefone', '(11) 99988-7766');
+            await preencherCampoSeguro('ref1Inicio', '2021-01');
+            await preencherCampoSeguro('ref1Fim', '2023-12');
+            await selecionarSelectSeguro('ref1Relacao', 'ex-patrao');
+            await preencherCampoSeguro('ref1MotivoSaida', 'Mudança da família para outro estado');
+            
+            // Referência 2 (opcional)
+            await preencherCampoSeguro('ref2Nome', 'Carlos Santos');
+            await preencherCampoSeguro('ref2Telefone', '(11) 98877-6655');
+            await preencherCampoSeguro('ref2Inicio', '2019-03');
+            await preencherCampoSeguro('ref2Fim', '2020-12');
+            await selecionarSelectSeguro('ref2Relacao', 'supervisor');
+            await preencherCampoSeguro('ref2MotivoSaida', 'Término do contrato');
+            await delay(500);
+
+            // 8. ÚLTIMO EMPREGO
+            console.log('🏢 8. Último emprego...');
+            await preencherCampoSeguro('ultimoEmpregoEmpresa', 'Família Santos');
+            await preencherCampoSeguro('ultimoEmpregoCargo', 'Caseiro');
+            await preencherCampoSeguro('ultimoEmpregoTempo', '2 anos e 6 meses');
+            await preencherCampoSeguro('ultimoEmpregoSalario', 'R$ 2.300,00');
+            await preencherCampoSeguro('ultimoEmpregoAtividades', 'Manutenção geral da propriedade, cuidados com jardim, limpeza de áreas externas, pequenos reparos elétricos e hidráulicos.');
+            await preencherCampoSeguro('ultimoEmpregoAprendizados', 'Aprendi muito sobre manutenção de piscinas e sistemas de irrigação automática.');
+            await preencherCampoSeguro('ultimoEmpregoDificuldades', 'Inicialmente tive dificuldades com equipamentos modernos, mas consegui me adaptar.');
+            await delay(500);
+
+            // 9. COMPETÊNCIAS TÉCNICAS
+            console.log('🔧 9. Competências técnicas...');
+            await selecionarSelectSeguro('manutencaoEletrica', 'intermediario');
+            await selecionarSelectSeguro('manutencaoHidraulica', 'basico');
+            await selecionarSelectSeguro('cuidadosJardim', 'intermediario');
+            await selecionarSelectSeguro('cuidadosPiscina', 'avancado');
+            await selecionarSelectSeguro('experienciaSeguranca', 'basico');
+            await selecionarSelectSeguro('automacaoResidencial', 'intermediario');
+            
+            // Equipamentos
+            const equipamentos = ['cortador-grama', 'rocadeira', 'lavadora-alta-pressao'];
+            for (const eq of equipamentos) {
+                const checkbox = document.querySelector(`input[name="equipamentosJardinagem"][value="${eq}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            await delay(500);
+
+            // 10. DISPONIBILIDADE
+            console.log('📅 10. Disponibilidade...');
+            await selecionarRadioSeguro('inicioImediato', 'nao');
+            await delay(300);
+            await preencherCampoSeguro('dataDisponivel', '2024-09-01');
+            await selecionarRadioSeguro('eventosNoturnos', 'ocasionalmente');
+            await selecionarRadioSeguro('fimSemana', 'sim-sempre');
+            await selecionarRadioSeguro('dormirFimSemana', 'sim');
+            await selecionarRadioSeguro('viagens', 'apenas-nacionais');
+            await selecionarRadioSeguro('passaporte', 'pode-providenciar');
+            await delay(500);
+
+            // 11. MORAR NO LOCAL
+            console.log('🏠 11. Moradia no local...');
+            await selecionarRadioSeguro('morarLocal', 'sim');
+            await delay(300);
+
+            // 12. PRETENSÕES
+            console.log('💰 12. Pretensões salariais...');
+            await preencherCampoSeguro('pretensaoSalarial', 'R$ 2.800,00');
+            await selecionarSelectSeguro('regimeTrabalho', 'clt');
+            await selecionarRadioSeguro('negociavel', 'sim');
+            await delay(300);
+
+            // 13. CERTIFICAÇÕES
+            console.log('🎓 13. Certificações...');
+            const certificacoes = ['primeiros-socorros', 'seguranca-trabalho'];
+            for (const cert of certificacoes) {
+                const checkbox = document.querySelector(`input[name="certificacoes"][value="${cert}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            await delay(500);
+
+            // 14. INFORMAÇÕES COMPLEMENTARES
+            console.log('📝 14. Informações complementares...');
+            await selecionarRadioSeguro('restricaoSaude', 'nao');
+            await selecionarRadioSeguro('fuma', 'nao');
+            await selecionarRadioSeguro('consumeAlcool', 'socialmente');
+            await selecionarRadioSeguro('veiculoProprio', 'sim');
+            await delay(300);
+            await preencherCampoSeguro('tipoVeiculo', 'Carro popular');
+            await delay(500);
+
+            // 15. QUESTÕES PROFISSIONAIS
+            console.log('💬 15. Questões profissionais...');
+            await preencherCampoSeguro('situacoesEmergencia', 'Mantenho a calma e sigo protocolos de segurança. Tenho conhecimentos básicos de primeiros socorros.');
+            await preencherCampoSeguro('porqueContratar', 'Tenho experiência sólida, sou confiável e responsável. Cuido da propriedade como se fosse minha.');
+            await preencherCampoSeguro('observacoesAdicionais', 'Sou dedicado, pontual e tenho facilidade para aprender novas tecnologias.');
+            await delay(1000);
+
+            // 16. DEBUG FINAL
+            console.log('🔍 16. Debug final...');
+            const telefoneDisplay = document.getElementById('telefone')?.value;
+            const telefoneHidden = document.getElementById('telefone_hidden')?.value;
+            const whatsappDisplay = document.getElementById('whatsapp')?.value;
+            const whatsappHidden = document.getElementById('whatsapp_hidden')?.value;
+            
+            console.log('📱 RESULTADO DOS TELEFONES:');
+            console.log(`Telefone Display: "${telefoneDisplay}" → Hidden: "${telefoneHidden}"`);
+            console.log(`WhatsApp Display: "${whatsappDisplay}" → Hidden: "${whatsappHidden}"`);
+            
+            if (telefoneHidden?.length >= 12 && whatsappHidden?.length >= 12) {
+                console.log('✅ Telefones formatados corretamente!');
+            } else {
+                console.log('⚠️ Problema na formatação dos telefones');
+            }
+            
+            console.log('🎉 Preenchimento concluído!');
+            console.log('🚀 Formulário pronto para envio');
+
+        } catch (error) {
+            console.error('❌ Erro durante o preenchimento:', error);
+        }
+    }
+
+    // Iniciar preenchimento
+    executarPreenchimento();
+}
+
+// ===== FUNÇÃO DE TESTE =====
+function testarEnvio() {
+    console.log('🧪 Testando envio...');
+    const form = document.querySelector('form');
+    if (form) {
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(submitEvent);
+    } else {
+        console.error('❌ Formulário não encontrado');
+    }
+}
+
+// ===== FUNÇÃO DE VERIFICAÇÃO =====
+function verificarCamposObrigatorios() {
+    console.log('🔍 Verificando campos obrigatórios...');
+    const required = document.querySelectorAll('[required]');
+    const vazios = [];
+    
+    required.forEach(campo => {
+        if (!campo.value || campo.value.trim() === '') {
+            vazios.push({
+                id: campo.id,
+                name: campo.name,
+                tipo: campo.tagName.toLowerCase(),
+                elemento: campo
+            });
+        }
+    });
+    
+    if (vazios.length > 0) {
+        console.log('⚠️ Campos obrigatórios vazios:', vazios);
+    } else {
+        console.log('✅ Todos os campos obrigatórios preenchidos!');
+    }
+    
+    return vazios;
+}
+
+// ===== EXECUTAR =====
+console.log('🎯 Comandos disponíveis:');
+console.log('preencherFormularioCaseiroCorrigido() // Preencher com aguardo de campos');
+console.log('verificarCamposObrigatorios() // Verificar campos vazios');
+console.log('testarEnvio() // Testar envio');
+
+// Auto-executar
+setTimeout(() => {
+    if (confirm('🤖 Executar preenchimento automático inteligente?')) {
+        preencherFormularioCaseiroCorrigido();
+    }
+}, 2000);
