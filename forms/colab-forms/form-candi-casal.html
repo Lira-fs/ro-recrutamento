@@ -477,151 +477,223 @@
                     </div>
                 </section>
 
-                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Experiência Profissional
-                    </h2>
-                    
-                    <div class="form-group">
-                        <label>O casal já trabalhou juntos como caseiros?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="trabalharamJuntos" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="trabalharamJuntos" value="nao-interesse" required>
-                                <span>Não, mas têm interesse/preparo para isso</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="trabalharamJuntos" value="nao" required>
-                                <span>Não</span>
-                            </label>
+                <!-- Seção de Referências - Agora Obrigatória -->
+            <section class="form-section">
+                <div class="referencias-section">
+                    <div class="info-box aviso-referencias">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <h4>Referências Profissionais Obrigatórias</h4>
+                            <p>Referências do último lugar que trabalhou (até um ano) são primordiais para seleções. A primeira referência é <strong>obrigatória</strong>.</p>
+                            <p style="font-style: italic;">O intuito é manter a transparência e oferecer um bom histórico para a vaga futura! <br><br>(se nunca trabalhou na função antes, pode enviar do antigo trabalho, sem nenhum problema)</p>
                         </div>
                     </div>
 
-                    <!-- CAMPO CONDICIONAL: Tempo trabalhando juntos (somente se marcou "sim") -->
-                    <div class="trabalhou-juntos-tempo">
-                        <div class="form-group">
-                            <label for="tempoCaseiros">Por quanto tempo trabalharam juntos como caseiros?</label>
-                            <input type="text" id="tempoCaseiros" name="tempoCaseiros" placeholder="Ex: 3 anos">
-                        </div>
-                    </div>
+                    <!-- REFERÊNCIAS DELE -->
+                    <h3 style="color: var(--bronze-light); margin-bottom: var(--spacing-lg);">
+                        <i class="fas fa-male"></i> Referências - Ele
+                    </h3>
 
-                    <div class="form-group">
-                        <label>Experiência em residência de alto padrão?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="experienciaAltoPadrao" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="experienciaAltoPadrao" value="nao" required>
-                                <span>Não</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="alto-padrao-details">
-                        <div class="form-group">
-                            <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
-                            <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Possuem referências profissionais verificáveis?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="possuiReferencias" value="nao" required>
-                                <span>Não</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="possuiReferencias" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Referências -->
-                    <div class="referencias-section">
-                        <h3>Referências Profissionais</h3>
-                        
-                        <!-- Referência 1 -->
-                        <div class="referencia-card">
-                            <h4>Referência 1</h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref1Nome">Nome</label>
-                                    <input type="text" id="ref1Nome" name="ref1Nome">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Telefone">Telefone</label>
-                                    <input type="tel" id="ref1Telefone" name="ref1Telefone">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Inicio">Período - Início</label>
-                                    <input type="month" id="ref1Inicio" name="ref1Inicio">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Fim">Período - Fim</label>
-                                    <input type="month" id="ref1Fim" name="ref1Fim">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Relacao">Relação</label>
-                                    <select id="ref1Relacao" name="ref1Relacao">
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref1-outro">
-                                    <label for="ref1OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
-                                </div>
+                    <!-- Referência 1 ELE - OBRIGATÓRIA -->
+                    <div class="referencia-card referencia-obrigatoria">
+                        <h4>Referência 1 - Ele <span class="required-asterisk">*</span></h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="refEle1Nome">Nome <span class="required-asterisk">*</span></label>
+                                <input type="text" id="refEle1Nome" name="refEle1Nome" required>
                             </div>
-                        </div>
-
-                        <!-- Referência 2 -->
-                        <div class="referencia-card">
-                            <h4>Referência 2</h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref2Nome">Nome</label>
-                                    <input type="text" id="ref2Nome" name="ref2Nome">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Telefone">Telefone</label>
-                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Inicio">Período - Início</label>
-                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Fim">Período - Fim</label>
-                                    <input type="month" id="ref2Fim" name="ref2Fim">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Relacao">Relação</label>
-                                    <select id="ref2Relacao" name="ref2Relacao">
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref2-outro">
-                                    <label for="ref2OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
-                                </div>
+                            <div class="form-group">
+                                <label for="refEle1Telefone">Telefone <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="refEle1Telefone" name="refEle1Telefone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle1Inicio">Período - Início <span class="required-asterisk">*</span></label>
+                                <input type="month" id="refEle1Inicio" name="refEle1Inicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle1Fim">Período - Fim <span class="required-asterisk">*</span></label>
+                                <input type="month" id="refEle1Fim" name="refEle1Fim" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle1Relacao">Relação <span class="required-asterisk">*</span></label>
+                                <select id="refEle1Relacao" name="refEle1Relacao" required>
+                                    <option value="">Selecione</option>
+                                    <option value="ex-patrao">Ex-patrão</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group refEle1-outro">
+                                <label for="refEle1OutroEspecificar">Especificar relação</label>
+                                <input type="text" id="refEle1OutroEspecificar" name="refEle1OutroEspecificar">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="refEle1MotivoSaida">Motivo da saída <span class="required-asterisk">*</span></label>
+                                <textarea id="refEle1MotivoSaida" name="refEle1MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..." required></textarea>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Referência 2 - ELE - OPCIONAL -->
+                    <div class="referencia-card referencia-opcional">
+                        <h4>Referência 2 - Ele</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="refEle2Nome">Nome</label>
+                                <input type="text" id="refEle2Nome" name="refEle2Nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle2Telefone">Telefone</label>
+                                <input type="tel" id="refEle2Telefone" name="refEle2Telefone">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle2Inicio">Período - Início</label>
+                                <input type="month" id="refEle2Inicio" name="refEle2Inicio">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle2Fim">Período - Fim</label>
+                                <input type="month" id="refEle2Fim" name="refEle2Fim">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEle2Relacao">Relação</label>
+                                <select id="refEle2Relacao" name="refEle2Relacao">
+                                    <option value="">Selecione</option>
+                                    <option value="ex-patrao">Ex-patrão</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group refEle2-outro">
+                                <label for="refEle2OutroEspecificar">Especificar relação</label>
+                                <input type="text" id="refEle2OutroEspecificar" name="refEle2OutroEspecificar">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="refEle2MotivoSaida">Motivo da saída</label>
+                                <textarea id="refEle2MotivoSaida" name="refEle2MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REFERÊNCIAS DELA -->
+                    <h3 style="color: var(--bronze-light); margin-bottom: var(--spacing-lg); margin-top: 30px;">
+                        <i class="fas fa-female"></i> Referências - Ela
+                    </h3>
+
+                    <!-- Referência 1 ELA - OBRIGATÓRIA -->
+                    <div class="referencia-card referencia-obrigatoria">
+                        <h4>Referência 1 - Ela <span class="required-asterisk">*</span></h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="refEla1Nome">Nome <span class="required-asterisk">*</span></label>
+                                <input type="text" id="refEla1Nome" name="refEla1Nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla1Telefone">Telefone <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="refEla1Telefone" name="refEla1Telefone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla1Inicio">Período - Início <span class="required-asterisk">*</span></label>
+                                <input type="month" id="refEla1Inicio" name="refEla1Inicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla1Fim">Período - Fim <span class="required-asterisk">*</span></label>
+                                <input type="month" id="refEla1Fim" name="refEla1Fim" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla1Relacao">Relação <span class="required-asterisk">*</span></label>
+                                <select id="refEla1Relacao" name="refEla1Relacao" required>
+                                    <option value="">Selecione</option>
+                                    <option value="ex-patrao">Ex-patrão</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group refEla1-outro">
+                                <label for="refEla1OutroEspecificar">Especificar relação</label>
+                                <input type="text" id="refEla1OutroEspecificar" name="refEla1OutroEspecificar">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="refEla1MotivoSaida">Motivo da saída <span class="required-asterisk">*</span></label>
+                                <textarea id="refEla1MotivoSaida" name="refEla1MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referência 2 - ELA - OPCIONAL -->
+                    <div class="referencia-card referencia-opcional">
+                        <h4>Referência 2 - Ela</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="refEla2Nome">Nome</label>
+                                <input type="text" id="refEla2Nome" name="refEla2Nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla2Telefone">Telefone</label>
+                                <input type="tel" id="refEla2Telefone" name="refEla2Telefone">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla2Inicio">Período - Início</label>
+                                <input type="month" id="refEla2Inicio" name="refEla2Inicio">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla2Fim">Período - Fim</label>
+                                <input type="month" id="refEla2Fim" name="refEla2Fim">
+                            </div>
+                            <div class="form-group">
+                                <label for="refEla2Relacao">Relação</label>
+                                <select id="refEla2Relacao" name="refEla2Relacao">
+                                    <option value="">Selecione</option>
+                                    <option value="ex-patrao">Ex-patrão</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group refEla2-outro">
+                                <label for="refEla2OutroEspecificar">Especificar relação</label>
+                                <input type="text" id="refEla2OutroEspecificar" name="refEla2OutroEspecificar">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="refEla2MotivoSaida">Motivo da saída</label>
+                                <textarea id="refEla2MotivoSaida" name="refEla2MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </section>
+
+        <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL -->
+        <section class="form-section">
+            <h2 class="section-title">
+                <i class="fas fa-briefcase"></i>
+                Experiência Profissional do Casal
+            </h2>
+            
+            <!-- EXPERIÊNCIA PROFISSIONAL - ELE -->
+            <div class="form-subsection">
+                <h3 class="section-title">
+                    <i class="fas fa-male"></i>
+                    Conte sobre o último emprego - Ele
+                </h3>
+                
+                <div class="form-group full-width">
+                    <label for="ultimoEmpregoEle">Descreva brevemente seu último emprego</label>
+                    <textarea id="ultimoEmpregoEle" name="ultimoEmpregoEle" rows="5" placeholder="Ex: Trabalhei por 3 anos como caseiro numa chácara em Itatiba. Fazia manutenção geral da propriedade, cuidava do jardim, piscina e segurança. Trabalhava de segunda a sábado das 7h às 17h. A propriedade tinha casa principal, casa de caseiro, área de lazer com piscina e churrasqueira. Minhas principais responsabilidades eram manter tudo funcionando e em ordem..."></textarea>
+                </div>
+            </div>
+
+            <!-- EXPERIÊNCIA PROFISSIONAL - ELA -->
+            <div class="form-subsection">
+                <h3 class="section-title">
+                    <i class="fas fa-female"></i>
+                    Conte sobre o último emprego - Ela
+                </h3>
+                
+                <div class="form-group full-width">
+                    <label for="ultimoEmpregoEla">Descreva brevemente seu último emprego</label>
+                    <textarea id="ultimoEmpregoEla" name="ultimoEmpregoEla" rows="5" placeholder="Ex: Trabalhei por 2 anos como cozinheira numa família em Alphaville. Preparava refeições diárias para 4 pessoas, organizava cardápios semanais, fazia compras e cuidava da limpeza da cozinha. Trabalhava de segunda a sexta das 8h às 16h. Cozinhava pratos variados, desde comida caseira até receitas mais elaboradas para jantares especiais..."></textarea>
+                </div>
+            </div>
+        </section>
 
                 <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS -->
                 <section class="form-section">
@@ -1228,7 +1300,6 @@ function initializeCasalSpecificFields() {
     setupConditionalRadio('experienciaJardim', 'jardim-details');
     setupConditionalRadio('cuidarPiscina', 'piscina-details');
     setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
-    setupConditionalRadio('possuiReferencias', 'referencias-section');
     setupConditionalRadio('inicioImediato', 'data-disponivel', 'nao');
     setupConditionalRadio('restricaoSaude', 'restricao-details');
 
@@ -1242,7 +1313,7 @@ function initializeCasalSpecificFields() {
     }
 
     // ✅ REFERÊNCIAS "OUTRO"
-    ['ref1Relacao', 'ref2Relacao'].forEach(selectId => {
+    ['refEle1Relacao', 'refEle2Relacao', 'refEla1Relacao', 'refEla2Relacao'].forEach(selectId => {
         const select = document.getElementById(selectId);
         const targetDiv = document.querySelector(`.${selectId.replace('Relacao', '-outro')}`);
         

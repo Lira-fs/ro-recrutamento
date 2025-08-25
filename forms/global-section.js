@@ -141,11 +141,6 @@ const secoes = {
                                 <option value="AB">AB</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="vencimentoCnh">Vencimento CNH</label>
-                            <input type="date" id="vencimentoCnh" name="vencimentoCnh">
-                        </div>
                     </div>
                 </div>
             </div>
@@ -184,65 +179,84 @@ const secoes = {
     
     // TREINAMENTO OBRIGATÓRIO
     'treinamento-obrigatorio': `
-        <section class="form-section treinamento-section">
-            <h2 class="section-title">
-                <i class="fas fa-graduation-cap"></i>
-                Treinamento Obrigatório - Centro de Treinamento
-            </h2>
-            
-            <div class="treinamento-info">
-                <div class="info-box">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <h3>Importante!</h3>
-                        <p>Para fazer parte do nosso banco de dados, é <strong>obrigatório</strong> passar pelo treinamento introdutório em nosso Centro de Treinamento.</p>
-                        <p><i class="fas fa-map-marker-alt"></i> <strong>Local:</strong> Rua Pedro Mascagni, 425 – Itatiba</p>
+    <section class="form-section treinamento-section">
+        <h2 class="section-title">
+            <i class="fas fa-graduation-cap"></i>
+            Treinamento Obrigatório - Centro de Treinamento
+        </h2>
+        
+        <div class="treinamento-info">
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <h3>Importante!</h3>
+                    <p>Para fazer parte do nosso banco de dados, é <strong>obrigatório</strong> passar pelo treinamento introdutório em nosso Centro de Treinamento.</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Local:</strong> Rua Pedro Mascagni, 425 – Itatiba</p>
+                    
+                    <!-- NOVO: Botão "Saiba Mais" -->
+                    <button type="button" class="btn-saiba-mais" onclick="toggleInfoTreinamento()">
+                        <i class="fas fa-question-circle"></i>
+                        Saiba Mais
+                    </button>
+                    
+                    <!-- NOVO: Informações detalhadas (inicialmente hidden) -->
+                    <div class="info-detalhada-treinamento" id="infoDetalhadaTreinamento" style="display: none;">
+                        <div class="info-expandida">
+                            <h4>Por que este treinamento é obrigatório?</h4>
+                            <ul>
+                                <li><strong>Qualidade assegurada:</strong> Nosso treinamento garante que todos os profissionais atendam aos padrões da maioria das residências de alto padrão.</li>
+                                <li><strong>Diferencial competitivo:</strong> Profissionais treinados por nós têm preferência nas seleções e melhores oportunidades de colocação.</li>
+                                <li><strong>Metodologia exclusiva:</strong> Desenvolvida no Quinta da Baronesa, com 25+ anos de experiência no mercado.</li>
+                                <li><strong>Certificação reconhecida:</strong> Nosso certificado é amplamente aceito por famílias e agências de alto padrão.</li>
+                                <li><strong>Suporte contínuo:</strong> Acompanhamento e orientação durante todo o processo de colocação profissional.</li><li><strong>Não há custos:</strong> Nosso obejtivo é ajudar quem quer ser ajudado, portanto esse treinamento, não gera custos ao colaborador!</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label class="treinamento-question">Você se habilita a participar do treinamento obrigatório no Centro de Treinamento? <span class="required-asterisk">*</span></label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="aceitaTreinamento" value="sim" required>
-                            <span>Sim, aceito participar do treinamento</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="aceitaTreinamento" value="nao" required>
-                            <span>Não aceito</span>
-                        </label>
-                    </div>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label class="treinamento-question">Você se habilita a participar do treinamento obrigatório no Centro de Treinamento? <span class="required-asterisk">*</span></label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="aceitaTreinamento" value="sim" required>
+                        <span>Sim, aceito participar do treinamento</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="aceitaTreinamento" value="nao" required>
+                        <span>Não aceito</span>
+                    </label>
                 </div>
             </div>
+        </div>
 
-            <div class="turno-selection">
-                <div class="form-group">
-                    <label for="turnoTreinamento">Qual turno você pode participar? (Segunda a Sexta)</label>
-                    <select id="turnoTreinamento" name="turnoTreinamento" required>
-                        <option value="">Selecione o turno</option>
-                        <option value="manha">Manhã (08h às 12h)</option>
-                        <option value="tarde">Tarde (13h às 17h)</option>
-                        <option value="noite">Noite (18h às 22h)</option>
-                    </select>
-                </div>
+        <div class="turno-selection">
+            <div class="form-group">
+                <label for="turnoTreinamento">Qual turno você pode participar? <span class="required-asterisk">*</span></label>
+                <select id="turnoTreinamento" name="turnoTreinamento" required>
+                    <option value="">Selecione um turno</option>
+                    <option value="manha">Manhã (8h às 12h)</option>
+                    <option value="tarde">Tarde (13h às 17h)</option>
+                    <option value="noite">Noite (18h às 22h)</option>
+                </select>
             </div>
+        </div>
 
-            <div class="rejection-message">
-                <div class="alert-box">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>
-                        <h4>Ops! Treinamento Obrigatório</h4>
-                        <p>Infelizmente, o treinamento no Centro de Treinamento é <strong>obrigatório</strong> para todos os profissionais que desejam fazer parte do nosso banco de dados.</p>
-                        <p>Este treinamento é o que nos diferencia e garante a qualidade dos nossos serviços!</p>
-                        <p><strong>Reconsidere sua decisão para continuar o cadastro.</strong></p>
-                    </div>
-                </div>
+        <div class="rejection-message">
+            <div class="alert-recusa">
+                <h4>Treinamento Obrigatório</h4>
+                <p>Infelizmente, o treinamento no Centro de Treinamento é <strong>obrigatório</strong> para todos os profissionais que desejam fazer parte do nosso banco de dados.</p>
+                <p>Este treinamento é o que nos diferencia e garante a qualidade dos nossos serviços!</p>
+                <p style="color: #f16353;"><strong>Reconsidere sua decisão para continuar o cadastro.</strong></p>
             </div>
-        </section>
-    `,
-    
+        </div>
+    </section>
+`,
+
+
+
     // PRETENSÕES E CONDIÇÕES
     'pretensoes-condicoes': `
         <section class="form-section">
@@ -395,13 +409,6 @@ const secoes = {
                             <input type="radio" name="passaporte" value="nao-interesse" required>
                             <span>Não tenho interesse</span>
                         </label>
-                    </div>
-                </div>
-                
-                <div class="passaporte-vencimento">
-                    <div class="form-group">
-                        <label for="vencimentoPassaporte">Vencimento do passaporte</label>
-                        <input type="date" id="vencimentoPassaporte" name="vencimentoPassaporte">
                     </div>
                 </div>
             </div>
@@ -625,13 +632,13 @@ function configurarTreinamentoObrigatorio() {
     
     console.log('🎓 Configurando treinamento obrigatório...');
     
-    // ✅ INICIALIZAR ESTADO - garantir que elementos existam
+    // ✅ INICIALIZAR ESTADO - garantir que elementos existam e estejam ocultos
     if (turnoSelection) {
         turnoSelection.style.display = 'none';
         turnoSelection.classList.remove('show');
     }
     if (rejectionMessage) {
-        rejectionMessage.style.display = 'none';
+        rejectionMessage.style.display = 'none'; // OCULTAR INICIALMENTE
         rejectionMessage.classList.remove('show');
     }
     
@@ -640,27 +647,32 @@ function configurarTreinamentoObrigatorio() {
     
     aceitaTreinamento.forEach(radio => {
         radio.addEventListener('change', function() {
-            console.log(`📄 Treinamento mudou para: ${this.value}`);
+            console.log(`🔄 Treinamento mudou para: ${this.value}`);
             
             if (this.value === 'sim') {
                 // ✅ ACEITO O TREINAMENTO
                 console.log('✅ Treinamento aceito, mostrando seleção de turno...');
                 
+                // Mostrar seleção de turno
                 if (turnoSelection) {
                     turnoSelection.style.display = 'block';
                     turnoSelection.classList.add('show');
                     console.log('📅 Seleção de turno exibida');
                 }
+                
+                // Ocultar mensagem de recusa
                 if (rejectionMessage) {
                     rejectionMessage.style.display = 'none';
                     rejectionMessage.classList.remove('show');
                 }
+                
+                // Tornar turno obrigatório
                 if (turnoSelect) {
                     turnoSelect.required = true;
                     console.log('⚡ Campo turno marcado como obrigatório');
                 }
                 
-                // ✅ SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
+                // SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
                 if (turnoSelect && turnoSelect.value) {
                     console.log('🚀 Turno já selecionado, liberando formulário...');
                     desbloquearOutrasSecoes();
@@ -674,15 +686,20 @@ function configurarTreinamentoObrigatorio() {
                 // ❌ NÃO ACEITO O TREINAMENTO
                 console.log('❌ Treinamento rejeitado');
                 
+                // Ocultar seleção de turno
                 if (turnoSelection) {
                     turnoSelection.style.display = 'none';
                     turnoSelection.classList.remove('show');
                 }
+                
+                // MOSTRAR mensagem de recusa
                 if (rejectionMessage) {
-                    rejectionMessage.style.display = 'block';
+                    rejectionMessage.style.display = 'block'; // MOSTRAR AGORA
                     rejectionMessage.classList.add('show');
                     console.log('⚠️ Mensagem de rejeição exibida');
                 }
+                
+                // Remover obrigatoriedade do turno
                 if (turnoSelect) {
                     turnoSelect.required = false;
                     turnoSelect.value = '';
@@ -714,11 +731,31 @@ function configurarTreinamentoObrigatorio() {
         // ✅ VERIFICAR ESTADO INICIAL DO TURNO
         const estadoInicial = turnoSelect.value;
         if (estadoInicial) {
-            console.log(`🔄 Estado inicial do turno: ${estadoInicial}`);
+            console.log(`📄 Estado inicial do turno: ${estadoInicial}`);
         }
     }
     
     console.log('✅ Treinamento obrigatório configurado com sucesso');
+}
+
+// Função para toggle do "Saiba Mais" do treinamento
+function toggleInfoTreinamento() {
+    const infoDiv = document.getElementById('infoDetalhadaTreinamento');
+    const botao = document.querySelector('.btn-saiba-mais');
+    
+    if (!infoDiv || !botao) {
+        console.warn('⚠️ Elementos do saiba mais não encontrados');
+        return;
+    }
+    
+    if (infoDiv.style.display === 'none' || infoDiv.style.display === '') {
+        infoDiv.style.display = 'block';
+        botao.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar';
+        infoDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        infoDiv.style.display = 'none';
+        botao.innerHTML = '<i class="fas fa-question-circle"></i> Saiba Mais';
+    }
 }
 
 function mostrarMensagemBloqueio() {

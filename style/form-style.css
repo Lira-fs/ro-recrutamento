@@ -339,45 +339,211 @@ textarea {
     display: block;
 }
 
+/* MENSAGEM DE RECUSA */
+
 .rejection-message {
     display: none;
-    margin-top: var(--spacing-lg);
-    animation: slideDown 0.3s ease;
+    margin-top: 20px;
+    animation: slideDown 0.4s ease;
 }
 
 .rejection-message.show {
     display: block;
 }
 
-.alert-box {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-md);
-    background: rgba(231, 76, 60, 0.1);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-sm);
-    border-left: 4px solid #e74c3c;
+/* Estilo da caixa de alerta de recusa */
+.alert-recusa {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(192, 57, 43, 0.15));
+    border: 2px solid #e74c3c;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+    backdrop-filter: blur(5px);
 }
 
-.alert-box i {
-    color: #e74c3c;
-    font-size: 1.5rem;
-    margin-top: 2px;
+/* Adicionar ícone de aviso */
+.alert-recusa::before {
+    content: "⚠️";
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 15px;
 }
 
-.alert-box h4 {
-    color: #e74c3c;
-    margin-bottom: var(--spacing-sm);
+.alert-recusa h4 {
+    color: #ff230b;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.alert-recusa p {
+    color: #ffffff;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.alert-recusa p:last-child {
+    margin-bottom: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Animação de entrada */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 300px;
+    }
+}
+
+/* Estilos para o botão "Saiba Mais" */
+.btn-saiba-mais {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-saiba-mais:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+/* Container das informações detalhadas */
+.info-detalhada-treinamento {
+    margin-top: 20px;
+    animation: slideDown 0.4s ease;
+}
+
+.info-expandida {
+    background: rgba(52, 152, 219, 0.1);
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.info-expandida h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.info-expandida ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-expandida li {
+    margin-bottom: 12px;
+    padding-left: 25px;
+    position: relative;
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+.info-expandida li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+/* Estilos para o Saiba Mais do treinamento */
+.btn-saiba-mais {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-saiba-mais:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-2px);
+}
+
+.info-detalhada-treinamento {
+    margin-top: 20px;
+    animation: slideDown 0.4s ease;
+}
+
+.info-expandida {
+    background: rgba(52, 152, 219, 0.1);
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.info-expandida h4 {
+    color: #86cfff;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.info-expandida ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-expandida li {
+    margin-bottom: 12px;
+    padding-left: 25px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.info-expandida li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #27ae60;
+    font-weight: bold;
     font-size: 1.2rem;
 }
 
-.alert-box p {
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-light);
-}
-
-.alert-box p:last-child {
-    margin-bottom: 0;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
 }
 
 /* ========================================
@@ -435,6 +601,61 @@ textarea {
     color: var(--bronze-light);
     margin-bottom: var(--spacing-lg);
     font-size: 1.2rem;
+}
+
+/* Referências sempre visíveis */
+.referencias-section {
+    display: block; /* ← MUDANÇA AQUI */
+    animation: slideDown 0.3s ease;
+}
+
+.referencias-section.show {
+    display: block;
+}
+
+/* Estilos para as novas classes de referência */
+.aviso-referencias {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 235, 59, 0.15));
+    border: 2px solid #ffc107;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.aviso-referencias i {
+    color: #ff9800;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.aviso-referencias h4 {
+    color: #e65100;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.referencia-obrigatoria {
+    /* border: 2px solid #e74c3c; */
+    background: rgba(231, 76, 60, 0.05);
+    margin-bottom: 25px;
+}
+
+.referencia-opcional {
+    /* border: 2px solid #95a5a6; */
+    background: rgba(149, 165, 166, 0.05);
+    margin-bottom: 25px;
+}
+
+.referencia-card {
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.referencia-card h4 {
+    border-bottom: 2px solid currentColor;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 /* ========================================
@@ -605,7 +826,6 @@ textarea {
 .cnh-details,
 .filhos-details,
 .alto-padrao-details,
-.referencias-section,
 .data-disponivel,
 .passaporte-vencimento,
 .outros-eventos,
@@ -618,7 +838,6 @@ textarea {
 .cnh-details.show,
 .filhos-details.show,
 .alto-padrao-details.show,
-.referencias-section.show,
 .data-disponivel.show,
 .passaporte-vencimento.show,
 .outros-eventos.show,
@@ -888,6 +1107,24 @@ textarea {
    .termos-content {
        padding: 20px;
    }
+
+       .alert-recusa {
+        padding: 20px 15px;
+    }
+    
+    .alert-recusa h4 {
+        font-size: 1.1rem;
+    }
+    
+    .alert-recusa::before {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .btn-saiba-mais {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
 }
 
 /* ========================================

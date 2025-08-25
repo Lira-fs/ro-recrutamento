@@ -1241,6 +1241,182 @@ function unlockOwnerFormSections() {
     console.log('✅ Formulário desbloqueado! Termos aceitos.');
 }
 
+// CORREÇÃO ESPECÍFICA PARA global-section-prop.js
+// ADICIONE ESTA FUNÇÃO NO FINAL DO ARQUIVO global-section-prop.js
+
+// ========================================
+// CORREÇÃO CAMPOS CONDICIONAIS PROPRIETÁRIOS
+// ========================================
+
+function fixConditionalFieldsProprietarios() {
+    console.log('🔧 Corrigindo campos condicionais proprietários...');
+    
+    // FUNÇÃO PARA GERENCIAR REQUIRED EM CAMPOS CONDICIONAIS
+    function setupFieldToggle(radioName, containerSelector) {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const container = document.querySelector(containerSelector);
+        
+        if (!radios.length || !container) {
+            console.warn(`⚠️ Não encontrado: ${radioName} ou ${containerSelector}`);
+            return;
+        }
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const allFields = container.querySelectorAll('input, select, textarea');
+                
+                if (this.value === 'sim' && this.checked) {
+                    // SIM: mostrar e tornar obrigatório
+                    container.style.display = 'block';
+                    container.classList.remove('hidden');
+                    container.classList.add('show');
+                    
+                    allFields.forEach(field => {
+                        if (field.dataset.originalRequired === 'true' || field.hasAttribute('data-required')) {
+                            field.setAttribute('required', 'required');
+                        }
+                    });
+                    
+                    console.log(`✅ ${radioName}: Campos mostrados e required adicionado`);
+                } else {
+                    // NÃO: esconder e remover obrigatório
+                    container.style.display = 'none';
+                    container.classList.add('hidden');
+                    container.classList.remove('show');
+                    
+                    allFields.forEach(field => {
+                        field.removeAttribute('required');
+                        field.value = ''; // Limpar valor
+                    });
+                    
+                    console.log(`❌ ${radioName}: Campos escondidos e required removido`);
+                }
+            });
+        });
+    }
+    
+    // AGUARDAR ELEMENTOS CARREGAREM
+    setTimeout(() => {
+        // CAMPOS CONDICIONAIS COMUNS EM FORMULÁRIOS DE PROPRIETÁRIOS
+        setupFieldToggle('experienciaMinima', '.experiencia-details');
+        setupFieldToggle('experienciaMinima', '.experiencia-minima');
+        setupFieldToggle('experienciaMinima', '[class*="experiencia"]');
+        setupFieldToggle('temExperiencia', '.experiencia-details');
+        setupFieldToggle('temPets', '.pets-details');
+        setupFieldToggle('temAnimais', '.animais-details');
+        setupFieldToggle('dormirTrabalho', '.dormir-detalhes');
+        setupFieldToggle('cuidadosEspeciais', '.cuidados-especiais-details');
+        setupFieldToggle('inicio_urgente', '.urgente-details');
+        
+        // CORREÇÃO IMEDIATA: Remover required de campos hidden
+        document.querySelectorAll('[style*="display: none"] [required], [style*="display:none"] [required], .hidden [required]').forEach(field => {
+            field.removeAttribute('required');
+            field.value = '';
+            console.log(`🧹 Required removido de campo hidden: ${field.name}`);
+        });
+        
+        console.log('✅ Campos condicionais configurados para proprietários');
+    }, 1000);
+}
+
+// ========================================
+// VALIDAÇÃO CUSTOMIZADA PARA PROPRIETÁRIOS
+// ========================================
+
+function validateRequiredFieldsCustom(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return false;
+    
+    const requiredFields = form.querySelectorAll('[required]');
+    let isValid = true;
+    let firstInvalidField = null;
+    
+    requiredFields.forEach(field => {
+        // VERIFICAR SE O CAMPO ESTÁ REALMENTE VISÍVEL
+        const isVisible = field.offsetParent !== null && 
+                         getComputedStyle(field).display !== 'none' &&
+                         !field.closest('[style*="display: none"]') &&
+                         !field.closest('.hidden');
+        
+        // SÓ VALIDAR SE ESTIVER VISÍVEL
+        if (isVisible && !field.value.trim()) {
+            isValid = false;
+            field.classList.add('error');
+            field.style.border = '2px solid red';
+            
+            if (!firstInvalidField) {
+                firstInvalidField = field;
+            }
+            
+            console.error(`❌ Campo obrigatório vazio: ${field.name}`);
+        } else {
+            field.classList.remove('error');
+            field.style.border = '';
+        }
+    });
+    
+    // VERIFICAR TERMOS DE SERVIÇO
+    if (!isTermsAccepted()) {
+        isValid = false;
+        console.error('❌ Termos de serviço não foram aceitos');
+    }
+    
+    if (!isValid && firstInvalidField) {
+        firstInvalidField.focus();
+        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert('Por favor, preencha todos os campos obrigatórios destacados em vermelho.');
+    }
+    
+    return isValid;
+}
+
+// ========================================
+// SUBSTITUIR FUNÇÃO ORIGINAL
+// ========================================
+
+// Backup da função original
+if (typeof window.validateRequiredFields !== 'undefined') {
+    window.validateRequiredFields_original = window.validateRequiredFields;
+}
+
+// Substituir por versão corrigida
+window.validateRequiredFields = validateRequiredFieldsCustom;
+
+// ========================================
+// AUTO-INICIALIZAR
+// ========================================
+
+// Inicializar quando DOM estiver pronto
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fixConditionalFieldsProprietarios);
+} else {
+    fixConditionalFieldsProprietarios();
+}
+
+// Também inicializar após delay (caso seções demorem para carregar)
+setTimeout(fixConditionalFieldsProprietarios, 2000);
+
+console.log('🔧 Sistema de correção de campos condicionais para proprietários carregado');
+
+// FUNÇÃO PARA DEBUG MANUAL
+window.debugFormFields = function() {
+    const form = document.querySelector('form');
+    const required = form.querySelectorAll('[required]');
+    const hidden = form.querySelectorAll('[style*="display: none"] [required], .hidden [required]');
+    
+    console.log('📊 Debug Formulário:', {
+        'Total required': required.length,
+        'Required hidden': hidden.length,
+        'Campos hidden': Array.from(hidden).map(f => f.name)
+    });
+    
+    // Destacar campos problemáticos
+    hidden.forEach(field => {
+        field.style.backgroundColor = 'red';
+        console.log(`🔴 Campo problemático: ${field.name}`);
+    });
+};
+
 function loadAllOwnerStandardSections() {
     loadOwnerFormSection('aceitar-termos', 'aceitar-termos-container');
     loadOwnerFormSection('dados-proprietario', 'dados-proprietario-container');
@@ -1251,3 +1427,4 @@ function loadAllOwnerStandardSections() {
     loadOwnerFormSection('treinamento-personalizado', 'treinamento-personalizado-container');
     loadOwnerFormSection('observacoes-adicionais', 'observacoes-adicionais-container');
 }
+
