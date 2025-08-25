@@ -1106,7 +1106,7 @@ function estruturarDadosSupabase(formData) {
     const dadosEspecificos = extrairDadosEspecificos(formData);
     
     // Referências
-    const referencias = extrairReferencias(formData);
+    const referencias = extrairReferencias(formData, formularioId);
     
     return {
         ...dadosUniversais,
@@ -1378,113 +1378,198 @@ function extrairDadosArrumadeira(formData) {
  * Extrai dados específicos do casal (placeholder para futuras implementações)
  */
 function extrairDadosCasal(formData) {
+    console.log('📊 Extraindo dados específicos do casal...');
+    
     return {
-        // Dados pessoais - Ele
-        nome_completo_ele: formData.nomeCompletoEle || null,
-        data_nascimento_ele: formData.dataNascimentoEle || null,
-        cpf_ele: formData.cpfEle || null,
-        telefone_ele: formData.telefoneEle || null,
-        whatsapp_ele: formData.whatsappEle || null,
-        email_ele: formData.emailEle || null,
-        possui_cnh_ele: formData.possuiCnhEle === 'sim',
-        categoria_cnh_ele: formData.categoriaCnhEle || null,
+        // ===== DADOS PESSOAIS - ELE =====
+        nome_completo_ele: formData.get('nomeCompletoEle') || null,
+        data_nascimento_ele: formData.get('dataNascimentoEle') || null,
+        cpf_ele: formData.get('cpfEle') || null,
+        telefone_ele: formData.get('telefoneEle') || null,
+        whatsapp_ele: formData.get('whatsappEle') || null,
+        email_ele: formData.get('emailEle') || null,
+        possui_cnh_ele: formData.get('possuiCnhEle') === 'sim',
+        categoria_cnh_ele: formData.get('categoriaCnhEle') || null,
         
-        // Dados pessoais - Ela
-        nome_completo_ela: formData.nomeCompletoEla || null,
-        data_nascimento_ela: formData.dataNascimentoEla || null,
-        cpf_ela: formData.cpfEla || null,
-        telefone_ela: formData.telefoneEla || null,
-        whatsapp_ela: formData.whatsappEla || null,
-        email_ela: formData.emailEla || null,
-        possui_cnh_ela: formData.possuiCnhEla === 'sim',
-        categoria_cnh_ela: formData.categoriaCnhEla || null,
+        // ===== DADOS PESSOAIS - ELA =====
+        nome_completo_ela: formData.get('nomeCompletoEla') || null,
+        data_nascimento_ela: formData.get('dataNascimentoEla') || null,
+        cpf_ela: formData.get('cpfEla') || null,
+        telefone_ela: formData.get('telefoneEla') || null,
+        whatsapp_ela: formData.get('whatsappEla') || null,
+        email_ela: formData.get('emailEla') || null,
+        possui_cnh_ela: formData.get('possuiCnhEla') === 'sim',
+        categoria_cnh_ela: formData.get('categoriaCnhEla') || null,
         
-        // Informações gerais do casal
-        estado_civil_casal: formData.estadoCivil || null,
-        tempo_juntos: formData.tempoJuntos || null,
-        endereco_completo: formData.enderecoCompleto || null,
-        morar_residencia: formData.morarResidencia === 'sim',
-        possui_pets: formData.possuiPets === 'sim',
-        tipo_pet: formData.tipoPet || null,
+        // ===== INFORMAÇÕES GERAIS DO CASAL =====
+        estado_civil_casal: formData.get('estadoCivil') || null,
+        tempo_juntos: formData.get('tempoJuntos') || null,
+        endereco_completo: formData.get('enderecoCompleto') || null,
+        cep: formData.get('cep') || null,
+        morar_residencia: formData.get('morarResidencia') === 'sim',
+        possui_pets: formData.get('possuiPets') === 'sim',
+        tipo_pet: formData.get('tipoPet') || null,
         
-        // Experiência profissional
-        trabalhou_juntos: formData.trabalharamJuntos === 'sim',
-        tempo_caseiros: formData.tempoCaseiros || null,
+        // ===== EXPERIÊNCIA PROFISSIONAL =====
+        trabalhou_juntos: formData.get('trabalharamJuntos') === 'sim',
+        tempo_caseiros: formData.get('tempoCaseiros') || null,
+        experiencia_alto_padrao: formData.get('experienciaAltoPadrao') === 'sim',
+        tempo_alto_padrao: formData.get('tempoAltoPadrao') || null,
         
-        // Competências - Ele
-        competencias_ele: arraySeguro(formData.competenciasEle),
-        sabe_fazer_churrasco: formData.sabeFazerChurrasco || null,
-        sabe_assar_pizza: formData.sabeAssarPizza || null,
-        montar_aperitivos: formData.montarAperitivos || null,
-        servicos_barman: formData.servicosBarman === 'sim',
-        nivel_coqueteis: arraySeguro(formData.nivelCoqueteis),
-        experiencia_jardim: formData.experienciaJardim || null,
-        detalhes_jardim: formData.detalhesJardim || null,
-        cuidar_piscina: formData.cuidarPiscina || null,
-        detalhes_piscina: formData.detalhesPiscina || null,
-        outros_conhecimentos_ele: formData.outrosConhecimentosEle || null,
+        // ===== COMPETÊNCIAS - ELE =====
+        competencias_ele: arraySeguro(formData.getAll('competenciasEle')),
+        sabe_fazer_churrasco: formData.get('sabeFazerChurrasco') || null,
+        sabe_assar_pizza: formData.get('sabeAssarPizza') || null,
+        montar_aperitivos: formData.get('montarAperitivos') || null,
+        servicos_barman: formData.get('servicosBarman') === 'sim',
+        nivel_coqueteis: arraySeguro(formData.getAll('nivelCoqueteis')),
+        experiencia_jardim: formData.get('experienciaJardim') || null,
+        detalhes_jardim: formData.get('detalhesJardim') || null,
+        cuidar_piscina: formData.get('cuidarPiscina') || null,
+        detalhes_piscina: formData.get('detalhesPiscina') || null,
+        outros_conhecimentos_ele: formData.get('outrosConhecimentosEle') || null,
         
-        // Competências - Ela
-        competencias_ela: arraySeguro(formData.competenciasEla),
-        sabe_cozinhar: formData.sabeCozinhar === 'sim',
-        habilidades_cozinha: arraySeguro(formData.habilidadesCozinha),
-        conhece_confeitaria: formData.conheceConfeitaria || null,
-        especialidades_culinarias: formData.especialidadesCulinarias || null,
-        outros_conhecimentos_ela: formData.outrosConhecimentosEla || null,
+        // ===== COMPETÊNCIAS - ELA =====
+        competencias_ela: arraySeguro(formData.getAll('competenciasEla')),
+        sabe_cozinhar: formData.get('sabeCozinhar') === 'sim',
+        habilidades_cozinha: arraySeguro(formData.getAll('habilidadesCozinha')),
+        conhece_confeitaria: formData.get('conheceConfeitaria') || null,
+        especialidades_culinarias: formData.get('especialidadesCulinarias') || null,
+        outros_conhecimentos_ela: formData.get('outrosConhecimentosEla') || null,
         
-        // Disponibilidade
-        morar_trabalho: formData.morarTrabalho === 'sim',
-        fim_semana: formData.fimSemana === 'sim',
+        // ===== DISPONIBILIDADE =====
+        morar_trabalho: formData.get('morarTrabalho') === 'sim',
+        fim_semana: formData.get('fimSemana') === 'sim',
+        dormir_fim_semana: formData.get('dormirFimSemana') || null,
+        viagens: formData.get('viagens') || null,
         
-        // Regime e pretensão
-        regime_desejado: formData.regimeDesejado || null,
-        regime_outro_especificar: formData.regimeOutroEspecificar || null,
-        pretensao_salarial_casal: converterSalario(formData.pretensaoSalarialCasal),
+        // ===== REGIME E PRETENSÃO =====
+        regime_desejado: formData.get('regimeDesejado') || null,
+        regime_outro_especificar: formData.get('regimeOutroEspecificar') || null,
+        pretensao_salarial_casal: converterSalario(formData.get('pretensaoSalarialCasal')),
+        salario_negociavel: formData.get('salarioNegociavel') === 'sim',
         
-        // Objetivo e motivação
-        porque_juntos: formData.porqueJuntos || null,
-        diferencial_casal: formData.diferencialCasal || null,
+        // ===== OBJETIVO E MOTIVAÇÃO =====
+        porque_juntos: formData.get('porqueJuntos') || null,
+        diferencial_casal: formData.get('diferencialCasal') || null,
         
-        // Informações complementares
-        fumam: formData.fumam === 'sim',
-        consomem_alcool: formData.consumemAlcool || null
+        // ===== INFORMAÇÕES COMPLEMENTARES =====
+        fumam: formData.get('fumam') === 'sim',
+        consomem_alcool: formData.get('consumemAlcool') || null,
+        restricao_saude: formData.get('restricaoSaude') === 'sim',
+        especificar_restricao: formData.get('especificarRestricao') || null,
+        
+        // ===== OBSERVAÇÕES =====
+        observacoes_adicionais: formData.get('observacoesAdicionais') || null
     };
 }
 
 /**
  * Extrai referências do formulário
  */
-function extrairReferencias(formData) {
+function extrairReferencias(formData, formularioId) {
+    console.log('📋 Extraindo referências para:', formularioId);
+    
     const referencias = [];
     
-    if (formData.possuiReferencias === 'sim') {
-        // Referência 1
-        if (formData.ref1Nome) {
+    // ===== CASAL - REFERÊNCIAS SEPARADAS =====
+    if (formularioId === 'candi-casal') {
+        
+        // REFERÊNCIAS DELE
+        if (formData.get('refEle1Nome')) {
             referencias.push({
-                nome: formData.ref1Nome,
-                telefone: formData.ref1Telefone,
-                periodo_inicio: formData.ref1Inicio,
-                periodo_fim: formData.ref1Fim,
-                idades_criancas: formData.ref1IdadesCriancas || null,
-                relacao: formData.ref1Relacao,
-                outro_especificar: formData.ref1OutroEspecificar
+                pessoa: 'ele',
+                tipo: 'referencia_1',
+                nome: formData.get('refEle1Nome'),
+                telefone: formData.get('refEle1Telefone'),
+                periodo_inicio: formData.get('refEle1Inicio'),
+                periodo_fim: formData.get('refEle1Fim'),
+                relacao: formData.get('refEle1Relacao'),
+                outro_especificar: formData.get('refEle1OutroEspecificar') || null,
+                motivo_saida: formData.get('refEle1MotivoSaida') || null
             });
         }
         
-        // Referência 2
-        if (formData.ref2Nome) {
+        if (formData.get('refEle2Nome')) {
             referencias.push({
-                nome: formData.ref2Nome,
-                telefone: formData.ref2Telefone,
-                periodo_inicio: formData.ref2Inicio,
-                periodo_fim: formData.ref2Fim,
-                idades_criancas: formData.ref2IdadesCriancas || null,
-                relacao: formData.ref2Relacao,
-                outro_especificar: formData.ref2OutroEspecificar
+                pessoa: 'ele',
+                tipo: 'referencia_2',
+                nome: formData.get('refEle2Nome'),
+                telefone: formData.get('refEle2Telefone'),
+                periodo_inicio: formData.get('refEle2Inicio'),
+                periodo_fim: formData.get('refEle2Fim'),
+                relacao: formData.get('refEle2Relacao'),
+                outro_especificar: formData.get('refEle2OutroEspecificar') || null,
+                motivo_saida: formData.get('refEle2MotivoSaida') || null
             });
+        }
+        
+        // REFERÊNCIAS DELA
+        if (formData.get('refEla1Nome')) {
+            referencias.push({
+                pessoa: 'ela',
+                tipo: 'referencia_1',
+                nome: formData.get('refEla1Nome'),
+                telefone: formData.get('refEla1Telefone'),
+                periodo_inicio: formData.get('refEla1Inicio'),
+                periodo_fim: formData.get('refEla1Fim'),
+                relacao: formData.get('refEla1Relacao'),
+                outro_especificar: formData.get('refEla1OutroEspecificar') || null,
+                motivo_saida: formData.get('refEla1MotivoSaida') || null
+            });
+        }
+        
+        if (formData.get('refEla2Nome')) {
+            referencias.push({
+                pessoa: 'ela',
+                tipo: 'referencia_2',
+                nome: formData.get('refEla2Nome'),
+                telefone: formData.get('refEla2Telefone'),
+                periodo_inicio: formData.get('refEla2Inicio'),
+                periodo_fim: formData.get('refEla2Fim'),
+                relacao: formData.get('refEla2Relacao'),
+                outro_especificar: formData.get('refEla2OutroEspecificar') || null,
+                motivo_saida: formData.get('refEla2MotivoSaida') || null
+            });
+        }
+        
+    } else {
+        // ===== OUTROS FORMULÁRIOS - PADRÃO =====
+        if (formData.get('possuiReferencias') === 'sim') {
+            
+            // Referência 1
+            if (formData.get('ref1Nome')) {
+                referencias.push({
+                    tipo: 'referencia_1',
+                    nome: formData.get('ref1Nome'),
+                    telefone: formData.get('ref1Telefone'),
+                    periodo_inicio: formData.get('ref1Inicio'),
+                    periodo_fim: formData.get('ref1Fim'),
+                    idades_criancas: formData.get('ref1IdadesCriancas') || null,
+                    relacao: formData.get('ref1Relacao'),
+                    outro_especificar: formData.get('ref1OutroEspecificar') || null,
+                    motivo_saida: formData.get('ref1MotivoSaida') || null
+                });
+            }
+            
+            // Referência 2
+            if (formData.get('ref2Nome')) {
+                referencias.push({
+                    tipo: 'referencia_2',
+                    nome: formData.get('ref2Nome'),
+                    telefone: formData.get('ref2Telefone'),
+                    periodo_inicio: formData.get('ref2Inicio'),
+                    periodo_fim: formData.get('ref2Fim'),
+                    idades_criancas: formData.get('ref2IdadesCriancas') || null,
+                    relacao: formData.get('ref2Relacao'),
+                    outro_especificar: formData.get('ref2OutroEspecificar') || null,
+                    motivo_saida: formData.get('ref2MotivoSaida') || null
+                });
+            }
         }
     }
     
+    console.log(`✅ ${referencias.length} referências extraídas para ${formularioId}`);
     return referencias;
 }
 
