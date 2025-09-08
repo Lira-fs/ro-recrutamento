@@ -1,4 +1,4 @@
-# app/streamlit_app.py
+# app/streamlit_app_fixed.py - VERSÃO CORRIGIDA
 import sys
 import os
 import streamlit as st
@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 from supabase_client import get_supabase_client
-from pdf_utils import gerar_ficha_candidato
+from pdf_utils import gerar_ficha_candidato_completa
 
 # Configurar página
 st.set_page_config(
@@ -87,21 +87,13 @@ def atualizar_status_ficha(candidato_id):
     try:
         supabase = get_supabase_client()
         
-        # Adicionar coluna se não existir (tentativa)
-        try:
-            supabase.table('candidatos').update({
-                'ficha_emitida': True,
-                'data_ficha_gerada': datetime.now().isoformat()
-            }).eq('id', candidato_id).execute()
-            
-            return True
-            
-        except Exception as e:
-            # Se der erro, provavelmente a coluna não existe
-            st.warning("⚠️ Coluna 'ficha_emitida' não existe no banco. Execute no Supabase SQL Editor:")
-            st.code("ALTER TABLE candidatos ADD COLUMN IF NOT EXISTS ficha_emitida boolean DEFAULT false;")
-            st.code("ALTER TABLE candidatos ADD COLUMN IF NOT EXISTS data_ficha_gerada timestamptz;")
-            return False
+        # Atualizar status
+        supabase.table('candidatos').update({
+            'ficha_emitida': True,
+            'data_ficha_gerada': datetime.now().isoformat()
+        }).eq('id', candidato_id).execute()
+        
+        return True
             
     except Exception as e:
         st.error(f"❌ Erro ao atualizar status: {str(e)}")
@@ -224,8 +216,8 @@ def main():
                 # Informações básicas
                 st.write(f"**📧 Email:** {candidato.get('email', 'Não informado')}")
                 st.write(f"**📍 Endereço:** {candidato.get('endereco', 'Não informado')}")
-                st.write(f"**👨‍👩‍👧‍👦 Filhos:** {candidato.get('tem_filhos', 'Não informado')}")
-                st.write(f"**🚗 CNH:** {candidato.get('possui_cnh', 'Não informado')}")
+                st.write(f"**👨‍👩‍👧‍👦 Filhos:** {'Sim' if candidato.get('tem_filhos') else 'Não'}")
+                st.write(f"**🚗 CNH:** {'Sim' if candidato.get('possui_cnh') else 'Não'}")
                 
                 if candidato.get('created_at'):
                     data_cadastro = pd.to_datetime(candidato['created_at']).strftime('%d/%m/%Y às %H:%M')
@@ -244,32 +236,57 @@ def main():
                 # Botão para gerar PDF
                 nome_arquivo = f"ficha_{candidato.get('nome_completo', 'candidato').replace(' ', '_')}_{candidato.get('id', 'sem_id')}.pdf"
                 
+                # Armazenar PDF no session_state
+                if f"pdf_data_{candidato.get('id')}" not in st.session_state:
+                    st.session_state[f"pdf_data_{candidato.get('id')}"] = None
+                
+                # Botão para gerar PDF
                 if st.button(f"📄 Gerar Ficha PDF", key=f"pdf_{candidato.get('id')}"):
                     try:
                         with st.spinner("Gerando PDF..."):
-                            # Gerar PDF
+                            
+                            st.write("📝 Preparando dados do candidato...")
+                            
+                            # USAR A FUNÇÃO QUE FUNCIONA
                             pdf_bytes = gerar_ficha_candidato(candidato.to_dict())
                             
-                            # Oferecer download
-                            st.download_button(
-                                label="📥 Baixar Ficha PDF",
-                                data=pdf_bytes,
-                                file_name=nome_arquivo,
-                                mime="application/pdf",
-                                key=f"download_{candidato.get('id')}"
-                            )
+                            # Salvar no session_state
+                            st.session_state[f"pdf_data_{candidato.get('id')}"] = pdf_bytes
+                            
+                            st.success(f"✅ PDF gerado! Tamanho: {len(pdf_bytes)} bytes")
+                            st.info("👇 Clique no botão verde abaixo para baixar!")
                             
                             # Atualizar status no banco
                             if atualizar_status_ficha(candidato.get('id')):
-                                st.success("✅ PDF gerado e status atualizado!")
-                                st.rerun()  # Recarregar página
+                                st.success("✅ Status atualizado no banco!")
+                                # Limpar cache para atualizar dados
+                                st.cache_data.clear()
                             else:
-                                st.success("✅ PDF gerado com sucesso!")
-                                st.info("ℹ️ Status não atualizado (coluna não existe)")
+                                st.info("ℹ️ PDF gerado, mas status não atualizado")
                             
                     except Exception as e:
                         st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-                        st.error("🔧 Verifique se todos os arquivos estão no local correto.")
+                        st.error(f"🔧 Tipo do erro: {type(e).__name__}")
+                        
+                        # Mostrar detalhes do erro
+                        import traceback
+                        with st.expander("🔍 Detalhes técnicos do erro"):
+                            st.code(traceback.format_exc())
+                
+                # Botão de download (sempre visível se PDF foi gerado)
+                if st.session_state[f"pdf_data_{candidato.get('id')}"] is not None:
+                    pdf_data = st.session_state[f"pdf_data_{candidato.get('id')}"]
+                    
+                    st.download_button(
+                        label="📥 📱 BAIXAR FICHA PDF",
+                        data=pdf_data,
+                        file_name=nome_arquivo,
+                        mime="application/pdf",
+                        key=f"download_{candidato.get('id')}",
+                        type="primary"  # Botão verde destacado
+                    )
+                    
+                    st.success("✅ PDF pronto para download!")
     
     # RODAPÉ
     st.markdown("---")
@@ -282,3 +299,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
