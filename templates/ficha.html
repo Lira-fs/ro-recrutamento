@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha Profissional - {{ nome }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+            background-image: url('background-fichas.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-image: url('background-fichas.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm 20mm;
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #a65e2e, #d4a574);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            margin-right: 20px;
+        }
+        
+        .company-info {
+            text-align: left;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #a65e2e;
+            margin-bottom: 5px;
+        }
+        
+        .company-subtitle {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .title-section {
+            background: linear-gradient(135deg, #a65e2e, #d4a574);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .document-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .candidate-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #a65e2e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #a65e2e;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #a65e2e;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fff8f0, #f4e8d0);
+            border: 2px solid #a65e2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .function-badge {
+            background: linear-gradient(135deg, #a65e2e, #d4a574);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .referencias-section {
+            background: rgba(255, 248, 240, 0.9);
+            border: 2px dashed #a65e2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .referencia-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #d4a574;
+        }
+        
+        .manual-space {
+            height: 60px;
+            border: 1px dashed #ccc;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        
+        .observacoes-box {
+            background: linear-gradient(135deg, #f0f8ff, #e8f4f8);
+            border: 2px solid #a65e2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 15mm;
+            left: 20mm;
+            right: 20mm;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border-top: 3px solid #a65e2e;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: #a65e2e;
+        }
+        
+        .generated-info {
+            font-size: 10px;
+            color: #999;
+            margin-top: 10px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        /* Estilos específicos para impressão */
+        @media print {
+            .container {
+                margin: 0;
+                padding: 20mm;
+            }
+            
+            .footer {
+                position: fixed;
+                bottom: 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- CABEÇALHO -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-placeholder">RO</div>
+                <div class="company-info">
+                    <div class="company-name">R.O RECRUTAMENTO</div>
+                    <div class="company-subtitle">Agência de Profissionais Domésticos Qualificados</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TÍTULO DO DOCUMENTO -->
+        <div class="title-section">
+            <div class="document-title">FICHA PROFISSIONAL</div>
+            <div class="candidate-name">{{ nome }}</div>
+        </div>
+
+        <!-- FUNÇÃO/CARGO -->
+        <div class="highlight-box">
+            <div class="function-badge">
+                {% if formulario_id == 'candi-baba' %}👶 BABÁ
+                {% elif formulario_id == 'candi-caseiro' %}🏠 CASEIRO
+                {% elif formulario_id == 'candi-copeiro' %}🍷 COPEIRO
+                {% elif formulario_id == 'candi-cozinheira' %}👨‍🍳 COZINHEIRA(O)
+                {% elif formulario_id == 'candi-governanta' %}👑 GOVERNANTA
+                {% elif formulario_id == 'candi-arrumadeira' %}🧹 ARRUMADEIRA
+                {% elif formulario_id == 'candi-casal' %}👫 CASAL
+                {% else %}PROFISSIONAL DOMÉSTICO
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- DADOS PESSOAIS -->
+        <div class="content-section">
+            <div class="section-title">📋 DADOS PESSOAIS</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Nome Completo</div>
+                    <div class="info-value">{{ nome }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">CPF</div>
+                    <div class="info-value">{{ cpf }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">RG</div>
+                    <div class="info-value">{{ dados_candidato.get('rg', 'Não informado') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Data de Nascimento</div>
+                    <div class="info-value">{{ data_nascimento }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Estado Civil</div>
+                    <div class="info-value">{{ dados_candidato.get('estado_civil', 'Não informado') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nacionalidade</div>
+                    <div class="info-value">{{ dados_candidato.get('nacionalidade', 'Brasileira') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFORMAÇÕES DE CONTATO -->
+        <div class="content-section">
+            <div class="section-title">📞 CONTATO</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Telefone</div>
+                    <div class="info-value">{{ telefone }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">WhatsApp</div>
+                    <div class="info-value">{{ whatsapp }}</div>
+                </div>
+                <div class="info-item full-width">
+                    <div class="info-label">E-mail</div>
+                    <div class="info-value">{{ email }}</div>
+                </div>
+                <div class="info-item full-width">
+                    <div class="info-label">Endereço Completo</div>
+                    <div class="info-value">{{ endereco }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFORMAÇÕES PROFISSIONAIS -->
+        <div class="content-section">
+            <div class="section-title">💼 INFORMAÇÕES PROFISSIONAIS</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Tem Filhos</div>
+                    <div class="info-value">{{ tem_filhos }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Quantidade de Filhos</div>
+                    <div class="info-value">{{ quantos_filhos }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Possui CNH</div>
+                    <div class="info-value">{{ possui_cnh }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Categoria CNH</div>
+                    <div class="info-value">{{ categoria_cnh }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Pretensão Salarial</div>
+                    <div class="info-value">{{ dados_candidato.get('pretensao_salarial', 'Não informado') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Aceita Treinamento</div>
+                    <div class="info-value">{{ dados_candidato.get('aceita_treinamento', 'Não informado') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tempo de Experiência</div>
+                    <div class="info-value">{{ dados_candidato.get('tempo_experiencia', 'Não informado') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Data de Cadastro</div>
+                    <div class="info-value">{{ data_cadastro }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DADOS ESPECÍFICOS DA FUNÇÃO -->
+        {% if dados_especificos and dados_especificos|length > 0 %}
+        <div class="content-section">
+            <div class="section-title">🎯 INFORMAÇÕES ESPECÍFICAS</div>
+            <div class="info-grid">
+                {% for item in dados_especificos %}
+                <div class="info-item">
+                    <div class="info-label">{{ item[0] }}</div>
+                    <div class="info-value">{{ item[1] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- REFERÊNCIAS PROFISSIONAIS -->
+        <div class="referencias-section">
+            <div class="section-title">📞 REFERÊNCIAS PROFISSIONAIS</div>
+            
+            {% if referencias and referencias|length > 0 %}
+                {% for ref in referencias %}
+                <div class="referencia-item">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Nome</div>
+                            <div class="info-value">{{ ref.nome }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Telefone</div>
+                            <div class="info-value">{{ ref.telefone }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Relação</div>
+                            <div class="info-value">{{ ref.relacao }}</div>
+                        </div>
+                        {% if ref.periodo_inicio or ref.periodo_fim %}
+                        <div class="info-item">
+                            <div class="info-label">Período</div>
+                            <div class="info-value">{{ ref.periodo_inicio }} até {{ ref.periodo_fim or 'atual' }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="manual-space">Espaço para referências (preenchimento manual)</div>
+                <div class="manual-space">Espaço para referências (preenchimento manual)</div>
+                <div class="manual-space">Espaço para referências (preenchimento manual)</div>
+            {% endif %}
+        </div>
+
+        <!-- OBSERVAÇÕES DA AGÊNCIA -->
+        <div class="observacoes-box">
+            <div class="section-title">📝 OBSERVAÇÕES DA AGÊNCIA</div>
+            {% if observacoes and observacoes != 'Nenhuma observação' %}
+                <div class="info-value">{{ observacoes }}</div>
+            {% else %}
+                <div class="manual-space">Espaço para observações da equipe (preenchimento manual)</div>
+                <div class="manual-space">Espaço para observações da equipe (preenchimento manual)</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="footer">
+        <div class="contact-info">
+            <div class="contact-item">📱 @rorecrutamento</div>
+            <div class="contact-item">📧 atendimento@rorecrutamento.com.br</div>
+            <div class="contact-item">📞 (11) 95107-2131</div>
+        </div>
+        <div class="generated-info">
+            <strong>www.rorecrutamento.com.br</strong><br>
+            Ficha gerada em {{ data_geracao }}<br>
+            <em>Documento confidencial - Uso restrito para processo seletivo</em>
+        </div>
+    </div>
+</body>
+</html>
