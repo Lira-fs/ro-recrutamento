@@ -9,6 +9,24 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from io import BytesIO
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+import pdfkit
+
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "..", "templates")
+
+def render_html(template_name, context):
+    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+    template = env.get_template(template_name)
+    return template.render(**context)
+
+def html_to_pdf_fallback(html):
+    from reportlab.pdfgen import canvas
+    from io import BytesIO
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer)
+    p.drawString(50, 750, "FICHA R.O RECRUTAMENTO")
+    p.save()
+    return buffer.getvalue()
 
 def processar_dados_especificos(dados_especificos, formulario_id):
     """
@@ -225,333 +243,30 @@ def gerar_ficha_candidato_completa(dados_candidato):
     try:
         print(f"🎨 Gerando PDF completo para: {dados_candidato.get('nome_completo', 'Nome não encontrado')}")
         
-        # Criar buffer para PDF
-        buffer = BytesIO()
-        
-        # Criar documento
-        doc = SimpleDocTemplate(
-            buffer, 
-            pagesize=A4, 
-            topMargin=0.5*inch,
-            bottomMargin=0.5*inch,
-            leftMargin=0.7*inch,
-            rightMargin=0.7*inch
-        )
-        
-        # Estilos personalizados
-        styles = getSampleStyleSheet()
-        
-        # Estilo para título principal
-        titulo_style = ParagraphStyle(
-            'TituloCustom',
-            parent=styles['Title'],
-            fontSize=20,
-            spaceAfter=10,
-            textColor=colors.Color(0.65, 0.37, 0.18),  # Cor bronze
-            alignment=TA_CENTER,
-            fontName='Helvetica-Bold'
-        )
-        
-        # Estilo para nome do candidato
-        nome_style = ParagraphStyle(
-            'NomeCustom',
-            parent=styles['Heading1'],
-            fontSize=24,
-            spaceAfter=20,
-            textColor=colors.Color(0.17, 0.24, 0.31),  # Azul escuro
-            alignment=TA_CENTER,
-            fontName='Helvetica-Bold'
-        )
-        
-        # Estilo para seções
-        secao_style = ParagraphStyle(
-            'SecaoCustom',
-            parent=styles['Heading2'],
-            fontSize=14,
-            spaceBefore=15,
-            spaceAfter=10,
-            textColor=colors.Color(0.65, 0.37, 0.18),  # Cor bronze
-            fontName='Helvetica-Bold'
-        )
-        
-        # Conteúdo do PDF
-        story = []
-        
-        # CABEÇALHO ESTILIZADO
-        titulo = Paragraph("R.O RECRUTAMENTO", titulo_style)
-        story.append(titulo)
-        
-        subtitulo = Paragraph(
-            "<i>Agência de Profissionais Domésticos Qualificados</i>", 
-            styles['Normal']
-        )
-        subtitulo.alignment = TA_CENTER
-        story.append(subtitulo)
-        story.append(Spacer(1, 20))
-        
-        # LINHA DECORATIVA
-        linha_dados = [['', '']]
-        linha_table = Table(linha_dados, colWidths=[6*inch, 0.5*inch])
-        linha_table.setStyle(TableStyle([
-            ('LINEABOVE', (0, 0), (-1, 0), 3, colors.Color(0.65, 0.37, 0.18)),
-        ]))
-        story.append(linha_table)
-        story.append(Spacer(1, 10))
-        
-        # NOME DO CANDIDATO DESTACADO
-        nome = formatar_valor(dados_candidato.get('nome_completo'))
-        nome_principal = Paragraph(nome, nome_style)
-        story.append(nome_principal)
-        
-        # Badge da função
-        funcao_map = {
-            'candi-baba': '👶 BABÁ',
-            'candi-caseiro': '🏠 CASEIRO', 
-            'candi-copeiro': '🍷 COPEIRO',
-            'candi-cozinheira': '👨‍🍳 COZINHEIRA(O)',
-            'candi-governanta': '👑 GOVERNANTA',
-            'candi-arrumadeira': '🧹 ARRUMADEIRA',
-            'candi-casal': '👫 CASAL'
+        # Preparar contexto para template HTML
+        context = {
+            'nome': dados_candidato.get('nome_completo', 'Não informado'),
+            'cpf': dados_candidato.get('cpf', 'Não informado'),
+            'telefone': dados_candidato.get('telefone', 'Não informado'),
+            'whatsapp': dados_candidato.get('whatsapp', 'Não informado'),
+            'email': dados_candidato.get('email', 'Não informado'),
+            'endereco': dados_candidato.get('endereco', 'Não informado'),
+            'data_nascimento': dados_candidato.get('data_nascimento', 'Não informado'),
+            'formulario_id': dados_candidato.get('formulario_id', ''),
+            'data_geracao': datetime.now().strftime('%d/%m/%Y às %H:%M'),
+            'dados_candidato': dados_candidato
         }
-        
-        funcao = funcao_map.get(dados_candidato.get('formulario_id', ''), 'PROFISSIONAL')
-        badge_funcao = Paragraph(f"<b>{funcao}</b>", styles['Normal'])
-        badge_funcao.alignment = TA_CENTER
-        story.append(badge_funcao)
-        story.append(Spacer(1, 25))
-        
-        # SEÇÃO: DADOS PESSOAIS
-        secao_pessoais = Paragraph("📋 DADOS PESSOAIS", secao_style)
-        story.append(secao_pessoais)
-        
-        dados_pessoais = [
-            ['Nome Completo:', formatar_valor(dados_candidato.get('nome_completo'))],
-            ['CPF:', formatar_valor(dados_candidato.get('cpf'))],
-            ['RG:', formatar_valor(dados_candidato.get('rg'))],
-            ['Data de Nascimento:', formatar_valor(dados_candidato.get('data_nascimento'))],
-            ['Estado Civil:', formatar_valor(dados_candidato.get('estado_civil'))],
-            ['Nacionalidade:', formatar_valor(dados_candidato.get('nacionalidade', 'Brasileira'))],
-        ]
-        
-        tabela_dados = Table(dados_pessoais, colWidths=[2.2*inch, 4*inch])
-        tabela_dados.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.98, 0.98, 0.98)),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.8, 0.8, 0.8))
-        ]))
-        
-        story.append(tabela_dados)
-        story.append(Spacer(1, 20))
-        
-        # SEÇÃO: CONTATO
-        secao_contato = Paragraph("📞 INFORMAÇÕES DE CONTATO", secao_style)
-        story.append(secao_contato)
-        
-        contato_dados = [
-            ['Telefone:', formatar_valor(dados_candidato.get('telefone'))],
-            ['WhatsApp:', formatar_valor(dados_candidato.get('whatsapp'))],
-            ['Email:', formatar_valor(dados_candidato.get('email'))],
-        ]
-        
-        tabela_contato = Table(contato_dados, colWidths=[2.2*inch, 4*inch])
-        tabela_contato.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.98, 0.98, 0.98)),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.8, 0.8, 0.8))
-        ]))
-        
-        story.append(tabela_contato)
-        story.append(Spacer(1, 20))
-        
-        # SEÇÃO: ENDEREÇO
-        secao_endereco = Paragraph("📍 ENDEREÇO", secao_style)
-        story.append(secao_endereco)
-        
-        endereco_dados = [
-            ['Endereço Completo:', formatar_valor(dados_candidato.get('endereco'))],
-            ['CEP:', formatar_valor(dados_candidato.get('cep'))],
-            ['Cidade:', formatar_valor(dados_candidato.get('cidade'))],
-        ]
-        
-        tabela_endereco = Table(endereco_dados, colWidths=[2.2*inch, 4*inch])
-        tabela_endereco.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.98, 0.98, 0.98)),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.8, 0.8, 0.8))
-        ]))
-        
-        story.append(tabela_endereco)
-        story.append(Spacer(1, 20))
-        
-        # SEÇÃO: INFORMAÇÕES PROFISSIONAIS
-        secao_prof = Paragraph("💼 INFORMAÇÕES PROFISSIONAIS", secao_style)
-        story.append(secao_prof)
-        
-        info_profissional = [
-            ['Função:', funcao],
-            ['Data de Cadastro:', dados_candidato.get('created_at', 'Não informado')[:10] if dados_candidato.get('created_at') else 'Não informado'],
-            ['Tem Filhos:', formatar_valor(dados_candidato.get('tem_filhos'), 'boolean')],
-            ['Quantidade de Filhos:', formatar_valor(dados_candidato.get('quantos_filhos'))],
-            ['Possui CNH:', formatar_valor(dados_candidato.get('possui_cnh'), 'boolean')],
-            ['Categoria CNH:', formatar_valor(dados_candidato.get('categoria_cnh'))],
-            ['Pretensão Salarial:', formatar_valor(dados_candidato.get('pretensao_salarial'), 'dinheiro')],
-            ['Aceita Treinamento:', formatar_valor(dados_candidato.get('aceita_treinamento'), 'boolean')],
-            ['Tempo de Experiência:', formatar_valor(dados_candidato.get('tempo_experiencia'))],
-            ['Experiência Alto Padrão:', formatar_valor(dados_candidato.get('experiencia_alto_padrao'), 'boolean')],
-            ['Possui Referências:', formatar_valor(dados_candidato.get('possui_referencias'), 'boolean')],
-        ]
-        
-        tabela_prof = Table(info_profissional, colWidths=[2.2*inch, 4*inch])
-        tabela_prof.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.98, 0.98, 0.98)),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.8, 0.8, 0.8))
-        ]))
-        
-        story.append(tabela_prof)
-        story.append(Spacer(1, 20))
-        
-        # SEÇÃO: DADOS ESPECÍFICOS POR FUNÇÃO
-        dados_especificos = processar_dados_especificos(
-            dados_candidato.get('dados_especificos', '{}'), 
-            dados_candidato.get('formulario_id', '')
-        )
-        
-        if dados_especificos:
-            secao_especificos = Paragraph("🎯 INFORMAÇÕES ESPECÍFICAS DA FUNÇÃO", secao_style)
-            story.append(secao_especificos)
-            
-            tabela_especificos = Table(dados_especificos, colWidths=[2.2*inch, 4*inch])
-            tabela_especificos.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 0), (-1, -1), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.95, 0.98, 0.95)),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.7, 0.9, 0.7))
-            ]))
-            
-            story.append(tabela_especificos)
-            story.append(Spacer(1, 20))
-        
-        # SEÇÃO: REFERÊNCIAS PROFISSIONAIS
-        referencias = processar_referencias(dados_candidato.get('referencias', '[]'))
-        
-        if referencias:
-            secao_ref = Paragraph("📞 REFERÊNCIAS PROFISSIONAIS", secao_style)
-            story.append(secao_ref)
-            
-            for i, ref in enumerate(referencias[:3]):  # Máximo 3 referências
-                ref_dados = [
-                    [f'Referência {i+1}:', formatar_valor(ref.get('nome'))],
-                    ['Telefone:', formatar_valor(ref.get('telefone'))],
-                    ['Relação:', formatar_valor(ref.get('relacao'))],
-                ]
+
+        # Renderizar HTML usando template
+        html = render_html('ficha.html', context)
+
+        # Gerar PDF do HTML
+        try:
+            options = {'page-size': 'A4', 'encoding': "UTF-8"}
+            pdf_bytes = pdfkit.from_string(html, False, options=options)
+        except:
+            pdf_bytes = html_to_pdf_fallback(html)
                 
-                if ref.get('periodo_inicio') or ref.get('periodo_fim'):
-                    periodo_inicio = formatar_valor(ref.get('periodo_inicio', ''))
-                    periodo_fim = formatar_valor(ref.get('periodo_fim', 'atual'))
-                    periodo = f"{periodo_inicio} até {periodo_fim}"
-                    ref_dados.append(['Período:', periodo])
-                
-                tabela_ref = Table(ref_dados, colWidths=[2.2*inch, 4*inch])
-                tabela_ref.setStyle(TableStyle([
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                    ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 9),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                    ('TOPPADDING', (0, 0), (-1, -1), 6),
-                    ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.95, 0.98, 0.95)),
-                    ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.7, 0.9, 0.7))
-                ]))
-                
-                story.append(tabela_ref)
-                story.append(Spacer(1, 10))
-        
-        # OBSERVAÇÕES ADICIONAIS
-        if dados_candidato.get('observacoes_adicionais'):
-            secao_obs = Paragraph("📝 OBSERVAÇÕES ADICIONAIS", secao_style)
-            story.append(secao_obs)
-            
-            obs_dados = [
-                ['Observações:', formatar_valor(dados_candidato.get('observacoes_adicionais'))]
-            ]
-            
-            tabela_obs = Table(obs_dados, colWidths=[2.2*inch, 4*inch])
-            tabela_obs.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 0), (-1, -1), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BACKGROUND', (0, 0), (-1, -1), colors.Color(1, 0.98, 0.94)),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.Color(0.9, 0.8, 0.6))
-            ]))
-            
-            story.append(tabela_obs)
-            story.append(Spacer(1, 20))
-        
-        # NOVA PÁGINA PARA RODAPÉ
-        story.append(Spacer(1, 50))
-        
-        # LINHA DECORATIVA FINAL
-        linha_final = Table([['', '']], colWidths=[6*inch, 0.5*inch])
-        linha_final.setStyle(TableStyle([
-            ('LINEABOVE', (0, 0), (-1, 0), 2, colors.Color(0.65, 0.37, 0.18)),
-        ]))
-        story.append(linha_final)
-        story.append(Spacer(1, 15))
-        
-        # RODAPÉ ESTILIZADO
-        rodape_style = ParagraphStyle(
-            'RodapeCustom',
-            parent=styles['Normal'],
-            fontSize=10,
-            alignment=TA_CENTER,
-            textColor=colors.Color(0.4, 0.4, 0.4)
-        )
-        
-        rodape = Paragraph(
-            f"<b>R.O RECRUTAMENTO</b><br/>"
-            f"📱 WhatsApp: (11) 95107-2131 | 🌐 www.rorecrutamento.com.br<br/>"
-            f"📄 Ficha gerada em: {datetime.now().strftime('%d/%m/%Y às %H:%M')}<br/><br/>"
-            f"<i>Este documento contém informações confidenciais do candidato.<br/>"
-            f"Uso restrito para processo seletivo - Não compartilhar.</i>",
-            rodape_style
-        )
-        story.append(rodape)
-        
-        # Gerar PDF
-        doc.build(story)
-        
-        # Obter bytes
-        pdf_bytes = buffer.getvalue()
-        buffer.close()
-        
         print(f"✅ PDF completo gerado com sucesso! Tamanho: {len(pdf_bytes)} bytes")
         return pdf_bytes
         
