@@ -1,4 +1,4 @@
-# app/streamlit_app.py - VERSÃO CORRIGIDA
+# app/streamlit_app_fixed.py - VERSÃO CORRIGIDA
 import sys
 import os
 import streamlit as st
@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 from supabase_client import get_supabase_client
-from pdf_utils import gerar_ficha_candidato_completa  # ✅ Import correto
+from pdf_utils import gerar_ficha_candidato_completa
 
 # Configurar página
 st.set_page_config(
@@ -247,24 +247,11 @@ def main():
                             
                             st.write("📝 Preparando dados do candidato...")
                             
-                            # ✅ ATUALIZADO: Função retorna PDF e nome do arquivo
-                            resultado = gerar_ficha_candidato_completa(candidato.to_dict())
-                            
-                            # Verificar se retornou tupla (pdf_bytes, nome_arquivo) ou só pdf_bytes
-                            if isinstance(resultado, tuple):
-                                pdf_bytes, nome_arquivo = resultado
-                            else:
-                                pdf_bytes = resultado
-                                # Fallback para nome de arquivo se função antiga
-                                nome_limpo = candidato.get('nome_completo', 'candidato').replace(' ', '_').lower()
-                                import re
-                                nome_limpo = re.sub(r'[^a-zA-Z0-9_]', '', nome_limpo)
-                                data_criacao = datetime.now().strftime('%d%m%Y')
-                                nome_arquivo = f"{nome_limpo}-{data_criacao}.pdf"
+                            # USAR A FUNÇÃO QUE FUNCIONA
+                            pdf_bytes = gerar_ficha_candidato_completa(candidato.to_dict())
                             
                             # Salvar no session_state
                             st.session_state[f"pdf_data_{candidato.get('id')}"] = pdf_bytes
-                            st.session_state[f"pdf_nome_{candidato.get('id')}"] = nome_arquivo
                             
                             st.success(f"✅ PDF gerado! Tamanho: {len(pdf_bytes)} bytes")
                             st.info("👇 Clique no botão verde abaixo para baixar!")
@@ -283,25 +270,24 @@ def main():
                         
                         # Mostrar detalhes do erro
                         import traceback
-                        with st.expander("🔍 Detalhes técnicos do erro"):
-                            st.code(traceback.format_exc())
+                        st.error("Detalhes técnicos:")
+                        st.code(traceback.format_exc())
                 
                 # Botão de download (sempre visível se PDF foi gerado)
-                if st.session_state.get(f"pdf_data_{candidato.get('id')}") is not None:
+                if st.session_state[f"pdf_data_{candidato.get('id')}"] is not None:
                     pdf_data = st.session_state[f"pdf_data_{candidato.get('id')}"]
-                    nome_arquivo = st.session_state.get(f"pdf_nome_{candidato.get('id')}", f"ficha_{candidato.get('id')}.pdf")
                     
                     st.download_button(
                         label="📥 📱 BAIXAR FICHA PDF",
                         data=pdf_data,
-                        file_name=nome_arquivo,  # ✅ NOME DINÂMICO
+                        file_name=nome_arquivo,
                         mime="application/pdf",
                         key=f"download_{candidato.get('id')}",
                         type="primary"  # Botão verde destacado
                     )
                     
-                    st.success(f"✅ PDF pronto: {nome_arquivo}")
-                    
+                    st.success("✅ PDF pronto para download!")
+    
     # RODAPÉ
     st.markdown("---")
     st.markdown("""
@@ -313,3 +299,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
