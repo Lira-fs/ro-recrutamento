@@ -1,0 +1,30 @@
+# Dashboard R.O Recrutamento - Dependências Atualizadas com WeasyPrint
+# ==================================================================
+
+# Core - Streamlit e banco
+streamlit==1.39.0
+supabase==2.9.1
+pandas==2.2.3
+python-dotenv==1.0.1
+
+# PDF Generation - WeasyPrint (NOVO)
+weasyprint==62.3
+# Dependências do WeasyPrint
+pillow>=8.2.0
+cffi>=1.0.0
+cssselect2>=0.1
+html5lib>=1.0.1
+pyphen>=0.9.1
+tinycss2>=1.0.0
+
+# Templates e HTML
+jinja2==3.1.4
+
+# Fallback - ReportLab (mantido como backup)
+reportlab==4.2.5
+
+# Opcional - Para debugging e desenvolvimento
+# ipython==8.25.0
+
+# REMOVIDO: pdfkit (não é mais necessário)
+# pdfkit==1.0.0

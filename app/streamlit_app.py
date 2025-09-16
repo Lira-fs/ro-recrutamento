@@ -82,6 +82,263 @@ def carregar_candidatos():
         st.error(f"❌ Erro ao carregar candidatos: {str(e)}")
         return pd.DataFrame()
 
+# 🔥 NOVA FUNÇÃO SIMPLIFICADA (adicione no início do arquivo, após as outras funções)
+def qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor):
+    """Função simplificada para qualificar candidato"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Buscar tipo de formulário do candidato
+        candidato_resp = supabase.table('candidatos').select('formulario_id').eq('id', candidato_id).execute()
+        
+        if not candidato_resp.data:
+            return False, None
+        
+        tipo_treinamento = candidato_resp.data[0].get('formulario_id', 'GERAL')
+        
+        # Gerar certificado
+        import uuid
+        import datetime
+        
+        certificado_numero = f"RO-{tipo_treinamento.upper().replace('CANDI-', '')}-{str(uuid.uuid4())[:8]}"
+        
+        # Dados para inserir
+        dados = {
+            'candidato_id': candidato_id,
+            'nota_treinamento': int(nota),
+            'observacoes_treinamento': observacoes,
+            'instrutor_responsavel': instrutor,
+            'tipo_treinamento': tipo_treinamento,
+            'certificado_numero': certificado_numero,
+            'certificado_emitido': True if nota >= 7 else False,
+            'data_qualificacao': datetime.datetime.now().isoformat(),
+            'created_at': datetime.datetime.now().isoformat()
+        }
+        
+        # Inserir no banco
+        resultado = supabase.table('candidatos_qualificados').insert(dados).execute()
+        
+        if resultado.data and len(resultado.data) > 0:
+            return True, certificado_numero
+        else:
+            return False, None
+            
+    except Exception as e:
+        # Mostrar erro na interface
+        st.error(f"Erro técnico: {str(e)}")
+        return False, None
+
+# Adicionar no app/streamlit_app.py
+
+def carregar_candidatos_qualificados():
+    """Carrega candidatos qualificados com dados combinados - VERSÃO CORRIGIDA"""
+    try:
+        supabase = get_supabase_client()
+        
+        # ✅ USAR API PADRÃO DO SUPABASE (não execute_sql)
+        # Primeiro, buscar qualificações
+        qualificacoes = supabase.table('candidatos_qualificados').select('*').execute()
+        
+        if not qualificacoes.data:
+            return pd.DataFrame()  # Retorna vazio se não há qualificações
+        
+        # Buscar candidatos que estão qualificados
+        candidatos_ids = [q['candidato_id'] for q in qualificacoes.data]
+        
+        candidatos = supabase.table('candidatos').select('*').in_('id', candidatos_ids).execute()
+        
+        if not candidatos.data:
+            return pd.DataFrame()
+        
+        # Combinar dados manualmente
+        dados_combinados = []
+        for candidato in candidatos.data:
+            # Encontrar qualificação correspondente
+            qualificacao = next((q for q in qualificacoes.data if q['candidato_id'] == candidato['id']), None)
+            
+            if qualificacao:
+                # Combinar dados
+                candidato_completo = candidato.copy()
+                candidato_completo.update({
+                    'data_qualificacao': qualificacao.get('data_qualificacao'),
+                    'nota_treinamento': qualificacao.get('nota_treinamento'),
+                    'certificado_emitido': qualificacao.get('certificado_emitido'),
+                    'certificado_numero': qualificacao.get('certificado_numero'),
+                    'instrutor_responsavel': qualificacao.get('instrutor_responsavel')
+                })
+                dados_combinados.append(candidato_completo)
+        
+        return pd.DataFrame(dados_combinados)
+            
+    except Exception as e:
+        st.error(f"Erro ao carregar candidatos qualificados: {str(e)}")
+        return pd.DataFrame()
+
+def carregar_candidatos_pendentes():
+    """Carrega candidatos que ainda não foram qualificados - VERSÃO CORRIGIDA"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Buscar todos os candidatos
+        todos_candidatos = supabase.table('candidatos').select('*').execute()
+        
+        if not todos_candidatos.data:
+            return pd.DataFrame()
+        
+        # Buscar IDs dos candidatos já qualificados
+        qualificacoes = supabase.table('candidatos_qualificados').select('candidato_id').execute()
+        
+        candidatos_qualificados_ids = []
+        if qualificacoes.data:
+            candidatos_qualificados_ids = [q['candidato_id'] for q in qualificacoes.data]
+        
+        # Filtrar candidatos pendentes
+        candidatos_pendentes = [
+            c for c in todos_candidatos.data 
+            if c['id'] not in candidatos_qualificados_ids
+        ]
+        
+        return pd.DataFrame(candidatos_pendentes)
+            
+    except Exception as e:
+        st.error(f"Erro ao carregar candidatos pendentes: {str(e)}")
+        return pd.DataFrame()
+
+def qualificar_candidato(candidato_id, nota, observacoes, instrutor):
+    """Move candidato para tabela de qualificados - VERSÃO COM DEBUG"""
+    try:
+        st.write(f"🔄 Debug: Iniciando qualificação do candidato {candidato_id}")
+        
+        supabase = get_supabase_client()
+        
+        # Buscar dados do candidato
+        st.write("📋 Debug: Buscando dados do candidato...")
+        candidato_response = supabase.table('candidatos').select('formulario_id').eq('id', candidato_id).execute()
+        
+        if not candidato_response.data:
+            st.error("❌ Debug: Candidato não encontrado!")
+            return False, None
+        
+        tipo_treinamento = candidato_response.data[0].get('formulario_id', 'GERAL')
+        st.write(f"✅ Debug: Tipo de treinamento: {tipo_treinamento}")
+        
+        # Gerar número do certificado
+        import uuid
+        certificado_numero = f"RO-{tipo_treinamento.upper().replace('CANDI-', '')}-{str(uuid.uuid4())[:8]}"
+        st.write(f"🎓 Debug: Certificado gerado: {certificado_numero}")
+        
+        dados_qualificacao = {
+            'candidato_id': candidato_id,
+            'nota_treinamento': nota,
+            'observacoes_treinamento': observacoes,
+            'instrutor_responsavel': instrutor,
+            'tipo_treinamento': tipo_treinamento,
+            'certificado_numero': certificado_numero,
+            'certificado_emitido': True if nota >= 7 else False,
+            'data_qualificacao': datetime.now().isoformat(),
+            'created_at': datetime.now().isoformat()
+        }
+        
+        st.write("💾 Debug: Tentando inserir no banco...")
+        st.write(f"📊 Debug: Dados a inserir: {dados_qualificacao}")
+        
+        # Inserir na tabela
+        result = supabase.table('candidatos_qualificados').insert(dados_qualificacao).execute()
+        
+        st.write(f"📤 Debug: Resultado da inserção: {result}")
+        
+        if result.data:
+            st.write("✅ Debug: Inserção bem-sucedida!")
+            return True, certificado_numero
+        else:
+            st.write("❌ Debug: Falha na inserção!")
+            return False, None
+        
+    except Exception as e:
+        st.error(f"💥 Debug: Erro na função qualificar_candidato: {str(e)}")
+        
+        # Mostrar traceback completo
+        import traceback
+        st.code(traceback.format_exc())
+        
+        return False, None
+    """Move candidato para tabela de qualificados - VERSÃO CORRIGIDA"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Buscar dados do candidato
+        candidato_response = supabase.table('candidatos').select('formulario_id').eq('id', candidato_id).execute()
+        
+        if not candidato_response.data:
+            st.error("Candidato não encontrado!")
+            return False, None
+        
+        tipo_treinamento = candidato_response.data[0].get('formulario_id', 'GERAL')
+        
+        # Gerar número do certificado
+        import uuid
+        certificado_numero = f"RO-{tipo_treinamento.upper().replace('CANDI-', '')}-{str(uuid.uuid4())[:8]}"
+        
+        dados_qualificacao = {
+            'candidato_id': candidato_id,
+            'nota_treinamento': nota,
+            'observacoes_treinamento': observacoes,
+            'instrutor_responsavel': instrutor,
+            'tipo_treinamento': tipo_treinamento,
+            'certificado_numero': certificado_numero,
+            'certificado_emitido': True if nota >= 7 else False,
+            'data_qualificacao': datetime.now().isoformat(),
+            'created_at': datetime.now().isoformat()
+        }
+        
+        # Inserir na tabela
+        result = supabase.table('candidatos_qualificados').insert(dados_qualificacao).execute()
+        
+        if result.data:
+            return True, certificado_numero
+        else:
+            return False, None
+        
+    except Exception as e:
+        st.error(f"Erro ao qualificar candidato: {str(e)}")
+        return False, None        
+
+# 🔥 ADICIONE ESTA FUNÇÃO após a função formatar_funcao()
+
+def formatar_whatsapp_link(numero_whatsapp):
+    """Converte número do WhatsApp em link clicável"""
+    if not numero_whatsapp or numero_whatsapp == 'Não informado' or str(numero_whatsapp).lower() == 'nan':
+        return "Não informado"
+    
+    # Limpar o número (remover espaços, parênteses, hífens, etc.)
+    numero_limpo = str(numero_whatsapp)
+    numero_limpo = ''.join(filter(str.isdigit, numero_limpo))
+    
+    # Verificar se o número tem pelo menos 10 dígitos
+    if len(numero_limpo) < 10:
+        return f"📲 {numero_whatsapp} (número inválido)"
+    
+    # Se não começar com 55 (Brasil), adicionar
+    if not numero_limpo.startswith('55'):
+        # Se começar com 11, 21, etc. (códigos de área brasileiros), adicionar 55
+        if len(numero_limpo) >= 10:
+            numero_limpo = '55' + numero_limpo
+    
+    # Criar link do WhatsApp
+    link_whatsapp = f"https://wa.me/{numero_limpo}"
+    
+    # Formatar número para exibição (com máscara brasileira)
+    if len(numero_limpo) == 13:  # 55 + 11 + 9 dígitos
+        numero_formatado = f"+{numero_limpo[:2]} ({numero_limpo[2:4]}) {numero_limpo[4:9]}-{numero_limpo[9:]}"
+    elif len(numero_limpo) == 12:  # 55 + 11 + 8 dígitos (número antigo)
+        numero_formatado = f"+{numero_limpo[:2]} ({numero_limpo[2:4]}) {numero_limpo[4:8]}-{numero_limpo[8:]}"
+    else:
+        numero_formatado = numero_limpo
+    
+    return f'<a href="{link_whatsapp}" target="_blank" style="color: #25D366; text-decoration: none; font-weight: bold;">📲 {numero_formatado}</a>'
+
+# 🔥 SUBSTITUA ESTA LINHA no código onde exibe as informações do candidato: 
+
 def atualizar_status_ficha(candidato_id):
     """Atualiza status de ficha_emitida no banco"""
     try:
@@ -123,10 +380,30 @@ def main():
     
     # SIDEBAR - FILTROS
     st.sidebar.header("🔍 Filtros")
-    
-    # Carregar dados
+
+    # 🆕 NOVO FILTRO DE QUALIFICAÇÃO
+    tipo_visualizacao = st.sidebar.selectbox(
+        "Visualizar:",
+        [
+            "Todos os candidatos",
+            "Candidatos qualificados", 
+            "Pendentes de qualificação"
+        ]
+    )
+
+    # 🔄 CARREGAMENTO CONDICIONAL BASEADO NO FILTRO
     with st.spinner("Carregando candidatos..."):
-        df = carregar_candidatos()
+        if tipo_visualizacao == "Candidatos qualificados":
+            df = carregar_candidatos_qualificados()
+            st.header("👑 Candidatos Qualificados")
+            
+        elif tipo_visualizacao == "Pendentes de qualificação":
+            df = carregar_candidatos_pendentes()
+            st.header("⏳ Pendentes de Qualificação")
+            
+        else:
+            df = carregar_candidatos()
+            st.header("📋 Todos os Candidatos")
     
     if df.empty:
         st.warning("⚠️ Nenhum candidato encontrado no banco de dados.")
@@ -215,6 +492,8 @@ def main():
             with col1:
                 # Informações básicas
                 st.write(f"**📧 Email:** {candidato.get('email', 'Não informado')}")
+                whatsapp_link = formatar_whatsapp_link(candidato.get('whatsapp'))
+                st.markdown(f"**📲 Whatsapp:** {whatsapp_link}", unsafe_allow_html=True)
                 st.write(f"**📍 Endereço:** {candidato.get('endereco', 'Não informado')}")
                 st.write(f"**👨‍👩‍👧‍👦 Filhos:** {'Sim' if candidato.get('tem_filhos') else 'Não'}")
                 st.write(f"**🚗 CNH:** {'Sim' if candidato.get('possui_cnh') else 'Não'}")
@@ -222,6 +501,14 @@ def main():
                 if candidato.get('created_at'):
                     data_cadastro = pd.to_datetime(candidato['created_at']).strftime('%d/%m/%Y às %H:%M')
                     st.write(f"**📅 Cadastrado em:** {data_cadastro}")
+
+                # 🆕 MOSTRAR STATUS DE QUALIFICAÇÃO
+                if 'data_qualificacao' in candidato:
+                    st.success(f"✅ Qualificado em {candidato['data_qualificacao']}")
+                    if candidato.get('certificado_numero'):
+                        st.info(f"🎓 Certificado: {candidato['certificado_numero']}")
+                else:
+                    st.warning("⏳ Pendente de qualificação")
                 
                 # Status da ficha
                 if candidato.get('ficha_emitida'):
@@ -285,6 +572,63 @@ def main():
                         import traceback
                         with st.expander("🔍 Detalhes técnicos do erro"):
                             st.code(traceback.format_exc())
+
+                # 🆕 BOTÃO QUALIFICAR (apenas para pendentes)
+                # 🔥 SUBSTITUA TODO O BLOCO DO BOTÃO QUALIFICAR POR ESTA VERSÃO SIMPLIFICADA
+
+                # 🆕 BOTÃO QUALIFICAR (apenas para pendentes) - VERSÃO SIMPLIFICADA
+                if 'data_qualificacao' not in candidato.index:
+                    
+                    # Chave única para este candidato
+                    candidato_id = candidato.get('id')
+                    
+                    # Container para organizar
+                    with st.container():
+                        st.markdown("---")
+                        st.markdown("### 🎓 Qualificar Candidato")
+                        
+                        # Formulário simples com chaves únicas
+                        with st.form(key=f"qualificacao_form_{candidato_id}", clear_on_submit=False):
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                nota = st.slider("Nota do treinamento (0-10)", 0, 10, 7)
+                                
+                            with col2:
+                                instrutor = st.text_input("Nome do instrutor")
+                            
+                            observacoes = st.text_area("Observações sobre o treinamento", height=100)
+                            
+                            # Botão submit
+                            submitted = st.form_submit_button("✅ QUALIFICAR CANDIDATO", type="primary")
+                            
+                            if submitted:
+                                # Validação básica
+                                if not instrutor.strip():
+                                    st.error("❌ O nome do instrutor é obrigatório!")
+                                else:
+                                    # Tentar qualificar
+                                    with st.spinner("Processando qualificação..."):
+                                        sucesso, certificado = qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor)
+                                        
+                                        if sucesso:
+                                            st.success(f"🎉 Candidato qualificado com sucesso!")
+                                            st.success(f"🎓 Certificado: {certificado}")
+                                            st.balloons()
+                                            
+                                            # Aguardar um pouco antes de recarregar
+                                            import time
+                                            time.sleep(2)
+                                            
+                                            # Limpar cache
+                                            st.cache_data.clear()
+                                            
+                                            # Mostrar mensagem e recarregar
+                                            st.info("🔄 Recarregando página...")
+                                            st.rerun()
+                                        else:
+                                            st.error("❌ Erro ao qualificar candidato. Tente novamente.")      
                 
                 # Botão de download (sempre visível se PDF foi gerado)
                 if st.session_state.get(f"pdf_data_{candidato.get('id')}") is not None:
