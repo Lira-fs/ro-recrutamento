@@ -1,46 +1,49 @@
-# backend/pdf_utils.py - VERSÃO COMPLETA CORRIGIDA
+# backend/pdf_utils.py - VERSÃO COMPLETA COM WEASYPRINT
 import os
 import json
 from datetime import datetime
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+# Tentar importar WeasyPrint
+WEASYPRINT_AVAILABLE = False
+try:
+    from weasyprint import HTML, CSS
+    from weasyprint.text.fonts import FontConfiguration
+    WEASYPRINT_AVAILABLE = True
+    print("✅ WeasyPrint disponível")
+except ImportError as e:
+    print(f"⚠️ WeasyPrint não disponível: {e}")
+    print("🔄 Usando fallback ReportLab")
+
+# Sempre importar ReportLab como fallback
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.units import inch, cm
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.pdfgen import canvas
 from io import BytesIO
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-import pdfkit
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "..", "templates")
 
 def render_html(template_name, context):
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
-    template = env.get_template(template_name)
-    return template.render(**context)
-
-def html_to_pdf_fallback(html, dados_candidato=None):
     """
-    Fallback que cria PDF básico usando ReportLab
+    Renderiza template HTML usando Jinja2
     """
-    from reportlab.pdfgen import canvas
-    from io import BytesIO
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer)
-    p.drawString(50, 750, "FICHA R.O RECRUTAMENTO")
-    
-    if dados_candidato:
-        p.drawString(50, 720, f"Nome: {dados_candidato.get('nome_completo', 'Não informado')}")
-        p.drawString(50, 700, f"Telefone: {dados_candidato.get('telefone', 'Não informado')}")
-        p.drawString(50, 680, f"Email: {dados_candidato.get('email', 'Não informado')}")
-    
-    p.save()
-    return buffer.getvalue()
+    try:
+        env = Environment(
+            loader=FileSystemLoader(TEMPLATE_DIR),
+            autoescape=select_autoescape(['html', 'xml'])
+        )
+        template = env.get_template(template_name)
+        return template.render(**context)
+    except Exception as e:
+        print(f"❌ Erro ao renderizar template {template_name}: {e}")
+        raise
 
 def formatar_texto_legivel(texto):
-    """
-    Converte texto com hífens/underscores em texto legível
-    """
+    """Converte texto com hífens/underscores em texto legível"""
     if not texto or texto == '':
         return 'Não informado'
     
@@ -48,7 +51,8 @@ def formatar_texto_legivel(texto):
     texto_formatado = ' '.join(word.capitalize() for word in texto_formatado.split())
     
     correções = {
-        'Cnh': 'CNH', 'Rg': 'RG', 'Cpf': 'CPF', 'Tv': 'TV', 'Dvd': 'DVD'
+        'Cnh': 'CNH', 'Rg': 'RG', 'Cpf': 'CPF', 'Tv': 'TV', 'Dvd': 'DVD',
+        'Intermediario': 'Intermediário', 'Basico': 'Básico', 'Avancado': 'Avançado'
     }
     
     for termo_errado, termo_correto in correções.items():
@@ -57,374 +61,402 @@ def formatar_texto_legivel(texto):
     return texto_formatado
 
 def processar_dados_especificos(dados_especificos, formulario_id):
-    """
-    Processa o campo dados_especificos (JSON) baseado no tipo de formulário
-    """
+    """Processa o campo dados_especificos (JSON) baseado no tipo de formulário"""
     try:
-        if isinstance(dados_especificos, str):
-            dados = json.loads(dados_especificos) if dados_especificos and dados_especificos != '{}' else {}
-        else:
-            dados = dados_especificos or {}
-        
-        if formulario_id == 'candi-copeiro':
-            return processar_dados_copeiro(dados)
-        elif formulario_id == 'candi-arrumadeira':
-            return processar_dados_arrumadeira(dados)
-        elif formulario_id == 'candi-baba':
-            return processar_dados_baba(dados)
-        elif formulario_id == 'candi-caseiro':
-            return processar_dados_caseiro(dados)
-        elif formulario_id == 'candi-governanta':
-            return processar_dados_governanta(dados)
-        elif formulario_id == 'candi-cozinheira':
-            return processar_dados_cozinheira(dados)
-        else:
+        if not dados_especificos:
             return []
+        
+        # Parse JSON se for string
+        if isinstance(dados_especificos, str):
+            dados_especificos = json.loads(dados_especificos)
+        
+        dados_processados = []
+        
+        # MAPEAMENTO POR TIPO DE FORMULÁRIO
+        mapeamentos = {
+            'candi-baba': {
+                'idades_experiencia': 'Idades com Experiência',
+                'cuidados_especiais': 'Cuidados Especiais',
+                'atividades_pedagogicas': 'Atividades Pedagógicas',
+                'nivel_ingles': 'Nível de Inglês',
+                'primeiros_socorros': 'Primeiros Socorros',
+                'natacao': 'Sabe Nadar',
+                'disponibilidade_viagens': 'Disponível para Viagens'
+            },
+            'candi-caseiro': {
+                'manutencao_geral': 'Manutenção Geral',
+                'jardinagem': 'Jardinagem',
+                'piscina': 'Manutenção de Piscina',
+                'eletrica_basica': 'Elétrica Básica',
+                'encanamento_basico': 'Encanamento Básico',
+                'seguranca': 'Conhecimentos de Segurança',
+                'animais_domesticos': 'Cuidado com Animais'
+            },
+            'candi-copeiro': {
+                'conhecimento_coqueteis': 'Conhecimento em Coquetéis',
+                'servico_mesa': 'Serviço de Mesa',
+                'conhecimento_vinhos': 'Conhecimento em Vinhos',
+                'experiencia_eventos': 'Experiência em Eventos',
+                'idiomas_conversacao': 'Idiomas para Conversação'
+            },
+            'candi-motorista': {
+                'categoria_cnh': 'Categoria da CNH',
+                'experiencia_categoria': 'Experiência na Categoria',
+                'veiculos_grandes': 'Conduz Veículos Grandes',
+                'conhecimento_mecanica': 'Conhecimento em Mecânica',
+                'disponibilidade_viagens': 'Disponível para Viagens',
+                'conhecimento_rotas': 'Conhecimento de Rotas'
+            },
+            'candi-domestica': {
+                'tipos_limpeza': 'Tipos de Limpeza',
+                'organizacao': 'Organização',
+                'cuidado_roupas': 'Cuidado com Roupas',
+                'cozinha_basica': 'Cozinha Básica',
+                'experiencia_casas_grandes': 'Experiência em Casas Grandes'
+            }
+        }
+        
+        # Obter mapeamento para o formulário
+        mapeamento = mapeamentos.get(formulario_id, {})
+        
+        # Processar cada campo
+        for campo, valor in dados_especificos.items():
+            # Usar mapeamento se existir, senão formatar campo
+            nome_campo = mapeamento.get(campo, formatar_texto_legivel(campo))
             
+           # Processar valor
+            if isinstance(valor, list):
+                # Filtrar itens "None" da lista
+                lista_filtrada = [v for v in valor if v and str(v).lower() not in ['none', 'null', 'nan', '']]
+                if lista_filtrada:  # Só processar se sobrou algo na lista
+                    valor_formatado = ', '.join([formatar_texto_legivel(v) for v in lista_filtrada])
+                else:
+                    continue  # Pular este campo se lista vazia
+            elif isinstance(valor, bool):
+                valor_formatado = 'Sim' if valor else 'Não'
+            else:
+                valor_str = str(valor).strip()
+                # Filtrar valores indesejados
+                if valor_str.lower() in ['none', 'null', 'nan', '', 'não informado']:
+                    continue  # Pular este campo
+                valor_formatado = formatar_texto_legivel(valor_str)
+
+            dados_processados.append((nome_campo, valor_formatado))
+        
+        return dados_processados
+        
     except Exception as e:
         print(f"Erro ao processar dados específicos: {e}")
         return []
 
-def processar_dados_copeiro(dados):
-    """Dados específicos para copeiro"""
-    info = []
-    
-    if dados.get('conhecimento_coqueteis'):
-        valor = formatar_texto_legivel(dados['conhecimento_coqueteis'])
-        info.append(['Conhecimento em Coquetéis:', valor])
-    
-    if dados.get('servico_mesa'):
-        valor = formatar_texto_legivel(dados['servico_mesa'])
-        info.append(['Serviço de Mesa:', valor])
-    
-    if dados.get('conhecimento_vinhos'):
-        valor = formatar_texto_legivel(dados['conhecimento_vinhos'])
-        info.append(['Conhecimento em Vinhos:', valor])
-    
-    if dados.get('experiencia_eventos'):
-        valor = formatar_texto_legivel(dados['experiencia_eventos'])
-        info.append(['Experiência em Eventos:', valor])
-    
-    if dados.get('idiomas_conversacao'):
-        if isinstance(dados['idiomas_conversacao'], list):
-            idiomas = ', '.join([formatar_texto_legivel(idioma) for idioma in dados['idiomas_conversacao']])
-        else:
-            idiomas = formatar_texto_legivel(dados['idiomas_conversacao'])
-        info.append(['Idiomas para Conversação:', idiomas])
-    
-    return info
-
-def processar_dados_arrumadeira(dados):
-    """Dados específicos para arrumadeira"""
-    info = []
-    
-    if dados.get('tipos_residencia'):
-        if isinstance(dados['tipos_residencia'], list):
-            tipos = ', '.join([formatar_texto_legivel(tipo) for tipo in dados['tipos_residencia']])
-        else:
-            tipos = formatar_texto_legivel(dados['tipos_residencia'])
-        info.append(['Tipos de Residência:', tipos])
-    
-    if dados.get('produtos_limpeza'):
-        if isinstance(dados['produtos_limpeza'], list):
-            produtos = ', '.join([formatar_texto_legivel(produto) for produto in dados['produtos_limpeza']])
-        else:
-            produtos = formatar_texto_legivel(dados['produtos_limpeza'])
-        info.append(['Produtos de Limpeza:', produtos])
-    
-    if dados.get('equipamentos_limpeza'):
-        if isinstance(dados['equipamentos_limpeza'], list):
-            equipamentos = ', '.join([formatar_texto_legivel(equip) for equip in dados['equipamentos_limpeza']])
-        else:
-            equipamentos = formatar_texto_legivel(dados['equipamentos_limpeza'])
-        info.append(['Equipamentos:', equipamentos])
-    
-    if dados.get('tecnicas_organizacao'):
-        if isinstance(dados['tecnicas_organizacao'], list):
-            tecnicas = ', '.join([formatar_texto_legivel(tecnica) for tecnica in dados['tecnicas_organizacao']])
-        else:
-            tecnicas = formatar_texto_legivel(dados['tecnicas_organizacao'])
-        info.append(['Técnicas de Organização:', tecnicas])
-    
-    if dados.get('maior_diferencial'):
-        valor = formatar_texto_legivel(dados['maior_diferencial'])
-        info.append(['Maior Diferencial:', valor])
-    
-    return info
-
-def processar_dados_baba(dados):
-    """Dados específicos para babá"""
-    info = []
-    
-    if dados.get('faixas_etarias'):
-        if isinstance(dados['faixas_etarias'], list):
-            faixas = ', '.join([formatar_texto_legivel(faixa) for faixa in dados['faixas_etarias']])
-        else:
-            faixas = formatar_texto_legivel(dados['faixas_etarias'])
-        info.append(['Faixas Etárias:', faixas])
-    
-    if dados.get('numero_maximo_criancas'):
-        info.append(['Número Máximo de Crianças:', str(dados['numero_maximo_criancas'])])
-    
-    if dados.get('primeiros_socorros'):
-        valor = formatar_texto_legivel(dados['primeiros_socorros'])
-        info.append(['Primeiros Socorros:', valor])
-    
-    if dados.get('atividades_ludicas'):
-        valor = formatar_texto_legivel(dados['atividades_ludicas'])
-        info.append(['Atividades Lúdicas:', valor])
-    
-    if dados.get('nivel_ingles'):
-        valor = formatar_texto_legivel(dados['nivel_ingles'])
-        info.append(['Nível de Inglês:', valor])
-    
-    return info
-
-def processar_dados_caseiro(dados):
-    """Dados específicos para caseiro"""
-    info = []
-    
-    if dados.get('manutencao_eletrica'):
-        valor = formatar_texto_legivel(dados['manutencao_eletrica'])
-        info.append(['Manutenção Elétrica:', valor])
-    
-    if dados.get('manutencao_hidraulica'):
-        valor = formatar_texto_legivel(dados['manutencao_hidraulica'])
-        info.append(['Manutenção Hidráulica:', valor])
-    
-    if dados.get('experiencia_jardim'):
-        valor = formatar_texto_legivel(dados['experiencia_jardim'])
-        info.append(['Experiência com Jardim:', valor])
-    
-    if dados.get('cuidados_piscina'):
-        valor = formatar_texto_legivel(dados['cuidados_piscina'])
-        info.append(['Cuidados com Piscina:', valor])
-    
-    if dados.get('tipos_propriedade'):
-        if isinstance(dados['tipos_propriedade'], list):
-            tipos = ', '.join([formatar_texto_legivel(tipo) for tipo in dados['tipos_propriedade']])
-        else:
-            tipos = formatar_texto_legivel(dados['tipos_propriedade'])
-        info.append(['Tipos de Propriedade:', tipos])
-    
-    return info
-
-def processar_dados_governanta(dados):
-    """Dados específicos para governanta"""
-    info = []
-    
-    if dados.get('coordenacao_equipe'):
-        valor = formatar_texto_legivel(dados['coordenacao_equipe'])
-        info.append(['Coordenação de Equipe:', valor])
-    
-    if dados.get('gestao_compras'):
-        valor = formatar_texto_legivel(dados['gestao_compras'])
-        info.append(['Gestão de Compras:', valor])
-    
-    if dados.get('organizacao_eventos'):
-        valor = formatar_texto_legivel(dados['organizacao_eventos'])
-        info.append(['Organização de Eventos:', valor])
-    
-    if dados.get('idiomas_governanta'):
-        if isinstance(dados['idiomas_governanta'], list):
-            idiomas = ', '.join([formatar_texto_legivel(idioma) for idioma in dados['idiomas_governanta']])
-        else:
-            idiomas = formatar_texto_legivel(dados['idiomas_governanta'])
-        info.append(['Idiomas:', idiomas])
-    
-    return info
-
-def processar_dados_cozinheira(dados):
-    """Dados específicos para cozinheira"""
-    info = []
-    
-    if dados.get('tipos_culinaria'):
-        if isinstance(dados['tipos_culinaria'], list):
-            tipos = ', '.join([formatar_texto_legivel(tipo) for tipo in dados['tipos_culinaria']])
-        else:
-            tipos = formatar_texto_legivel(dados['tipos_culinaria'])
-        info.append(['Tipos de Culinária:', tipos])
-    
-    if dados.get('restricoes_alimentares'):
-        if isinstance(dados['restricoes_alimentares'], list):
-            restricoes = ', '.join([formatar_texto_legivel(restricao) for restricao in dados['restricoes_alimentares']])
-        else:
-            restricoes = formatar_texto_legivel(dados['restricoes_alimentares'])
-        info.append(['Restrições Alimentares:', restricoes])
-    
-    if dados.get('experiencia_eventos'):
-        valor = formatar_texto_legivel(dados['experiencia_eventos'])
-        info.append(['Experiência em Eventos:', valor])
-    
-    if dados.get('cardapios_especiais'):
-        valor = formatar_texto_legivel(dados['cardapios_especiais'])
-        info.append(['Cardápios Especiais:', valor])
-    
-    return info
-
-def processar_referencias(referencias_json):
-    """
-    Processa o campo referencias (JSON)
-    """
+def processar_referencias(referencias):
+    """Processa lista de referências"""
     try:
-        if isinstance(referencias_json, str):
-            referencias = json.loads(referencias_json) if referencias_json and referencias_json != '[]' else []
-        else:
-            referencias = referencias_json or []
+        if not referencias:
+            return []
         
-        referencias_validas = []
+        # Parse JSON se for string
+        if isinstance(referencias, str):
+            referencias = json.loads(referencias)
+        
+        referencias_processadas = []
+        
         for ref in referencias:
-            if ref and ref.get('nome'):
-                referencias_validas.append(ref)
+            if isinstance(ref, dict):
+                referencias_processadas.append({
+                    'nome': ref.get('nome', 'Não informado'),
+                    'telefone': ref.get('telefone', 'Não informado'),
+                    'relacao': formatar_texto_legivel(ref.get('relacao', 'Não informado')),
+                    'periodo_inicio': ref.get('periodo_inicio', ''),
+                    'periodo_fim': ref.get('periodo_fim', '')
+                })
         
-        return referencias_validas
+        return referencias_processadas
         
     except Exception as e:
         print(f"Erro ao processar referências: {e}")
         return []
 
-def formatar_valor(valor, tipo='texto'):
-    """
-    Formata valores, tratando null, vazio, etc.
-    """
-    if valor is None or valor == '' or str(valor).lower() == 'nan':
-        return 'Não informado'
+def formatar_funcao_display(formulario_id):
+    """Converte ID do formulário em nome de função para exibição"""
+    mapeamento_funcoes = {
+        'candi-baba': 'BABÁ',
+        'candi-caseiro': 'CASEIRO(A)',
+        'candi-copeiro': 'COPEIRO(A)',
+        'candi-motorista': 'MOTORISTA',
+        'candi-domestica': 'DOMÉSTICA',
+        'candi-cozinheiro': 'COZINHEIRO(A)',
+        'candi-jardineiro': 'JARDINEIRO(A)',
+        'candi-seguranca': 'SEGURANÇA'
+    }
     
-    if tipo == 'dinheiro':
-        try:
-            if str(valor).replace('.', '').replace(',', '').isdigit():
-                return f"R$ {float(valor):,.2f}".replace(',', '.')
-            else:
-                return 'Não informado'
-        except:
-            return 'Não informado'
-    
-    if tipo == 'boolean':
-        if isinstance(valor, bool):
-            return 'Sim' if valor else 'Não'
-        elif str(valor).lower() in ['true', '1', 'sim']:
-            return 'Sim'
-        else:
-            return 'Não'
-    
-    return str(valor)
+    return mapeamento_funcoes.get(formulario_id, formatar_texto_legivel(formulario_id))
 
 def gerar_ficha_candidato_completa(dados_candidato):
     """
-    Gera PDF completo com todos os dados do candidato
+    Gera PDF completo da ficha do candidato usando WeasyPrint ou ReportLab
+    
+    Args:
+        dados_candidato (dict): Dicionário com todos os dados do candidato
+    
+    Returns:
+        tuple: (pdf_bytes, nome_arquivo)
     """
     try:
-        print(f"Gerando PDF completo para: {dados_candidato.get('nome_completo', 'Nome não encontrado')}")
+        print(f"📝 Gerando ficha para: {dados_candidato.get('nome_completo', 'Candidato sem nome')}")
         
-        from datetime import datetime as dt_local
-        data_atual = dt_local.now()
-        data_formatada = data_atual.strftime('%d-%m-%Y')
+        # Processar dados
+        dados_especificos = processar_dados_especificos(
+            dados_candidato.get('dados_especificos'), 
+            dados_candidato.get('formulario_id', '')
+        )
         
+        referencias = processar_referencias(dados_candidato.get('referencias', []))
+        
+        # Formatar data de cadastro
+        data_cadastro = 'Não informado'
+        if dados_candidato.get('created_at'):
+            try:
+                data_obj = datetime.fromisoformat(dados_candidato['created_at'].replace('Z', '+00:00'))
+                data_cadastro = data_obj.strftime('%d/%m/%Y')
+            except:
+                data_cadastro = str(dados_candidato['created_at'])[:10]
+        
+        # Criar nome do arquivo
         nome_limpo = dados_candidato.get('nome_completo', 'candidato').replace(' ', '_').lower()
         import re
         nome_limpo = re.sub(r'[^a-zA-Z0-9_]', '', nome_limpo)
+        data_criacao = datetime.now().strftime('%d%m%Y')
+        nome_arquivo = f"{nome_limpo}-{data_criacao}.pdf"
         
-        nome_arquivo = f"{nome_limpo}-{data_formatada}.pdf"
-        
+        # Preparar contexto para template
         context = {
             'nome': dados_candidato.get('nome_completo', 'Não informado'),
             'cpf': dados_candidato.get('cpf', 'Não informado'),
             'telefone': dados_candidato.get('telefone', 'Não informado'),
-            'whatsapp': dados_candidato.get('whatsapp', 'Não informado'),
+            'whatsapp': dados_candidato.get('whatsapp', ''),
             'email': dados_candidato.get('email', 'Não informado'),
             'endereco': dados_candidato.get('endereco', 'Não informado'),
-            'data_nascimento': dados_candidato.get('data_nascimento', 'Não informado'),
-            'formulario_id': dados_candidato.get('formulario_id', ''),
-            'data_geracao': data_atual.strftime('%d/%m/%Y às %H:%M'),
+            'funcao': formatar_funcao_display(dados_candidato.get('formulario_id', '')),
+            'data_cadastro': data_cadastro,
+            'data_geracao': datetime.now().strftime('%d/%m/%Y às %H:%M'),
             'dados_candidato': dados_candidato,
-            'nome_arquivo': nome_arquivo,
-            'tem_filhos': 'Sim' if dados_candidato.get('tem_filhos') else 'Não',
-            'quantos_filhos': dados_candidato.get('quantos_filhos', 'Não informado') if dados_candidato.get('tem_filhos') else 'N/A',
-            'possui_cnh': 'Sim' if dados_candidato.get('possui_cnh') else 'Não',
-            'categoria_cnh': dados_candidato.get('categoria_cnh', 'Não informado') if dados_candidato.get('possui_cnh') else 'N/A',
-            'data_cadastro': dados_candidato.get('created_at', 'Não informado'),
-            'dados_especificos': processar_dados_especificos(dados_candidato.get('dados_especificos', {}), dados_candidato.get('formulario_id', '')),
-            'referencias': processar_referencias(dados_candidato.get('referencias', [])),
+            'dados_especificos': dados_especificos,
+            'referencias': referencias,
             'observacoes': dados_candidato.get('observacoes_adicionais', 'Nenhuma observação')
         }
-
-        html = render_html('ficha.html', context)
-
-        try:
-            options = {
-                'page-size': 'A4',
-                'encoding': "UTF-8",
-                'enable-local-file-access': None,
-                'no-outline': None,
-                'margin-top': '2.5cm',
-                'margin-right': '2.5cm', 
-                'margin-bottom': '2.5cm',
-                'margin-left': '2.5cm',
-                'print-media-type': None,
-                'disable-smart-shrinking': None
-            }
-            pdf_bytes = pdfkit.from_string(html, False, options=options)
-            
-            if len(pdf_bytes) < 1000:
-                raise Exception("PDF muito pequeno, provável erro no pdfkit")
+        
+        # Tentar WeasyPrint primeiro
+        if WEASYPRINT_AVAILABLE:
+            try:
+                print("🎨 Usando WeasyPrint com template...")
                 
-        except Exception as e:
-            print(f"ERRO PDFKIT: {e}")
-            print("Usando fallback...")
-            pdf_bytes = html_to_pdf_fallback(html, dados_candidato)
+                # Renderizar HTML usando o template
+                html_content = render_html('ficha.html', context)
                 
-        print(f"PDF completo gerado com sucesso! Tamanho: {len(pdf_bytes)} bytes")
-        print(f"Nome do arquivo: {nome_arquivo}")
+                # Configurar fontes
+                font_config = FontConfiguration()
+                
+                # Gerar PDF usando WeasyPrint
+                html_doc = HTML(string=html_content)
+                
+                # Gerar PDF em bytes
+                pdf_bytes = html_doc.write_pdf(font_config=font_config)
+                
+                print(f"✅ PDF gerado com WeasyPrint: {len(pdf_bytes)} bytes")
+                print(f"📂 Nome do arquivo: {nome_arquivo}")
+                
+                return pdf_bytes, nome_arquivo
+                
+            except Exception as e:
+                print(f"⚠️ WeasyPrint falhou: {e}")
+                print("🔄 Alternando para ReportLab...")
+        
+        # Fallback para ReportLab
+        print("📄 Usando ReportLab...")
+        pdf_bytes = gerar_pdf_reportlab(dados_candidato)
+        print(f"✅ PDF gerado com ReportLab: {len(pdf_bytes)} bytes")
         return pdf_bytes, nome_arquivo
         
     except Exception as e:
-        print(f"Erro ao gerar PDF completo: {str(e)}")
+        print(f"❌ Erro ao gerar PDF: {str(e)}")
         import traceback
         traceback.print_exc()
         raise
 
-# Teste
+def gerar_pdf_reportlab(dados_candidato):
+    """Gera PDF usando ReportLab (fallback)"""
+    buffer = BytesIO()
+    
+    # Configurar documento
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                          rightMargin=2*cm, leftMargin=2*cm,
+                          topMargin=2*cm, bottomMargin=2*cm)
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    
+    # Estilo customizado para cabeçalho
+    header_style = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        textColor=colors.HexColor('#a65e2e'),
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
+    
+    # Estilo para seções
+    section_style = ParagraphStyle(
+        'SectionStyle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#a65e2e'),
+        spaceBefore=15,
+        spaceAfter=10
+    )
+    
+    # Elementos do documento
+    elements = []
+    
+    # Cabeçalho
+    elements.append(Paragraph("R.O RECRUTAMENTO", header_style))
+    elements.append(Paragraph("FICHA PROFISSIONAL", styles['Heading2']))
+    elements.append(Spacer(1, 20))
+    
+    # Nome e função
+    nome = dados_candidato.get('nome_completo', 'Não informado')
+    funcao = formatar_funcao_display(dados_candidato.get('formulario_id', ''))
+    
+    elements.append(Paragraph(f"<b>{nome}</b>", styles['Title']))
+    elements.append(Paragraph(f"<b>{funcao}</b>", section_style))
+    elements.append(Spacer(1, 15))
+    
+    # Dados pessoais
+    elements.append(Paragraph("DADOS PESSOAIS", section_style))
+    
+    dados_pessoais = [
+        ['Nome Completo:', dados_candidato.get('nome_completo', 'Não informado')],
+        ['CPF:', dados_candidato.get('cpf', 'Não informado')],
+        ['Telefone:', dados_candidato.get('telefone', 'Não informado')],
+        ['Email:', dados_candidato.get('email', 'Não informado')],
+        ['Endereço:', dados_candidato.get('endereco', 'Não informado')]
+    ]
+    
+    table_dados = Table(dados_pessoais, colWidths=[4*cm, 12*cm])
+    table_dados.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa'))
+    ]))
+    
+    elements.append(table_dados)
+    elements.append(Spacer(1, 15))
+    
+    # Informações profissionais
+    elements.append(Paragraph("INFORMAÇÕES PROFISSIONAIS", section_style))
+    
+    dados_profissionais = [
+        ['Possui Filhos:', 'Sim' if dados_candidato.get('tem_filhos') else 'Não'],
+        ['Possui CNH:', 'Sim' if dados_candidato.get('possui_cnh') else 'Não'],
+        ['Pretensão Salarial:', f"R$ {dados_candidato.get('pretensao_salarial', 'Não informado')}"],
+        ['Aceita Treinamento:', 'Sim' if dados_candidato.get('aceita_treinamento') else 'Não']
+    ]
+    
+    table_prof = Table(dados_profissionais, colWidths=[4*cm, 12*cm])
+    table_prof.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa'))
+    ]))
+    
+    elements.append(table_prof)
+    elements.append(Spacer(1, 15))
+    
+    # Dados específicos (se houver)
+    dados_especificos = processar_dados_especificos(
+        dados_candidato.get('dados_especificos'), 
+        dados_candidato.get('formulario_id', '')
+    )
+    
+    if dados_especificos:
+        elements.append(Paragraph(f"INFORMAÇÕES ESPECÍFICAS - {funcao}", section_style))
+        
+        for nome, valor in dados_especificos:
+            elements.append(Paragraph(f"<b>{nome}:</b> {valor}", styles['Normal']))
+        
+        elements.append(Spacer(1, 15))
+    
+    # Observações
+    observacoes = dados_candidato.get('observacoes_adicionais', '')
+    if observacoes and observacoes != 'Nenhuma observação':
+        elements.append(Paragraph("OBSERVAÇÕES", section_style))
+        elements.append(Paragraph(observacoes, styles['Normal']))
+        elements.append(Spacer(1, 15))
+    
+    # Rodapé
+    data_geracao = datetime.now().strftime('%d/%m/%Y às %H:%M')
+    elements.append(Spacer(1, 30))
+    elements.append(Paragraph(f"Ficha gerada em {data_geracao}", styles['Italic']))
+    elements.append(Paragraph("www.rorecrutamento.com.br", styles['Italic']))
+    
+    # Gerar PDF
+    doc.build(elements)
+    return buffer.getvalue()
+
+# Teste da função
 if __name__ == "__main__":
     dados_teste = {
-        'nome_completo': 'Gabriel Lira',
+        'nome_completo': 'Maria Silva Santos',
         'cpf': '123.456.789-00',
         'telefone': '(11) 99999-9999',
-        'whatsapp': '5511970434094',
-        'email': 'gabriel@email.com',
-        'endereco': 'Rua das Flores, 123 - São Paulo/SP',
-        'formulario_id': 'candi-copeiro',
-        'tem_filhos': False,
-        'quantos_filhos': None,
+        'whatsapp': '5511999999999',
+        'email': 'maria.santos@email.com',
+        'endereco': 'Rua das Flores, 123 - Jardim Paulista, São Paulo/SP',
+        'formulario_id': 'candi-baba',
+        'tem_filhos': True,
+        'quantos_filhos': 2,
         'possui_cnh': False,
         'categoria_cnh': None,
-        'pretensao_salarial': 3500,
+        'pretensao_salarial': 3200,
         'aceita_treinamento': True,
-        'tempo_experiencia': '2-5-anos',
+        'tempo_experiencia': '3-5-anos',
         'experiencia_alto_padrao': True,
         'possui_referencias': True,
+        'created_at': '2024-01-15T10:30:00Z',
         'dados_especificos': {
-            'conhecimento_coqueteis': 'intermediario',
-            'servico_mesa': 'avancado',
-            'conhecimento_vinhos': 'basico',
-            'experiencia_eventos': 'sim',
-            'idiomas_conversacao': ['portugues', 'ingles']
+            'idades_experiencia': ['0-2-anos', '3-6-anos'],
+            'cuidados_especiais': 'intermediario',
+            'atividades_pedagogicas': 'sim',
+            'nivel_ingles': 'basico',
+            'primeiros_socorros': True,
+            'natacao': True,
+            'disponibilidade_viagens': False
         },
         'referencias': [
             {
-                'nome': 'Maria Silva',
+                'nome': 'Ana Paula Costa',
                 'telefone': '(11) 98888-8888',
                 'relacao': 'ex-patrao',
-                'periodo_inicio': '2020',
+                'periodo_inicio': '2021',
                 'periodo_fim': '2023'
             }
         ],
-        'observacoes_adicionais': 'Candidato muito dedicado e pontual'
+        'observacoes_adicionais': 'Candidata muito dedicada e carinhosa com as crianças.'
     }
     
     try:
-        pdf = gerar_ficha_candidato_completa(dados_teste)
-        with open("teste_completo.pdf", "wb") as f:
-            f.write(pdf)
-        print("PDF completo salvo como 'teste_completo.pdf'")
+        pdf_bytes, nome_arquivo = gerar_ficha_candidato_completa(dados_teste)
+        with open(f"teste_{nome_arquivo}", "wb") as f:
+            f.write(pdf_bytes)
+        print(f"✅ PDF de teste salvo como: teste_{nome_arquivo}")
     except Exception as e:
-        print(f"Erro no teste: {e}")
+        print(f"❌ Erro no teste: {e}")
