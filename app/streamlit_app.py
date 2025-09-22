@@ -1,4 +1,4 @@
-# app/streamlit_app.py - VERSÃO EXPANDIDA COM SISTEMA DE VAGAS
+# app/streamlit_app.py - VERSÃO CORRIGIDA E MELHORADA
 import sys
 import os
 import streamlit as st
@@ -9,9 +9,12 @@ from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 from supabase_client import get_supabase_client
-from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa  # ✅ Import para vagas
+from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa
 
-# Configurar página
+# =====================================
+# CONFIGURAÇÃO DA PÁGINA (APENAS UMA VEZ!)
+# =====================================
+
 st.set_page_config(
     page_title="R.O Recrutamento - Dashboard",
     page_icon="🏠",
@@ -19,7 +22,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS personalizado mantendo o padrão existente
+# =====================================
+# CSS PERSONALIZADO
+# =====================================
+
 st.markdown("""
 <style>
     .main-header {
@@ -61,47 +67,11 @@ st.markdown("""
         background: #8b4d22;
         color: white;
     }
-
-    .status-ativa {
-        background: #28a745;
-        color: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-    
-    .status-preenchida {
-        background: #007bff;
-        color: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-    
-    .status-pausada {
-        background: #ffc107;
-        color: #000;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-    
-    .status-cancelada {
-        background: #dc3545;
-        color: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # =====================================
-# FUNÇÕES EXISTENTES DE CANDIDATOS (preservadas do seu código)
+# FUNÇÕES DE CANDIDATOS (PRESERVADAS 100%)
 # =====================================
 
 @st.cache_data(ttl=300)
@@ -292,7 +262,7 @@ def formatar_funcao(formulario_id):
     return funcoes.get(formulario_id, formulario_id or 'Não especificado')
 
 # =====================================
-# NOVAS FUNÇÕES PARA SISTEMA DE VAGAS
+# FUNÇÕES DE VAGAS (NOVAS)
 # =====================================
 
 @st.cache_data(ttl=300)
@@ -348,12 +318,24 @@ def adicionar_observacao_vaga(vaga_id, observacao, tipo='geral'):
         return False
 
 def atualizar_status_vaga(vaga_id, novo_status):
-    """Atualiza status da vaga"""
+    """Atualiza status da vaga e sua situação"""
     try:
         supabase = get_supabase_client()
         
+        # Mapear status para situação
+        status_to_situacao = {
+            'ativa': 'ativa',
+            'em_andamento': 'ativa', 
+            'preenchida': 'preenchida',
+            'pausada': 'pausada',
+            'cancelada': 'cancelada'
+        }
+        
+        nova_situacao = status_to_situacao.get(novo_status, 'ativa')
+        
         result = supabase.table('vagas').update({
             'status_detalhado': novo_status,
+            'status': nova_situacao,  # Atualizar situação também
             'updated_at': datetime.now().isoformat()
         }).eq('id', vaga_id).execute()
         
@@ -376,23 +358,71 @@ def formatar_funcao_vaga(formulario_id):
     }
     return funcoes.get(formulario_id, formulario_id or 'Vaga não especificada')
 
-def relacionar_candidato_vaga(candidato_id, vaga_id, observacao=""):
-    """Relaciona candidato com vaga"""
+def formatar_status_vaga(status):
+    """Retorna ícone e cor para o status da vaga"""
+    status_map = {
+        'ativa': {'icon': '🟢', 'color': '#28a745', 'text': 'ATIVA'},
+        'em_andamento': {'icon': '🔄', 'color': '#17a2b8', 'text': 'EM ANDAMENTO'},
+        'preenchida': {'icon': '✅', 'color': '#007bff', 'text': 'PREENCHIDA'},
+        'pausada': {'icon': '⏸️', 'color': '#ffc107', 'text': 'PAUSADA'},
+        'cancelada': {'icon': '❌', 'color': '#dc3545', 'text': 'CANCELADA'}
+    }
+    
+    info = status_map.get(status, {'icon': '❓', 'color': '#6c757d', 'text': status.upper()})
+    return f"{info['icon']} {info['text']}", info['color']
+
+def relacionar_candidato_vaga_com_status(candidato_id, vaga_id, observacao="", status_inicial="enviado", data_entrevista=None):
+    """Relaciona candidato com vaga permitindo definir status inicial"""
     try:
         supabase = get_supabase_client()
         
+        # Criar observação automática baseada no status
+        timestamp = datetime.now().strftime('%d/%m/%Y %H:%M')
+        status_map = {
+            'enviado': 'Candidato enviado ao cliente',
+            'em_analise': 'Cliente recebeu candidato e está analisando',
+            'entrevista_agendada': 'Entrevista foi agendada',
+            'aprovado': 'Cliente aprovou o candidato',
+            'rejeitado': 'Cliente rejeitou o candidato',
+            'contratado': 'Candidato foi contratado',
+            'cancelado': 'Processo foi cancelado'
+        }
+        
+        # Construir observação inicial com histórico automático
+        observacao_automatica = f"[SISTEMA - {timestamp}] Relacionamento criado com status: {status_inicial.upper().replace('_', ' ')}. {status_map.get(status_inicial, '')}"
+        
+        if data_entrevista:
+            data_formatada = data_entrevista.strftime('%d/%m/%Y às %H:%M')
+            observacao_automatica += f"\n[SISTEMA - {timestamp}] Entrevista agendada para: {data_formatada}"
+        
+        # Combinar observação do usuário com a automática
+        observacao_final = observacao.strip() if observacao.strip() else ""
+        if observacao_final:
+            observacao_completa = f"{observacao_final}\n\n{observacao_automatica}"
+        else:
+            observacao_completa = observacao_automatica
+        
+        # Dados para inserir no relacionamento
         dados_relacao = {
             'candidato_id': candidato_id,
             'vaga_id': vaga_id,
-            'observacoes': observacao
+            'status_processo': status_inicial,
+            'observacoes': observacao_completa
         }
+        
+        # Adicionar data da entrevista se fornecida
+        if data_entrevista:
+            dados_relacao['data_entrevista'] = data_entrevista.isoformat()
         
         result = supabase.table('candidatos_vagas').insert(dados_relacao).execute()
         
         if result.data:
             # Adicionar observação automática na vaga
-            obs_automatica = f"Candidato enviado para esta vaga. {observacao}"
-            adicionar_observacao_vaga(vaga_id, obs_automatica, 'candidato_enviado')
+            obs_vaga = f"Candidato relacionado com status '{status_inicial.upper().replace('_', ' ')}'. {observacao.strip()}"
+            if data_entrevista:
+                obs_vaga += f" Entrevista: {data_entrevista.strftime('%d/%m/%Y às %H:%M')}"
+            
+            adicionar_observacao_vaga(vaga_id, obs_vaga, 'candidato_enviado')
             return True
         return False
         
@@ -415,33 +445,67 @@ def carregar_relacionamentos():
         st.error(f"❌ Erro ao carregar relacionamentos: {str(e)}")
         return pd.DataFrame()
 
-# =====================================
-# FUNÇÃO MAIN COM SISTEMA DE ABAS
-# =====================================
+def atualizar_relacionamento(relacionamento_id, novo_candidato_id=None, nova_observacao=None, novo_status=None, data_entrevista=None, reiniciar_prazo=False):
+    """Atualiza relacionamento com histórico automático"""
+    try:
+        supabase = get_supabase_client()
+        
+        dados_atualizacao = {}
+        historico_mudancas = []
+        
+        timestamp = datetime.now().strftime('%d/%m/%Y %H:%M')
+        
+        if novo_candidato_id:
+            dados_atualizacao['candidato_id'] = novo_candidato_id
+            historico_mudancas.append(f"[SISTEMA - {timestamp}] Candidato alterado")
+            
+            if reiniciar_prazo:
+                dados_atualizacao['data_envio'] = datetime.now().isoformat()
+                historico_mudancas.append(f"[SISTEMA - {timestamp}] Prazo de 90 dias reiniciado devido à troca de candidato")
+        
+        if novo_status:
+            dados_atualizacao['status_processo'] = novo_status
+            historico_mudancas.append(f"[SISTEMA - {timestamp}] Status alterado para: {novo_status.upper().replace('_', ' ')}")
+            
+        if data_entrevista:
+            dados_atualizacao['data_entrevista'] = data_entrevista.isoformat()
+            data_formatada = data_entrevista.strftime('%d/%m/%Y às %H:%M')
+            historico_mudancas.append(f"[SISTEMA - {timestamp}] Entrevista agendada para: {data_formatada}")
+        
+        # Construir observação final com histórico
+        observacao_final = nova_observacao or ""
+        if historico_mudancas:
+            historico_texto = "\n".join(historico_mudancas)
+            observacao_final = f"{observacao_final}\n\n{historico_texto}" if observacao_final else historico_texto
+        
+        if observacao_final:
+            dados_atualizacao['observacoes'] = observacao_final
+        
+        dados_atualizacao['updated_at'] = datetime.now().isoformat()
+        
+        result = supabase.table('candidatos_vagas').update(dados_atualizacao).eq('id', relacionamento_id).execute()
+        
+        return result.data is not None
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao atualizar relacionamento: {str(e)}")
+        return False
 
-def main():
-    # CABEÇALHO
-    st.markdown("""
-    <div class="main-header">
-        <h1>🏠 R.O RECRUTAMENTO - Dashboard</h1>
-        <p>Gerenciamento Completo de Candidatos e Vagas</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # SISTEMA DE ABAS
-    tab1, tab2, tab3 = st.tabs(["👥 Candidatos", "💼 Vagas", "🔗 Relacionamentos"])
-    
-    with tab1:
-        gerenciar_candidatos()
-    
-    with tab2:
-        gerenciar_vagas()
-    
-    with tab3:
-        gerenciar_relacionamentos()
+def excluir_relacionamento(relacionamento_id):
+    """Exclui um relacionamento"""
+    try:
+        supabase = get_supabase_client()
+        
+        result = supabase.table('candidatos_vagas').delete().eq('id', relacionamento_id).execute()
+        
+        return result.data is not None
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao excluir relacionamento: {str(e)}")
+        return False
 
 # =====================================
-# GESTÃO DE CANDIDATOS (seu código atual preservado)
+# PÁGINAS/ABAS DO SISTEMA
 # =====================================
 
 def gerenciar_candidatos():
@@ -457,7 +521,8 @@ def gerenciar_candidatos():
             "Todos os candidatos",
             "Candidatos qualificados", 
             "Pendentes de qualificação"
-        ]
+        ],
+        key="tipo_visualizacao_candidatos"
     )
 
     # Carregamento condicional baseado no filtro
@@ -547,7 +612,7 @@ def gerenciar_candidatos():
         st.info("🔍 Nenhum candidato encontrado com os filtros aplicados.")
         return
     
-    # LISTA DE CANDIDATOS (seu código preservado)
+    # LISTA DE CANDIDATOS
     for idx, candidato in df_filtrado.iterrows():
         with st.expander(
             f"{formatar_funcao(candidato.get('formulario_id', ''))} | "
@@ -559,7 +624,7 @@ def gerenciar_candidatos():
             col1, col2 = st.columns([2, 1])
             
             with col1:
-                # Informações básicas (seu código preservado)
+                # Informações básicas
                 st.write(f"**📧 Email:** {candidato.get('email', 'Não informado')}")
                 whatsapp_link = formatar_whatsapp_link(candidato.get('whatsapp'))
                 st.markdown(f"**📲 Whatsapp:** {whatsapp_link}", unsafe_allow_html=True)
@@ -571,7 +636,7 @@ def gerenciar_candidatos():
                     data_cadastro = pd.to_datetime(candidato['created_at']).strftime('%d/%m/%Y às %H:%M')
                     st.write(f"**📅 Cadastrado em:** {data_cadastro}")
 
-                # Status de qualificação (seu código preservado)
+                # Status de qualificação
                 if 'data_qualificacao' in candidato:
                     st.success(f"✅ Qualificado em {candidato['data_qualificacao']}")
                     if candidato.get('certificado_numero'):
@@ -589,7 +654,7 @@ def gerenciar_candidatos():
                     st.warning("⏳ Ficha pendente")
             
             with col2:
-                # Geração de PDF (seu código preservado)
+                # Geração de PDF
                 nome_arquivo = f"ficha_{candidato.get('nome_completo', 'candidato').replace(' ', '_')}_{candidato.get('id', 'sem_id')}.pdf"
                 
                 if f"pdf_data_{candidato.get('id')}" not in st.session_state:
@@ -598,7 +663,7 @@ def gerenciar_candidatos():
                 if st.button(f"📄 Gerar Ficha PDF", key=f"pdf_{candidato.get('id')}"):
                     try:
                         with st.spinner("Gerando PDF..."):
-                            st.write("📝 Preparando dados do candidato...")
+                            st.write("🔍 Preparando dados do candidato...")
                             
                             resultado = gerar_ficha_candidato_completa(candidato.to_dict())
                             
@@ -632,12 +697,11 @@ def gerenciar_candidatos():
                         with st.expander("🔍 Detalhes técnicos do erro"):
                             st.code(traceback.format_exc())
 
-                # Sistema de qualificação (seu código preservado)
+                # Sistema de qualificação
                 if 'data_qualificacao' not in candidato.index:
                     candidato_id = candidato.get('id')
                     
                     with st.container():
-                        st.markdown("---")
                         st.markdown("### 🎓 Qualificar Candidato")
                         
                         with st.form(key=f"qualificacao_form_{candidato_id}", clear_on_submit=False):
@@ -675,7 +739,7 @@ def gerenciar_candidatos():
                                         else:
                                             st.error("❌ Erro ao qualificar candidato. Tente novamente.")      
                 
-                # Botão de download (seu código preservado)
+                # Botão de download
                 if st.session_state.get(f"pdf_data_{candidato.get('id')}") is not None:
                     pdf_data = st.session_state[f"pdf_data_{candidato.get('id')}"]
                     nome_arquivo = st.session_state.get(f"pdf_nome_{candidato.get('id')}", f"ficha_{candidato.get('id')}.pdf")
@@ -691,10 +755,6 @@ def gerenciar_candidatos():
                     
                     st.success(f"✅ PDF pronto: {nome_arquivo}")
 
-# =====================================
-# GESTÃO DE VAGAS (nova funcionalidade)
-# =====================================
-
 def gerenciar_vagas():
     """Nova funcionalidade para gestão de vagas"""
     st.header("💼 Gestão de Vagas")
@@ -705,12 +765,14 @@ def gerenciar_vagas():
         
         filtro_status = st.selectbox(
             "Status da vaga:",
-            ["Todas", "ativa", "preenchida", "pausada", "cancelada", "em_andamento"]
+            ["Todas", "ativa", "preenchida", "pausada", "cancelada", "em_andamento"],
+            key="filtro_status_vagas"
         )
         
         filtro_urgencia = st.selectbox(
             "Urgência:",
-            ["Todas", "imediato", "ate-30-dias", "flexivel"]
+            ["Todas", "imediato", "ate-30-dias", "flexivel"],
+            key="filtro_urgencia_vagas"
         )
         
         filtro_salario_min = st.number_input("Salário mínimo:", min_value=0, value=0)
@@ -757,11 +819,16 @@ def gerenciar_vagas():
     st.subheader(f"📋 Vagas Disponíveis ({len(df_filtrado)} encontradas)")
     
     for idx, vaga in df_filtrado.iterrows():
+        # OBTER STATUS FORMATADO
+        status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
+        status_display, status_color = formatar_status_vaga(status_atual)
+        
         with st.expander(
             f"{formatar_funcao_vaga(vaga.get('formulario_id', ''))} | "
             f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')} | "
             f"💰 R$ {vaga.get('salario_oferecido', 'N/A')} | "
-            f"📍 {vaga.get('cidade', 'N/A')}",
+            f"📍 {vaga.get('cidade', 'N/A')} | "
+            f"{status_display}",
             expanded=False
         ):
             
@@ -774,18 +841,6 @@ def gerenciar_vagas():
                 st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
                 st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
                 st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
-                
-                # STATUS ATUAL
-                status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
-                
-                if status_atual == 'ativa':
-                    st.success(f"🟢 Status: {status_atual}")
-                elif status_atual == 'preenchida':
-                    st.info(f"✅ Status: {status_atual}")
-                elif status_atual == 'pausada':
-                    st.warning(f"⏸️ Status: {status_atual}")
-                else:
-                    st.error(f"🔴 Status: {status_atual}")
             
             with col2:
                 # CONTROLES DE STATUS
@@ -860,12 +915,8 @@ def gerenciar_vagas():
             else:
                 st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
 
-# =====================================
-# GESTÃO DE RELACIONAMENTOS (nova funcionalidade)
-# =====================================
-
 def gerenciar_relacionamentos():
-    """Funcionalidade para relacionar candidatos com vagas"""
+    """Gestão de relacionamentos com interface melhorada"""
     st.header("🔗 Relacionar Candidatos com Vagas")
     
     # CARREGAR DADOS
@@ -877,31 +928,177 @@ def gerenciar_relacionamentos():
         return
     
     # FORMULÁRIO DE RELACIONAMENTO
+    st.subheader("➕ Criar Novo Relacionamento")
+    
     with st.form("relacionar_candidato_vaga"):
-        col1, col2 = st.columns(2)
+        # SEÇÃO DE BUSCA DE CANDIDATOS
+        st.markdown("#### 👤 Selecionar Candidato")
         
-        with col1:
+        col_busca_cand, col_filtro_cand = st.columns([2, 1])
+        
+        with col_busca_cand:
+            busca_candidato = st.text_input(
+                "🔍 Buscar candidato por nome:",
+                placeholder="Digite nome do candidato...",
+                key="busca_candidato_relacionamento"
+            )
+        
+        with col_filtro_cand:
+            filtro_funcao_candidato = st.selectbox(
+                "Filtrar por função:",
+                ["Todas"] + sorted(df_candidatos['formulario_id'].dropna().unique().tolist()),
+                key="filtro_funcao_candidato"
+            )
+        
+        # FILTRAR CANDIDATOS BASEADO NA BUSCA
+        df_candidatos_filtrados = df_candidatos.copy()
+        
+        if busca_candidato.strip():
+            df_candidatos_filtrados = df_candidatos_filtrados[
+                df_candidatos_filtrados['nome_completo'].str.contains(busca_candidato, case=False, na=False)
+            ]
+        
+        if filtro_funcao_candidato != "Todas":
+            df_candidatos_filtrados = df_candidatos_filtrados[
+                df_candidatos_filtrados['formulario_id'] == filtro_funcao_candidato
+            ]
+        
+        if df_candidatos_filtrados.empty:
+            st.warning("⚠️ Nenhum candidato encontrado com os filtros aplicados. Ajuste a busca.")
+            candidato_selecionado = None
+        else:
+            st.info(f"📊 Encontrados {len(df_candidatos_filtrados)} candidatos")
             candidato_selecionado = st.selectbox(
-                "👤 Selecionar Candidato:",
-                options=df_candidatos['id'].tolist(),
-                format_func=lambda x: f"{df_candidatos[df_candidatos['id'] == x]['nome_completo'].iloc[0]} - {formatar_funcao(df_candidatos[df_candidatos['id'] == x]['formulario_id'].iloc[0])}"
+                f"Escolher candidato ({len(df_candidatos_filtrados)} opções):",
+                options=df_candidatos_filtrados['id'].tolist(),
+                format_func=lambda x: f"{df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['nome_completo'].iloc[0]} - {formatar_funcao(df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['formulario_id'].iloc[0])}",
+                key="select_candidato_filtrado"
             )
         
-        with col2:
+        st.markdown("---")
+        
+        # SEÇÃO DE BUSCA DE VAGAS
+        st.markdown("#### 💼 Selecionar Vaga")
+        
+        col_busca_vaga, col_filtro_vaga = st.columns([2, 1])
+        
+        with col_busca_vaga:
+            busca_vaga = st.text_input(
+                "🔍 Buscar vaga por proprietário:",
+                placeholder="Digite nome do proprietário...",
+                key="busca_vaga_relacionamento"
+            )
+        
+        with col_filtro_vaga:
+            filtro_tipo_vaga = st.selectbox(
+                "Filtrar por tipo:",
+                ["Todas"] + sorted(df_vagas['formulario_id'].dropna().unique().tolist()),
+                key="filtro_tipo_vaga"
+            )
+        
+        # FILTRAR VAGAS BASEADO NA BUSCA
+        df_vagas_filtradas = df_vagas.copy()
+        
+        if busca_vaga.strip():
+            # Criar coluna nome_completo_proprietario se não existir
+            if 'nome_completo_proprietario' not in df_vagas_filtradas.columns:
+                df_vagas_filtradas['nome_completo_proprietario'] = df_vagas_filtradas['nome'].fillna('') + ' ' + df_vagas_filtradas['sobrenome'].fillna('')
+            
+            df_vagas_filtradas = df_vagas_filtradas[
+                df_vagas_filtradas['nome_completo_proprietario'].str.contains(busca_vaga, case=False, na=False)
+            ]
+        
+        if filtro_tipo_vaga != "Todas":
+            df_vagas_filtradas = df_vagas_filtradas[
+                df_vagas_filtradas['formulario_id'] == filtro_tipo_vaga
+            ]
+        
+        # Filtrar apenas vagas ativas por padrão
+        df_vagas_filtradas = df_vagas_filtradas[
+            df_vagas_filtradas.get('status_detalhado', df_vagas_filtradas.get('status', 'ativa')).isin(['ativa', 'em_andamento'])
+        ]
+        
+        if df_vagas_filtradas.empty:
+            st.warning("⚠️ Nenhuma vaga ativa encontrada com os filtros aplicados. Ajuste a busca.")
+            vaga_selecionada = None
+        else:
+            st.info(f"📊 Encontradas {len(df_vagas_filtradas)} vagas ativas")
             vaga_selecionada = st.selectbox(
-                "💼 Selecionar Vaga:",
-                options=df_vagas['id'].tolist(),
-                format_func=lambda x: f"{df_vagas[df_vagas['id'] == x]['nome'].iloc[0]} {df_vagas[df_vagas['id'] == x]['sobrenome'].iloc[0]} - {formatar_funcao_vaga(df_vagas[df_vagas['id'] == x]['formulario_id'].iloc[0])}"
+                f"Escolher vaga ({len(df_vagas_filtradas)} opções):",
+                options=df_vagas_filtradas['id'].tolist(),
+                format_func=lambda x: f"{df_vagas_filtradas[df_vagas_filtradas['id'] == x]['nome'].iloc[0]} {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['sobrenome'].iloc[0]} - {formatar_funcao_vaga(df_vagas_filtradas[df_vagas_filtradas['id'] == x]['formulario_id'].iloc[0])} - R$ {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['salario_oferecido'].iloc[0]}",
+                key="select_vaga_filtrada"
             )
         
-        observacao_relacao = st.text_area("📝 Observação sobre o envio:", placeholder="Ex: Candidato enviado via WhatsApp às 14h30")
+        st.markdown("---")
         
-        if st.form_submit_button("🔗 Relacionar Candidato com Vaga"):
-            if relacionar_candidato_vaga(candidato_selecionado, vaga_selecionada, observacao_relacao):
-                st.success("✅ Candidato relacionado com sucesso!")
-                st.rerun()
+        # RESTO DO FORMULÁRIO (status, entrevista, etc.)
+        # NOVO: Campo para definir status inicial
+        col_status1, col_status2 = st.columns(2)
+        
+        with col_status1:
+            status_inicial = st.selectbox(
+                "📋 Status inicial do relacionamento:",
+                ["enviado", "em_analise", "entrevista_agendada", "aprovado", "rejeitado", "contratado", "cancelado"],
+                index=0,  # Padrão é "enviado"
+                key="status_inicial_relacionamento"
+            )
+        
+        with col_status2:
+            st.write("**Legenda dos Status:**")
+            st.caption("• **Enviado:** Candidato foi enviado ao cliente")
+            st.caption("• **Em Análise:** Cliente está analisando o candidato")
+            st.caption("• **Entrevista Agendada:** Entrevista marcada")
+            st.caption("• **Aprovado:** Cliente aprovou o candidato")
+            st.caption("• **Contratado:** Candidato foi contratado")
+        
+        # CAMPOS ESPECIAIS PARA ENTREVISTA
+        data_entrevista_inicial = None
+        if status_inicial == "entrevista_agendada":
+            st.markdown("---")
+            st.write("**📅 Dados da Entrevista (obrigatório para status 'entrevista_agendada'):**")
+            
+            col_data_inicial, col_hora_inicial = st.columns(2)
+            
+            with col_data_inicial:
+                data_ent_inicial = st.date_input(
+                    "Data da entrevista:",
+                    value=datetime.now().date(),
+                    key="data_entrevista_inicial"
+                )
+            
+            with col_hora_inicial:
+                hora_ent_inicial = st.time_input(
+                    "Hora da entrevista:",
+                    value=datetime.now().replace(second=0, microsecond=0).time(),
+                    key="hora_entrevista_inicial"
+                )
+            
+            data_entrevista_inicial = datetime.combine(data_ent_inicial, hora_ent_inicial)
+            st.success(f"✅ Entrevista será criada para: **{data_entrevista_inicial.strftime('%d/%m/%Y às %H:%M')}**")
+        
+        observacao_inicial = st.text_area(
+            "📝 Observação inicial:",
+            placeholder="Ex: Candidato enviado via WhatsApp às 14h30. Cliente solicitou entrevista presencial.",
+            height=80
+        )
+        
+        # VALIDAÇÃO E SUBMISSÃO
+        if st.form_submit_button("🔗 Criar Relacionamento", type="primary"):
+            if candidato_selecionado is None:
+                st.error("❌ Selecione um candidato válido!")
+            elif vaga_selecionada is None:
+                st.error("❌ Selecione uma vaga válida!")
+            elif status_inicial == "entrevista_agendada" and not data_entrevista_inicial:
+                st.error("❌ Para criar relacionamento com status 'entrevista_agendada', é obrigatório definir data e hora!")
             else:
-                st.error("❌ Erro ao relacionar (pode já existir esta relação)")
+                if relacionar_candidato_vaga_com_status(candidato_selecionado, vaga_selecionada, observacao_inicial, status_inicial, data_entrevista_inicial):
+                    st.success("✅ Relacionamento criado com sucesso!")
+                    st.rerun()
+                else:
+                    st.error("❌ Erro ao criar relacionamento (pode já existir)")
+    
+    st.markdown("---")
     
     # MOSTRAR RELACIONAMENTOS EXISTENTES
     st.subheader("📊 Relacionamentos Existentes")
@@ -909,307 +1106,356 @@ def gerenciar_relacionamentos():
     df_relacionamentos = carregar_relacionamentos()
     
     if not df_relacionamentos.empty:
-        st.dataframe(
-            df_relacionamentos[['nome_completo', 'tipo_candidato', 'nome_proprietario', 'tipo_vaga', 'data_envio', 'status_processo']],
-            use_container_width=True
-        )
+        # INTERFACE MELHORADA COM STREAMLIT NATIVO
+        for idx, rel in df_relacionamentos.iterrows():
+            # CALCULAR MÉTRICAS DE TEMPO
+            data_envio = pd.to_datetime(rel.get('data_envio'))
+            data_criacao = pd.to_datetime(rel.get('created_at', rel.get('data_envio')))
+            
+            # Normalizar timezone
+            if data_envio.tz is not None:
+                hoje = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
+            else:
+                hoje = pd.Timestamp.now().tz_localize(None)
+                data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
+                data_criacao = data_criacao.tz_localize(None) if data_criacao.tz is not None else data_criacao
+            
+            dias_passados = (hoje - data_envio).days
+            tres_meses = data_envio + pd.Timedelta(days=90)
+            dias_restantes = (tres_meses - hoje).days
+            
+            status_atual = rel.get('status_processo', 'enviado')
+            
+            # CONTAINER PRINCIPAL
+            with st.container():
+                # HEADER COM STATUS
+                col_status, col_prazo = st.columns([2, 1])
+                
+                with col_status:
+                    if status_atual == 'enviado':
+                        st.info("📤 **CANDIDATO ENVIADO**")
+                    elif status_atual == 'em_analise':
+                        st.warning("🔍 **EM ANÁLISE PELO CLIENTE**")
+                    elif status_atual == 'entrevista_agendada':
+                        st.success("📅 **ENTREVISTA AGENDADA**")
+                    elif status_atual == 'aprovado':
+                        st.success("✅ **CANDIDATO APROVADO**")
+                    elif status_atual == 'contratado':
+                        st.success("🎉 **CANDIDATO CONTRATADO**")
+                    elif status_atual == 'rejeitado':
+                        st.error("❌ **CANDIDATO REJEITADO**")
+                    elif status_atual == 'cancelado':
+                        st.error("ℹ️ **PROCESSO CANCELADO**")
+                
+                with col_prazo:
+                    if dias_restantes <= 0:
+                        st.error(f"🚨 Vencido há {abs(dias_restantes)} dias")
+                    elif dias_restantes <= 15:
+                        st.error(f"⚠️ {dias_restantes} dias restantes (CRÍTICO)")
+                    elif dias_restantes <= 30:
+                        st.warning(f"⏳ {dias_restantes} dias restantes")
+                    else:
+                        st.success(f"✅ {dias_restantes} dias restantes")
+                
+                # DESTAQUE PARA ENTREVISTA AGENDADA
+                if status_atual == 'entrevista_agendada' and rel.get('data_entrevista'):
+                    data_entrevista = pd.to_datetime(rel.get('data_entrevista'))
+                    if data_entrevista.tz is not None:
+                        data_entrevista = data_entrevista.tz_convert(hoje.tz if hoje.tz else 'UTC')
+                    else:
+                        data_entrevista = data_entrevista.tz_localize(None)
+                    
+                    dias_ate_entrevista = (data_entrevista - hoje).days
+                    
+                    if dias_ate_entrevista == 0:
+                        st.error(f"🚨 **ENTREVISTA É HOJE às {data_entrevista.strftime('%H:%M')}!**")
+                    elif dias_ate_entrevista == 1:
+                        st.warning(f"⚠️ **ENTREVISTA É AMANHÃ às {data_entrevista.strftime('%H:%M')}!**")
+                    elif dias_ate_entrevista > 0:
+                        st.info(f"📅 **Entrevista em {dias_ate_entrevista} dias:** {data_entrevista.strftime('%d/%m/%Y às %H:%M')}")
+                    else:
+                        st.error(f"⚠️ **Entrevista atrasada há {abs(dias_ate_entrevista)} dias!**")
+                
+                # INFORMAÇÕES ORGANIZADAS
+                col_pessoas, col_datas, col_prazo_detalhado = st.columns([2, 2, 1])
+                
+                with col_pessoas:
+                    st.markdown("**👥 PESSOAS ENVOLVIDAS**")
+                    st.write(f"👤 **Candidato:** {rel.get('nome_completo', 'N/A')}")
+                    st.write(f"🏷️ **Função:** {formatar_funcao(rel.get('tipo_candidato', ''))}")
+                    st.write(f"🏠 **Proprietário:** {rel.get('nome_proprietario', 'N/A')}")
+                    st.write(f"🎯 **Vaga:** {formatar_funcao_vaga(rel.get('tipo_vaga', ''))}")
+                
+                with col_datas:
+                    st.markdown("**📅 CRONOLOGIA DETALHADA**")
+                    st.write(f"📅 **Relacionamento criado:** {data_criacao.strftime('%d/%m/%Y às %H:%M')}")
+                    st.write(f"📤 **Candidato enviado:** {data_envio.strftime('%d/%m/%Y às %H:%M')}")
+                    st.write(f"⏱️ **Tempo ativo:** {dias_passados} dias")
+                    
+                    if rel.get('updated_at'):
+                        ultima_atualizacao = pd.to_datetime(rel.get('updated_at'))
+                        if ultima_atualizacao.tz is not None:
+                            ultima_atualizacao = ultima_atualizacao.tz_convert(hoje.tz if hoje.tz else 'UTC')
+                        else:
+                            ultima_atualizacao = ultima_atualizacao.tz_localize(None)
+                        st.write(f"🔄 **Última modificação:** {ultima_atualizacao.strftime('%d/%m/%Y às %H:%M')}")
+                
+                with col_prazo_detalhado:
+                    st.markdown("**⏰ PRAZO 90 DIAS**")
+                    if dias_restantes <= 0:
+                        st.error(f"🚨 **Vencido**\n{abs(dias_restantes)} dias")
+                    elif dias_restantes <= 15:
+                        st.error(f"⚠️ **Crítico**\n{dias_restantes} dias")
+                    elif dias_restantes <= 30:
+                        st.warning(f"⏳ **Atenção**\n{dias_restantes} dias")
+                    else:
+                        st.success(f"✅ **Normal**\n{dias_restantes} dias")
+                    
+                    # BARRA DE PROGRESSO
+                    progresso = max(0, min(100, (90 - dias_passados) / 90 * 100))
+                    st.progress(progresso / 100)
+                    st.caption(f"{progresso:.0f}% do prazo restante")
+                
+                # OBSERVAÇÕES (SE EXISTIREM)
+                if rel.get('observacoes') and rel.get('observacoes').strip():
+                    with st.expander("💬 Ver Histórico Completo", expanded=False):
+                        # Dividir e colorir observações por tipo
+                        observacoes_linhas = rel.get('observacoes').split('\n')
+                        for linha in observacoes_linhas:
+                            linha = linha.strip()
+                            if linha:
+                                if '[SISTEMA -' in linha:
+                                    st.info(f"🤖 {linha}")
+                                elif 'TROCA DE CANDIDATO' in linha or 'Candidato alterado' in linha:
+                                    st.warning(f"🔄 {linha}")
+                                elif 'Status alterado' in linha:
+                                    st.info(f"📋 {linha}")
+                                elif 'Entrevista agendada' in linha:
+                                    st.success(f"📅 {linha}")
+                                else:
+                                    st.write(f"💬 {linha}")
+                
+                # PAINEL DE CONTROLE
+                with st.expander("⚙️ Painel de Controle", expanded=False):
+                    tab_obs, tab_status, tab_troca, tab_excluir = st.tabs(
+                        ["📝 Observações", "🔄 Alterar Status", "🔀 Trocar Candidato", "🗑️ Excluir"]
+                    )
+                    
+                    # ABA OBSERVAÇÕES
+                    with tab_obs:
+                        st.write("**Adicionar nova observação:**")
+                        nova_obs = st.text_area(
+                            "Observação:",
+                            placeholder="Ex: Cliente solicitou envio do currículo por email",
+                            height=80,
+                            key=f"obs_{rel.get('id')}"
+                        )
+                        
+                        if st.button("💾 Adicionar", key=f"add_obs_{rel.get('id')}", type="primary"):
+                            if nova_obs.strip():
+                                observacao_atual = rel.get('observacoes', '')
+                                if observacao_atual:
+                                    observacao_completa = f"{observacao_atual}\n\n{nova_obs.strip()}"
+                                else:
+                                    observacao_completa = nova_obs.strip()
+                                
+                                if atualizar_relacionamento(
+                                    rel.get('id'),
+                                    nova_observacao=observacao_completa
+                                ):
+                                    st.success("✅ Observação adicionada!")
+                                    st.cache_data.clear()
+                                    st.rerun()
+                            else:
+                                st.error("❌ Digite uma observação")
+                    
+                    # ABA STATUS
+                    with tab_status:
+                        col_atual, col_novo = st.columns(2)
+                        
+                        with col_atual:
+                            st.write("**Status Atual:**")
+                            st.write(f"📋 {status_atual.upper().replace('_', ' ')}")
+                        
+                        with col_novo:
+                            novo_status = st.selectbox(
+                                "Alterar para:",
+                                ["enviado", "em_analise", "entrevista_agendada", "aprovado", "rejeitado", "contratado", "cancelado"],
+                                key=f"status_{rel.get('id')}"
+                            )
+                        
+                        # CAMPO ESPECIAL PARA ENTREVISTA
+                        data_entrevista_nova = None
+                        if novo_status == "entrevista_agendada":
+                            st.markdown("---")
+                            st.write("**📅 Dados da Entrevista:**")
+                            
+                            col_data, col_hora = st.columns(2)
+                            with col_data:
+                                data_ent = st.date_input(
+                                    "Data:",
+                                    value=datetime.now().date(),
+                                    key=f"data_ent_{rel.get('id')}"
+                                )
+                            
+                            with col_hora:
+                                hora_ent = st.time_input(
+                                    "Hora:",
+                                    value=datetime.now().replace(second=0, microsecond=0).time(),
+                                    key=f"hora_ent_{rel.get('id')}"
+                                )
+                            
+                            data_entrevista_nova = datetime.combine(data_ent, hora_ent)
+                            st.info(f"✅ Entrevista será agendada para: **{data_entrevista_nova.strftime('%d/%m/%Y às %H:%M')}**")
+                        
+                        if st.button("🔄 Confirmar Alteração", key=f"update_status_{rel.get('id')}", type="primary"):
+                            if atualizar_relacionamento(
+                                rel.get('id'),
+                                novo_status=novo_status,
+                                data_entrevista=data_entrevista_nova
+                            ):
+                                st.success("✅ Status atualizado com histórico!")
+                                st.cache_data.clear()
+                                st.rerun()
+                    
+                    # ABA TROCA
+                    with tab_troca:
+                        st.warning("⚠️ **ATENÇÃO:** Trocar candidato **reinicia** a contagem de 90 dias!")
+                        
+                        candidato_atual = rel.get('nome_completo', 'N/A')
+                        st.info(f"**Candidato atual:** {candidato_atual}")
+                        
+                        if not df_candidatos.empty:
+                            novo_candidato_id = st.selectbox(
+                                "Novo candidato:",
+                                options=df_candidatos['id'].tolist(),
+                                format_func=lambda x: f"{df_candidatos[df_candidatos['id'] == x]['nome_completo'].iloc[0]} ({formatar_funcao(df_candidatos[df_candidatos['id'] == x]['formulario_id'].iloc[0])})",
+                                key=f"novo_cand_{rel.get('id')}"
+                            )
+                            
+                            motivo_troca = st.text_area(
+                                "Motivo da troca:",
+                                placeholder="Ex: Cliente rejeitou perfil. Solicitou candidato com mais experiência em cozinha.",
+                                key=f"motivo_troca_{rel.get('id')}"
+                            )
+                            
+                            if st.button("🔀 Confirmar Troca", key=f"trocar_{rel.get('id')}", type="secondary"):
+                                if motivo_troca.strip():
+                                    novo_candidato_nome = df_candidatos[df_candidatos['id'] == novo_candidato_id]['nome_completo'].iloc[0]
+                                    
+                                    # Adicionar motivo às observações junto com o histórico automático
+                                    observacao_atual = rel.get('observacoes', '')
+                                    observacao_com_motivo = f"{observacao_atual}\n\nMOTIVO DA TROCA: {motivo_troca.strip()}"
+                                    
+                                    if atualizar_relacionamento(
+                                        rel.get('id'),
+                                        novo_candidato_id=novo_candidato_id,
+                                        nova_observacao=observacao_com_motivo,
+                                        reiniciar_prazo=True
+                                    ):
+                                        st.success("✅ Candidato trocado! Prazo reiniciado para 90 dias.")
+                                        st.cache_data.clear()
+                                        st.rerun()
+                                else:
+                                    st.error("❌ Informe o motivo da troca")
+                        else:
+                            st.error("❌ Nenhum candidato disponível")
+                    
+                    # ABA EXCLUIR
+                    with tab_excluir:
+                        st.error("⚠️ **AÇÃO PERMANENTE E IRREVERSÍVEL!**")
+                        st.write("Use apenas se o relacionamento foi criado por engano.")
+                        
+                        motivo_exclusao = st.text_area(
+                            "Motivo da exclusão:",
+                            placeholder="Ex: Relacionamento duplicado criado por engano",
+                            key=f"motivo_excl_{rel.get('id')}"
+                        )
+                        
+                        confirmar = st.checkbox(
+                            "Confirmo que desejo excluir permanentemente",
+                            key=f"confirm_{rel.get('id')}"
+                        )
+                        
+                        if st.button("🗑️ EXCLUIR RELACIONAMENTO", key=f"excluir_{rel.get('id')}", type="secondary"):
+                            if confirmar and motivo_exclusao.strip():
+                                if excluir_relacionamento(rel.get('id')):
+                                    st.success("✅ Relacionamento excluído!")
+                                    st.cache_data.clear()
+                                    st.rerun()
+                            else:
+                                st.error("❌ Confirme a exclusão e informe o motivo")
+
+                st.markdown("---")
+            
+        # ESTATÍSTICAS DOS RELACIONAMENTOS
+        st.subheader("📈 Estatísticas dos Relacionamentos")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("📊 Total", len(df_relacionamentos))
+        
+        with col2:
+            criticos = 0
+            for idx, r in df_relacionamentos.iterrows():
+                try:
+                    data_envio = pd.to_datetime(r.get('data_envio'))
+                    if data_envio.tz is not None:
+                        hoje_calc = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
+                    else:
+                        hoje_calc = pd.Timestamp.now().tz_localize(None)
+                        data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
+                    
+                    if (hoje_calc - data_envio).days >= 75:
+                        criticos += 1
+                except:
+                    pass
+            st.metric("🚨 Críticos", criticos)
+        
+        with col3:
+            vencidos = 0
+            for idx, r in df_relacionamentos.iterrows():
+                try:
+                    data_envio = pd.to_datetime(r.get('data_envio'))
+                    if data_envio.tz is not None:
+                        hoje_calc = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
+                    else:
+                        hoje_calc = pd.Timestamp.now().tz_localize(None)
+                        data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
+                    
+                    if (hoje_calc - data_envio).days >= 90:
+                        vencidos += 1
+                except:
+                    pass
+            st.metric("⏰ Vencidos", vencidos)
+        
+        with col4:
+            ativos = 0
+            for idx, r in df_relacionamentos.iterrows():
+                try:
+                    data_envio = pd.to_datetime(r.get('data_envio'))
+                    if data_envio.tz is not None:
+                        hoje_calc = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
+                    else:
+                        hoje_calc = pd.Timestamp.now().tz_localize(None)
+                        data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
+                    
+                    if (hoje_calc - data_envio).days < 90:
+                        ativos += 1
+                except:
+                    pass
+            st.metric("✅ Ativos", ativos)
+            
     else:
         st.info("ℹ️ Nenhum relacionamento encontrado.")
 
-    # RODAPÉ
-    st.markdown("---")
-    st.markdown("""
-    <div style='text-align: center; color: #666; padding: 1rem;'>
-        <p><strong>R.O RECRUTAMENTO</strong> - Dashboard de Gestão</p>
-        <p>🔄 Última atualização: {}</p>
-    </div>
-    """.format(datetime.now().strftime('%d/%m/%Y às %H:%M')), unsafe_allow_html=True)
-
 # =====================================
-# EXECUTAR APLICAÇÃO
-# =====================================
-
-if __name__ == "__main__":
-    main()# app/streamlit_app.py - VERSÃO EXPANDIDA COM SISTEMA DE VAGAS
-import sys
-import os
-import streamlit as st
-import pandas as pd
-from datetime import datetime
-
-# Adicionar pasta backend ao path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-
-from supabase_client import get_supabase_client
-from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa  # ✅ Import para vagas
-
-# Configurar página
-st.set_page_config(
-    page_title="R.O Recrutamento - Dashboard",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# CSS personalizado mantendo o padrão existente
-st.markdown("""
-<style>
-    .main-header {
-        background: linear-gradient(90deg, #a65e2e 0%, #d4a574 100%);
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: white;
-    }
-    
-    .metric-card {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid #a65e2e;
-        margin: 0.5rem 0;
-    }
-    
-    .candidate-card, .vaga-card {
-        background: white;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        margin: 0.5rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .stButton > button {
-        background: #a65e2e;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 0.5rem 1rem;
-        font-weight: bold;
-    }
-    
-    .stButton > button:hover {
-        background: #8b4d22;
-        color: white;
-    }
-
-    .status-ativa {
-        background: #28a745;
-        color: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-    
-    .status-preenchida {
-        background: #007bff;
-        color: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-    
-    .status-pausada {
-        background: #ffc107;
-        color: #000;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-    
-    .status-cancelada {
-        background: #dc3545;
-        color: white;
-        padding: 0.2rem 0.8rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# =====================================
-# FUNÇÕES EXISTENTES DE CANDIDATOS (preservadas)
-# =====================================
-
-@st.cache_data(ttl=300)
-def carregar_candidatos():
-    """Carrega candidatos do Supabase com cache"""
-    try:
-        supabase = get_supabase_client()
-        response = supabase.table('candidatos').select('*').order('created_at', desc=True).execute()
-        
-        if response.data:
-            return pd.DataFrame(response.data)
-        else:
-            return pd.DataFrame()
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao carregar candidatos: {str(e)}")
-        return pd.DataFrame()
-
-def atualizar_status_ficha(candidato_id):
-    """Atualiza status de ficha_emitida no banco"""
-    try:
-        supabase = get_supabase_client()
-        
-        supabase.table('candidatos').update({
-            'ficha_emitida': True,
-            'data_ficha_gerada': datetime.now().isoformat()
-        }).eq('id', candidato_id).execute()
-        
-        return True
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao atualizar status: {str(e)}")
-        return False
-
-def formatar_funcao(formulario_id):
-    """Converte ID da função em nome amigável para candidatos"""
-    funcoes = {
-        'candi-baba': '👶 Babá',
-        'candi-caseiro': '🏠 Caseiro',
-        'candi-copeiro': '🍷 Copeiro', 
-        'candi-cozinheira': '👨‍🍳 Cozinheira(o)',
-        'candi-governanta': '👑 Governanta',
-        'candi-arrumadeira': '🧹 Arrumadeira',
-        'candi-casal': '👫 Casal'
-    }
-    return funcoes.get(formulario_id, formulario_id or 'Não especificado')
-
-# =====================================
-# NOVAS FUNÇÕES PARA SISTEMA DE VAGAS
-# =====================================
-
-@st.cache_data(ttl=300)
-def carregar_vagas():
-    """Carrega vagas do Supabase"""
-    try:
-        supabase = get_supabase_client()
-        response = supabase.table('vagas').select('*').order('created_at', desc=True).execute()
-        
-        if response.data:
-            return pd.DataFrame(response.data)
-        else:
-            return pd.DataFrame()
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao carregar vagas: {str(e)}")
-        return pd.DataFrame()
-
-def carregar_observacoes_vaga(vaga_id):
-    """Carrega observações de uma vaga específica"""
-    try:
-        supabase = get_supabase_client()
-        response = supabase.table('vaga_observacoes').select('*').eq('vaga_id', vaga_id).order('data_criacao', desc=True).execute()
-        
-        if response.data:
-            return response.data
-        else:
-            return []
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao carregar observações: {str(e)}")
-        return []
-
-def adicionar_observacao_vaga(vaga_id, observacao, tipo='geral'):
-    """Adiciona nova observação à vaga"""
-    try:
-        supabase = get_supabase_client()
-        
-        dados_observacao = {
-            'vaga_id': vaga_id,
-            'observacao': observacao,
-            'tipo_observacao': tipo
-        }
-        
-        result = supabase.table('vaga_observacoes').insert(dados_observacao).execute()
-        
-        if result.data:
-            return True
-        return False
-        
-    except Exception as e:
-        st.error(f"❌ Erro ao adicionar observação: {str(e)}")
-        return False
-
-def atualizar_status_vaga(vaga_id, novo_status):
-    """Atualiza status da vaga"""
-    try:
-        supabase = get_supabase_client()
-        
-        result = supabase.table('vagas').update({
-            'status_detalhado': novo_status,
-            'updated_at': datetime.now().isoformat()
-        }).eq('id', vaga_id).execute()
-        
-        return result.data is not None
-        
-    except Exception as e:
-        st.error(f"❌ Erro ao atualizar status: {str(e)}")
-        return False
-
-def formatar_funcao_vaga(formulario_id):
-    """Converte ID da vaga em nome amigável"""
-    funcoes = {
-        'vaga-baba': '👶 Vaga Babá',
-        'vaga-caseiro': '🏠 Vaga Caseiro',
-        'vaga-copeiro': '🍷 Vaga Copeiro', 
-        'vaga-cozinheira': '👨‍🍳 Vaga Cozinheira(o)',
-        'vaga-governanta': '👑 Vaga Governanta',
-        'vaga-arrumadeira': '🧹 Vaga Arrumadeira',
-        'vaga-domestica': '🏠 Vaga Doméstica'
-    }
-    return funcoes.get(formulario_id, formulario_id or 'Vaga não especificada')
-
-def relacionar_candidato_vaga(candidato_id, vaga_id, observacao=""):
-    """Relaciona candidato com vaga"""
-    try:
-        supabase = get_supabase_client()
-        
-        dados_relacao = {
-            'candidato_id': candidato_id,
-            'vaga_id': vaga_id,
-            'observacoes': observacao
-        }
-        
-        result = supabase.table('candidatos_vagas').insert(dados_relacao).execute()
-        
-        if result.data:
-            # Adicionar observação automática na vaga
-            obs_automatica = f"Candidato enviado para esta vaga. {observacao}"
-            adicionar_observacao_vaga(vaga_id, obs_automatica, 'candidato_enviado')
-            return True
-        return False
-        
-    except Exception as e:
-        st.error(f"❌ Erro ao relacionar candidato-vaga: {str(e)}")
-        return False
-
-def carregar_relacionamentos():
-    """Carrega relacionamentos candidatos-vagas"""
-    try:
-        supabase = get_supabase_client()
-        response = supabase.table('candidatos_vagas_detalhado').select('*').order('data_envio', desc=True).execute()
-        
-        if response.data:
-            return pd.DataFrame(response.data)
-        else:
-            return pd.DataFrame()
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao carregar relacionamentos: {str(e)}")
-        return pd.DataFrame()
-
-# =====================================
-# FUNÇÃO MAIN COM SISTEMA DE ABAS
+# FUNÇÃO PRINCIPAL
 # =====================================
 
 def main():
+    """Função principal com sistema de abas"""
     # CABEÇALHO
     st.markdown("""
     <div class="main-header">
@@ -1230,354 +1476,14 @@ def main():
     with tab3:
         gerenciar_relacionamentos()
 
-# =====================================
-# GESTÃO DE CANDIDATOS (código existente preservado)
-# =====================================
-
-def gerenciar_candidatos():
-    """Função com código existente dos candidatos - PRESERVADO TOTALMENTE"""
-    
-    # SIDEBAR - FILTROS
-    st.sidebar.header("🔍 Filtros de Candidatos")
-
-    # Filtro de qualificação
-    tipo_visualizacao = st.sidebar.selectbox(
-        "Visualizar:",
-        [
-            "Todos os candidatos",
-            "Candidatos qualificados", 
-            "Pendentes de qualificação"
-        ]
-    )
-
-    # Carregamento condicional baseado no filtro
-    with st.spinner("Carregando candidatos..."):
-        df = carregar_candidatos()
-        st.header("📋 Candidatos")
-    
-    if df.empty:
-        st.warning("⚠️ Nenhum candidato encontrado no banco de dados.")
-        st.info("🔄 Certifique-se que existem candidatos cadastrados no Supabase.")
-        return
-
-    # Filtros adicionais na sidebar
-    if not df.empty:
-        filtro_funcao = st.sidebar.selectbox(
-            "Função:",
-            ["Todas"] + list(df['formulario_id'].dropna().unique())
-        )
-        
-        filtro_ficha = st.sidebar.selectbox(
-            "Status da ficha:",
-            ["Todas", "Emitidas", "Pendentes"]
-        )
-
-    # Aplicar filtros
-    df_filtrado = df.copy()
-    
-    if filtro_funcao != "Todas":
-        df_filtrado = df_filtrado[df_filtrado['formulario_id'] == filtro_funcao]
-    
-    if filtro_ficha == "Emitidas":
-        df_filtrado = df_filtrado[df_filtrado.get('ficha_emitida', False) == True]
-    elif filtro_ficha == "Pendentes":
-        df_filtrado = df_filtrado[df_filtrado.get('ficha_emitida', False) != True]
-
-    # Métricas
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("📊 Total Candidatos", len(df))
-    
-    with col2:
-        fichas_emitidas = len(df[df.get('ficha_emitida', False) == True])
-        st.metric("📄 Fichas Emitidas", fichas_emitidas)
-    
-    with col3:
-        fichas_pendentes = len(df) - fichas_emitidas
-        st.metric("⏳ Fichas Pendentes", fichas_pendentes)
-    
-    with col4:
-        if not df.empty:
-            novos_esta_semana = len(df[pd.to_datetime(df['created_at']).dt.date >= 
-                                    (datetime.now().date() - pd.Timedelta(days=7))])
-            st.metric("🆕 Novos (7 dias)", novos_esta_semana)
-
-    # Lista de candidatos
-    st.subheader(f"👥 Lista de Candidatos ({len(df_filtrado)} encontrados)")
-    
-    for idx, candidato in df_filtrado.iterrows():
-        with st.expander(
-            f"{candidato.get('nome_completo', 'Nome não informado')} | "
-            f"{formatar_funcao(candidato.get('formulario_id', ''))} | "
-            f"📞 {candidato.get('telefone', 'N/A')} | "
-            f"📧 {candidato.get('email', 'N/A')}",
-            expanded=False
-        ):
-            
-            col1, col2 = st.columns([3, 1])
-            
-            with col1:
-                st.write(f"**📱 WhatsApp:** {candidato.get('whatsapp', candidato.get('telefone', 'N/A'))}")
-                st.write(f"**🏠 Endereço:** {candidato.get('endereco', 'Não informado')}")
-                st.write(f"**🎂 Nascimento:** {candidato.get('data_nascimento', 'Não informado')}")
-                st.write(f"**👶 Filhos:** {'Sim' if candidato.get('tem_filhos') else 'Não'}")
-                st.write(f"**🚗 CNH:** {'Sim' if candidato.get('possui_cnh') else 'Não'}")
-                
-                # Status da ficha
-                if candidato.get('ficha_emitida'):
-                    st.success(f"✅ Ficha emitida em: {candidato.get('data_ficha_gerada', 'Data não disponível')}")
-                else:
-                    st.warning("⏳ Ficha pendente de emissão")
-            
-            with col2:
-                st.subheader("🎛️ Ações")
-                
-                # Botão gerar ficha
-                if st.button(f"📄 Gerar Ficha", key=f"ficha_{candidato.get('id')}"):
-                    try:
-                        with st.spinner("Gerando ficha..."):
-                            pdf_bytes, nome_arquivo = gerar_ficha_candidato_completa(candidato.to_dict())
-                            
-                            # Atualizar status no banco
-                            if atualizar_status_ficha(candidato.get('id')):
-                                st.success("✅ Status atualizado no banco!")
-                            
-                            st.download_button(
-                                label="💾 Download Ficha",
-                                data=pdf_bytes,
-                                file_name=nome_arquivo,
-                                mime="application/pdf",
-                                key=f"download_{candidato.get('id')}"
-                            )
-                            
-                    except Exception as e:
-                        st.error(f"❌ Erro ao gerar ficha: {str(e)}")
-
-# =====================================
-# GESTÃO DE VAGAS (nova funcionalidade)
-# =====================================
-
-def gerenciar_vagas():
-    """Nova funcionalidade para gestão de vagas"""
-    st.header("💼 Gestão de Vagas")
-    
-    # SIDEBAR - FILTROS
-    with st.sidebar:
-        st.subheader("🔍 Filtros de Vagas")
-        
-        filtro_status = st.selectbox(
-            "Status da vaga:",
-            ["Todas", "ativa", "preenchida", "pausada", "cancelada", "em_andamento"]
-        )
-        
-        filtro_urgencia = st.selectbox(
-            "Urgência:",
-            ["Todas", "imediato", "ate-30-dias", "flexivel"]
-        )
-        
-        filtro_salario_min = st.number_input("Salário mínimo:", min_value=0, value=0)
-    
-    # CARREGAR VAGAS
-    with st.spinner("Carregando vagas..."):
-        df_vagas = carregar_vagas()
-    
-    if df_vagas.empty:
-        st.warning("⚠️ Nenhuma vaga encontrada.")
-        return
-    
-    # APLICAR FILTROS
-    df_filtrado = df_vagas.copy()
-    
-    if filtro_status != "Todas":
-        df_filtrado = df_filtrado[df_filtrado.get('status_detalhado', df_filtrado.get('status', '')) == filtro_status]
-    
-    if filtro_urgencia != "Todas":
-        df_filtrado = df_filtrado[df_filtrado.get('inicio_urgente', '') == filtro_urgencia]
-    
-    if filtro_salario_min > 0:
-        df_filtrado = df_filtrado[pd.to_numeric(df_filtrado.get('salario_oferecido', 0), errors='coerce') >= filtro_salario_min]
-    
-    # MÉTRICAS DE VAGAS
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("📊 Total Vagas", len(df_vagas))
-    
-    with col2:
-        vagas_ativas = len(df_vagas[df_vagas.get('status_detalhado', df_vagas.get('status', '')) == 'ativa'])
-        st.metric("🟢 Ativas", vagas_ativas)
-    
-    with col3:
-        vagas_preenchidas = len(df_vagas[df_vagas.get('status_detalhado', df_vagas.get('status', '')) == 'preenchida'])
-        st.metric("✅ Preenchidas", vagas_preenchidas)
-    
-    with col4:
-        vagas_urgentes = len(df_vagas[df_vagas.get('inicio_urgente', '') == 'imediato'])
-        st.metric("🔥 Urgentes", vagas_urgentes)
-    
-    # LISTA DE VAGAS
-    st.subheader(f"📋 Vagas Disponíveis ({len(df_filtrado)} encontradas)")
-    
-    for idx, vaga in df_filtrado.iterrows():
-        with st.expander(
-            f"{formatar_funcao_vaga(vaga.get('formulario_id', ''))} | "
-            f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')} | "
-            f"💰 R$ {vaga.get('salario_oferecido', 'N/A')} | "
-            f"📍 {vaga.get('cidade', 'N/A')}",
-            expanded=False
-        ):
-            
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # INFORMAÇÕES DA VAGA
-                st.write(f"**📧 Email:** {vaga.get('email', 'Não informado')}")
-                st.write(f"**📞 Telefone:** {vaga.get('telefone_principal', 'Não informado')}")
-                st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
-                st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
-                st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
-                
-                # STATUS ATUAL
-                status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
-                
-                if status_atual == 'ativa':
-                    st.success(f"🟢 Status: {status_atual}")
-                elif status_atual == 'preenchida':
-                    st.info(f"✅ Status: {status_atual}")
-                elif status_atual == 'pausada':
-                    st.warning(f"⏸️ Status: {status_atual}")
-                else:
-                    st.error(f"🔴 Status: {status_atual}")
-            
-            with col2:
-                # CONTROLES DE STATUS
-                st.subheader("🎛️ Controles")
-                
-                novo_status = st.selectbox(
-                    "Alterar status:",
-                    ["ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
-                    index=["ativa", "em_andamento", "preenchida", "pausada", "cancelada"].index(status_atual),
-                    key=f"status_{vaga.get('id')}"
-                )
-                
-                if st.button(f"💾 Atualizar Status", key=f"update_status_{vaga.get('id')}"):
-                    if atualizar_status_vaga(vaga.get('id'), novo_status):
-                        st.success("✅ Status atualizado!")
-                        # Adicionar observação automática
-                        obs_status = f"Status alterado para: {novo_status}"
-                        adicionar_observacao_vaga(vaga.get('id'), obs_status, 'status_change')
-                        st.rerun()
-                    else:
-                        st.error("❌ Erro ao atualizar")
-                
-                # BOTÃO GERAR PDF
-                if st.button(f"📄 Gerar Ficha Vaga", key=f"pdf_vaga_{vaga.get('id')}"):
-                    try:
-                        with st.spinner("Gerando PDF da vaga..."):
-                            # Usar sistema de PDF existente adaptado para vagas
-                            pdf_bytes, nome_arquivo = gerar_ficha_vaga_completa(vaga.to_dict())
-                            
-                            st.download_button(
-                                label="💾 Download Ficha Vaga",
-                                data=pdf_bytes,
-                                file_name=nome_arquivo,
-                                mime="application/pdf",
-                                key=f"download_vaga_{vaga.get('id')}"
-                            )
-                            
-                    except Exception as e:
-                        st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-            
-            # SEÇÃO DE OBSERVAÇÕES
-            st.subheader("📝 Observações e Histórico")
-            
-            # ADICIONAR NOVA OBSERVAÇÃO
-            with st.form(f"obs_form_{vaga.get('id')}"):
-                nova_obs = st.text_area("Nova observação:", placeholder="Ex: Enviado candidato João Silva em 15/09/2025")
-                
-                if st.form_submit_button("➕ Adicionar Observação"):
-                    if nova_obs.strip():
-                        if adicionar_observacao_vaga(vaga.get('id'), nova_obs):
-                            st.success("✅ Observação adicionada!")
-                            st.rerun()
-                        else:
-                            st.error("❌ Erro ao adicionar observação")
-                    else:
-                        st.warning("⚠️ Digite uma observação válida")
-            
-            # EXIBIR OBSERVAÇÕES EXISTENTES
-            observacoes = carregar_observacoes_vaga(vaga.get('id'))
-            
-            if observacoes:
-                st.write("**📚 Histórico de Observações:**")
-                for obs in observacoes:
-                    data_obs = pd.to_datetime(obs['data_criacao']).strftime('%d/%m/%Y às %H:%M')
-                    tipo_icon = {
-                        'geral': '📝',
-                        'candidato_enviado': '👤',
-                        'status_change': '🔄'
-                    }.get(obs.get('tipo_observacao', 'geral'), '📝')
-                    
-                    st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
-            else:
-                st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
-
-# =====================================
-# GESTÃO DE RELACIONAMENTOS (nova funcionalidade)
-# =====================================
-
-def gerenciar_relacionamentos():
-    """Funcionalidade para relacionar candidatos com vagas"""
-    st.header("🔗 Relacionar Candidatos com Vagas")
-    
-    # CARREGAR DADOS
-    df_candidatos = carregar_candidatos()
-    df_vagas = carregar_vagas()
-    
-    if df_candidatos.empty or df_vagas.empty:
-        st.warning("⚠️ É necessário ter candidatos e vagas cadastrados.")
-        return
-    
-    # FORMULÁRIO DE RELACIONAMENTO
-    with st.form("relacionar_candidato_vaga"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            candidato_selecionado = st.selectbox(
-                "👤 Selecionar Candidato:",
-                options=df_candidatos['id'].tolist(),
-                format_func=lambda x: f"{df_candidatos[df_candidatos['id'] == x]['nome_completo'].iloc[0]} - {formatar_funcao(df_candidatos[df_candidatos['id'] == x]['formulario_id'].iloc[0])}"
-            )
-        
-        with col2:
-            vaga_selecionada = st.selectbox(
-                "💼 Selecionar Vaga:",
-                options=df_vagas['id'].tolist(),
-                format_func=lambda x: f"{df_vagas[df_vagas['id'] == x]['nome'].iloc[0]} {df_vagas[df_vagas['id'] == x]['sobrenome'].iloc[0]} - {formatar_funcao_vaga(df_vagas[df_vagas['id'] == x]['formulario_id'].iloc[0])}"
-            )
-        
-        observacao_relacao = st.text_area("📝 Observação sobre o envio:", placeholder="Ex: Candidato enviado via WhatsApp às 14h30")
-        
-        if st.form_submit_button("🔗 Relacionar Candidato com Vaga"):
-            if relacionar_candidato_vaga(candidato_selecionado, vaga_selecionada, observacao_relacao):
-                st.success("✅ Candidato relacionado com sucesso!")
-                st.rerun()
-            else:
-                st.error("❌ Erro ao relacionar (pode já existir esta relação)")
-    
-    # MOSTRAR RELACIONAMENTOS EXISTENTES
-    st.subheader("📊 Relacionamentos Existentes")
-    
-    df_relacionamentos = carregar_relacionamentos()
-    
-    if not df_relacionamentos.empty:
-        st.dataframe(
-            df_relacionamentos[['nome_completo', 'tipo_candidato', 'nome_proprietario', 'tipo_vaga', 'data_envio', 'status_processo']],
-            use_container_width=True
-        )
-    else:
-        st.info("ℹ️ Nenhum relacionamento encontrado.")
+    # RODAPÉ
+    st.markdown("---")
+    st.markdown("""
+    <div style='text-align: center; color: #666; padding: 1rem;'>
+        <p><strong>R.O RECRUTAMENTO</strong> - Dashboard de Gestão</p>
+        <p>🔄 Última atualização: {}</p>
+    </div>
+    """.format(datetime.now().strftime('%d/%m/%Y às %H:%M')), unsafe_allow_html=True)
 
 # =====================================
 # EXECUTAR APLICAÇÃO
