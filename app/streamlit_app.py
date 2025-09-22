@@ -3,7 +3,7 @@ import sys
 import os
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Adicionar pasta backend ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
@@ -262,8 +262,187 @@ def formatar_funcao(formulario_id):
     return funcoes.get(formulario_id, formulario_id or 'Não especificado')
 
 # =====================================
-# FUNÇÕES DE VAGAS (NOVAS)
+# FUNÇÕES DE VALIDAÇÃO E GESTÃO DE RELACIONAMENTOS
 # =====================================
+
+def expirar_relacionamentos_antigos():
+    """Função para verificar e expirar relacionamentos antigos (90+ dias)"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Data limite: 90 dias atrás
+        data_limite = (datetime.now() - timedelta(days=90)).isoformat()
+        
+        # Buscar relacionamentos antigos que ainda estão ativos
+        relacionamentos_antigos = supabase.table('candidatos_vagas').select('*').lt('data_envio', data_limite).not_.in_('status_processo', ['finalizado', 'expirado', 'contratado']).execute()
+        
+        if relacionamentos_antigos.data:
+            count_expirados = 0
+            
+            for rel in relacionamentos_antigos.data:
+                # Marcar como expirado
+                resultado = supabase.table('candidatos_vagas').update({
+                    'status_processo': 'expirado',
+                    'observacoes': f"{rel.get('observacoes', '')}\n\n[SISTEMA - {datetime.now().strftime('%d/%m/%Y %H:%M')}] Relacionamento expirado automaticamente após 90 dias",
+                    'updated_at': datetime.now().isoformat()
+                }).eq('id', rel['id']).execute()
+                
+                if resultado.data:
+                    count_expirados += 1
+                    
+                    # Liberar status do candidato (volta para disponível)
+                    supabase.table('candidatos').update({
+                        'status_candidato': 'disponivel'
+                    }).eq('id', rel['candidato_id']).execute()
+                    
+                    # Verificar se vaga deve voltar para ativa
+                    outros_relacionamentos = supabase.table('candidatos_vagas').select('id').eq('vaga_id', rel['vaga_id']).not_.in_('status_processo', ['finalizado', 'expirado', 'rejeitado', 'cancelado']).execute()
+                    
+                    if not outros_relacionamentos.data:
+                        # Nenhum relacionamento ativo restante, vaga volta para ativa
+                        supabase.table('vagas').update({
+                            'status_detalhado': 'ativa'
+                        }).eq('id', rel['vaga_id']).execute()
+            
+            if count_expirados > 0:
+                st.info(f"🔄 {count_expirados} relacionamentos antigos foram expirados automaticamente")
+                
+    except Exception as e:
+        st.error(f"❌ Erro ao expirar relacionamentos antigos: {str(e)}")
+
+def validar_limite_candidatos_vaga(vaga_id):
+    """Valida se vaga já atingiu limite máximo de 5 candidatos ativos"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Contar relacionamentos ativos para esta vaga
+        relacionamentos_ativos = supabase.table('candidatos_vagas').select('id', count='exact').eq('vaga_id', vaga_id).not_.in_('status_processo', ['finalizado', 'expirado', 'rejeitado', 'cancelado']).execute()
+        
+        return relacionamentos_ativos.count < 5, relacionamentos_ativos.count
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao validar limite de candidatos: {str(e)}")
+        return False, 0
+
+def verificar_relacionamento_existente(candidato_id, vaga_id):
+    """Verifica se já existe relacionamento entre candidato e vaga"""
+    try:
+        supabase = get_supabase_client()
+        
+        relacionamento_existente = supabase.table('candidatos_vagas').select('id', 'status_processo').eq('candidato_id', candidato_id).eq('vaga_id', vaga_id).execute()
+        
+        if relacionamento_existente.data:
+            # Relacionamento existe - verificar se está ativo
+            status = relacionamento_existente.data[0].get('status_processo')
+            if status not in ['finalizado', 'expirado']:
+                return True, status
+        
+        return False, None
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao verificar relacionamento existente: {str(e)}")
+        return True, "erro"  # Em caso de erro, bloquear por segurança
+
+def atualizar_status_automatico(candidato_id, vaga_id, acao='criar'):
+    """Atualiza status automático de candidatos e vagas"""
+    try:
+        supabase = get_supabase_client()
+        
+        if acao == 'criar':
+            # Ao criar relacionamento
+            # Candidato fica "em_processo"
+            supabase.table('candidatos').update({
+                'status_candidato': 'em_processo'
+            }).eq('id', candidato_id).execute()
+            
+            # Vaga fica "em_andamento"
+            supabase.table('vagas').update({
+                'status_detalhado': 'em_andamento'
+            }).eq('id', vaga_id).execute()
+            
+        elif acao == 'finalizar':
+            # Ao finalizar relacionamento
+            # Candidato volta para "disponivel" (exceto se foi contratado)
+            supabase.table('candidatos').update({
+                'status_candidato': 'disponivel'
+            }).eq('id', candidato_id).execute()
+            
+            # Verificar se vaga deve voltar para "ativa"
+            outros_relacionamentos = supabase.table('candidatos_vagas').select('id').eq('vaga_id', vaga_id).not_.in_('status_processo', ['finalizado', 'expirado', 'rejeitado', 'cancelado']).execute()
+            
+            if not outros_relacionamentos.data:
+                # Nenhum relacionamento ativo restante
+                supabase.table('vagas').update({
+                    'status_detalhado': 'ativa'
+                }).eq('id', vaga_id).execute()
+        
+        return True
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao atualizar status automático: {str(e)}")
+        return False
+
+def finalizar_relacionamento(relacionamento_id, resultado_final, motivo=""):
+    """Finaliza um relacionamento e libera status de candidato/vaga"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Buscar dados do relacionamento
+        relacionamento = supabase.table('candidatos_vagas').select('*').eq('id', relacionamento_id).execute()
+        
+        if not relacionamento.data:
+            return False, "Relacionamento não encontrado"
+        
+        rel = relacionamento.data[0]
+        
+        # Construir observação de finalização
+        timestamp = datetime.now().strftime('%d/%m/%Y %H:%M')
+        observacao_finalizacao = f"\n\n[SISTEMA - {timestamp}] Relacionamento finalizado. Resultado: {resultado_final.upper()}"
+        
+        if motivo.strip():
+            observacao_finalizacao += f". Motivo: {motivo}"
+        
+        observacao_atual = rel.get('observacoes', '')
+        observacao_completa = f"{observacao_atual}{observacao_finalizacao}"
+        
+        # Status final baseado no resultado
+        status_final_map = {
+            'contratado': 'contratado',
+            'rejeitado': 'rejeitado',
+            'cancelado': 'cancelado',
+            'desistiu': 'finalizado',
+            'outro': 'finalizado'
+        }
+        
+        status_final = status_final_map.get(resultado_final, 'finalizado')
+        
+        # Atualizar relacionamento
+        resultado_update = supabase.table('candidatos_vagas').update({
+            'status_processo': status_final,
+            'observacoes': observacao_completa,
+            'updated_at': datetime.now().isoformat()
+        }).eq('id', relacionamento_id).execute()
+        
+        if resultado_update.data:
+            # Atualizar status automático apenas se NÃO foi contratado
+            if resultado_final != 'contratado':
+                atualizar_status_automatico(rel['candidato_id'], rel['vaga_id'], 'finalizar')
+            else:
+                # Se foi contratado, candidato fica "contratado" e vaga "preenchida"
+                supabase.table('candidatos').update({
+                    'status_candidato': 'contratado'
+                }).eq('id', rel['candidato_id']).execute()
+                
+                supabase.table('vagas').update({
+                    'status_detalhado': 'preenchida'
+                }).eq('id', rel['vaga_id']).execute()
+            
+            return True, "Relacionamento finalizado com sucesso"
+        
+        return False, "Erro ao finalizar relacionamento"
+        
+    except Exception as e:
+        return False, f"Erro técnico: {str(e)}"
 
 @st.cache_data(ttl=300)
 def carregar_vagas():
@@ -372,9 +551,25 @@ def formatar_status_vaga(status):
     return f"{info['icon']} {info['text']}", info['color']
 
 def relacionar_candidato_vaga_com_status(candidato_id, vaga_id, observacao="", status_inicial="enviado", data_entrevista=None):
-    """Relaciona candidato com vaga permitindo definir status inicial"""
+    """Relaciona candidato com vaga com validações robustas"""
     try:
         supabase = get_supabase_client()
+        
+        # ✅ VALIDAÇÃO 1: Verificar se relacionamento já existe
+        existe_relacionamento, status_existente = verificar_relacionamento_existente(candidato_id, vaga_id)
+        if existe_relacionamento:
+            return False, f"❌ Candidato já está relacionado a esta vaga com status '{status_existente}'"
+        
+        # ✅ VALIDAÇÃO 2: Verificar limite máximo de candidatos por vaga (5)
+        dentro_do_limite, count_atual = validar_limite_candidatos_vaga(vaga_id)
+        if not dentro_do_limite:
+            return False, f"❌ Vaga já possui o limite máximo de 5 candidatos ativos (atual: {count_atual})"
+        
+        # ✅ VALIDAÇÃO 3: Verificar se candidato não está em processo em outra vaga
+        candidato_ativo = supabase.table('candidatos_vagas').select('id', 'vaga_id').eq('candidato_id', candidato_id).not_.in_('status_processo', ['finalizado', 'expirado', 'rejeitado', 'cancelado']).execute()
+        
+        if candidato_ativo.data:
+            return False, f"❌ Candidato já está em processo ativo em outra vaga"
         
         # Criar observação automática baseada no status
         timestamp = datetime.now().strftime('%d/%m/%Y %H:%M')
@@ -414,21 +609,28 @@ def relacionar_candidato_vaga_com_status(candidato_id, vaga_id, observacao="", s
         if data_entrevista:
             dados_relacao['data_entrevista'] = data_entrevista.isoformat()
         
+        # ✅ CRIAR RELACIONAMENTO
         result = supabase.table('candidatos_vagas').insert(dados_relacao).execute()
         
         if result.data:
-            # Adicionar observação automática na vaga
-            obs_vaga = f"Candidato relacionado com status '{status_inicial.upper().replace('_', ' ')}'. {observacao.strip()}"
-            if data_entrevista:
-                obs_vaga += f" Entrevista: {data_entrevista.strftime('%d/%m/%Y às %H:%M')}"
-            
-            adicionar_observacao_vaga(vaga_id, obs_vaga, 'candidato_enviado')
-            return True
-        return False
+            # ✅ VALIDAÇÃO 4: Atualizar status automático
+            if atualizar_status_automatico(candidato_id, vaga_id, 'criar'):
+                
+                # Adicionar observação automática na vaga
+                obs_vaga = f"Candidato relacionado com status '{status_inicial.upper().replace('_', ' ')}'. {observacao.strip()}"
+                if data_entrevista:
+                    obs_vaga += f" Entrevista: {data_entrevista.strftime('%d/%m/%Y às %H:%M')}"
+                
+                adicionar_observacao_vaga(vaga_id, obs_vaga, 'candidato_enviado')
+                
+                return True, "✅ Relacionamento criado com sucesso! Status automático atualizado."
+            else:
+                return True, "✅ Relacionamento criado, mas houve problema ao atualizar status automático."
+        
+        return False, "❌ Erro técnico ao criar relacionamento"
         
     except Exception as e:
-        st.error(f"❌ Erro ao relacionar candidato-vaga: {str(e)}")
-        return False
+        return False, f"❌ Erro técnico: {str(e)}"
 
 def carregar_relacionamentos():
     """Carrega relacionamentos candidatos-vagas"""
@@ -1092,11 +1294,14 @@ def gerenciar_relacionamentos():
             elif status_inicial == "entrevista_agendada" and not data_entrevista_inicial:
                 st.error("❌ Para criar relacionamento com status 'entrevista_agendada', é obrigatório definir data e hora!")
             else:
-                if relacionar_candidato_vaga_com_status(candidato_selecionado, vaga_selecionada, observacao_inicial, status_inicial, data_entrevista_inicial):
-                    st.success("✅ Relacionamento criado com sucesso!")
-                    st.rerun()
-                else:
-                    st.error("❌ Erro ao criar relacionamento (pode já existir)")
+                with st.spinner("🔄 Validando e criando relacionamento..."):
+                    sucesso, mensagem = relacionar_candidato_vaga_com_status(candidato_selecionado, vaga_selecionada, observacao_inicial, status_inicial, data_entrevista_inicial)
+                    
+                    if sucesso:
+                        st.success(mensagem)
+                        st.rerun()
+                    else:
+                        st.error(mensagem)
     
     st.markdown("---")
     
@@ -1237,9 +1442,37 @@ def gerenciar_relacionamentos():
                 
                 # PAINEL DE CONTROLE
                 with st.expander("⚙️ Painel de Controle", expanded=False):
-                    tab_obs, tab_status, tab_troca, tab_excluir = st.tabs(
-                        ["📝 Observações", "🔄 Alterar Status", "🔀 Trocar Candidato", "🗑️ Excluir"]
+                    tab_obs, tab_status, tab_troca, tab_finalizar, tab_excluir = st.tabs(
+                        ["📝 Observações", "🔄 Alterar Status", "🔀 Trocar Candidato", "🏁 Finalizar", "🗑️ Excluir"]
                     )
+                    
+                    # ABA FINALIZAR
+                    with tab_finalizar:
+                        st.warning("**Use esta opção quando o processo for concluído (contratação, rejeição, etc.)**")
+                        
+                        resultado_final = st.selectbox(
+                            "Resultado do processo:",
+                            ["contratado", "rejeitado", "cancelado", "desistiu", "outro"],
+                            key=f"resultado_{rel.get('id')}"
+                        )
+                        
+                        motivo_finalizacao = st.text_area(
+                            "Motivo/Observação final:",
+                            placeholder="Ex: Cliente contratou candidato. Início em 15/10/2025",
+                            key=f"motivo_fin_{rel.get('id')}"
+                        )
+                        
+                        if st.button("🏁 Finalizar Processo", key=f"finalizar_{rel.get('id')}", type="secondary"):
+                            if motivo_finalizacao.strip():
+                                sucesso, mensagem = finalizar_relacionamento(rel.get('id'), resultado_final, motivo_finalizacao)
+                                if sucesso:
+                                    st.success(mensagem)
+                                    st.cache_data.clear()
+                                    st.rerun()
+                                else:
+                                    st.error(mensagem)
+                            else:
+                                st.error("Informe o motivo da finalização")
                     
                     # ABA OBSERVAÇÕES
                     with tab_obs:
@@ -1463,6 +1696,10 @@ def main():
         <p>Gerenciamento Completo de Candidatos e Vagas</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # ✅ EXECUTAR EXPIRAÇÃO AUTOMÁTICA NO CARREGAMENTO
+    with st.spinner("🔄 Verificando relacionamentos antigos..."):
+        expirar_relacionamentos_antigos()
     
     # SISTEMA DE ABAS
     tab1, tab2, tab3 = st.tabs(["👥 Candidatos", "💼 Vagas", "🔗 Relacionamentos"])
