@@ -1,3 +1,59 @@
+# Imports existentes...
+import sys
+import os
+import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
+
+# Adicionar pasta backend ao path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+
+# ⭐ NOVO: Import de autenticação
+from auth import verificar_autenticacao, exibir_info_usuario_sidebar
+
+# Imports existentes do backend...
+from supabase_client import get_supabase_client
+from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa
+
+# ============================================
+# CONFIGURAÇÃO DA PÁGINA (APENAS UMA VEZ!)
+# ============================================
+
+st.set_page_config(
+    page_title="R.O Recrutamento - Dashboard",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# ============================================
+# ⭐ VERIFICAÇÃO DE AUTENTICAÇÃO (NOVO)
+# ============================================
+
+# CRÍTICO: Esta linha deve vir ANTES de qualquer outro código
+name, username, authenticator = verificar_autenticacao()
+
+# Se chegou aqui, usuário está autenticado! ✅
+
+# ============================================
+# CSS PERSONALIZADO (código existente...)
+# ============================================
+
+st.markdown("""
+<style>
+    .main-header {
+        background: linear-gradient(90deg, #a65e2e 0%, #d4a574 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: white;
+    }
+    
+    /* ... resto do CSS ... */
+</style>
+""", unsafe_allow_html=True)
+
 def gerenciar_candidatos():
     """Função com código existente dos candidatos + FILTROS AVANÇADOS"""
     
@@ -2781,12 +2837,20 @@ def gerenciar_relacionamentos():
 def main():
     """Função principal com sistema de abas"""
     # CABEÇALHO
-    st.markdown("""
+    st.markdown(f"""
     <div class="main-header">
-        <h1>🏠 R.O RECRUTAMENTO - Dashboard</h1>
-        <p>Gerenciamento Completo de Candidatos e Vagas</p>
+        <h1>🏠 R.O Recrutamento - Dashboard</h1>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+            Bem-vindo(a), {name}!
+        </p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # SIDEBAR
+    st.sidebar.title("📊 Menu Principal")
+    
+    # ⭐ Exibir info do usuário na sidebar
+    exibir_info_usuario_sidebar(name, username, authenticator)
     
     # ✅ EXECUTAR EXPIRAÇÃO AUTOMÁTICA NO CARREGAMENTO
     with st.spinner("🔄 Verificando relacionamentos antigos..."):
