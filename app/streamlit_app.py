@@ -1463,8 +1463,341 @@ def excluir_relacionamento(relacionamento_id):
     except Exception as e:
         st.error(f"❌ Erro ao excluir relacionamento: {str(e)}")
         return False
+    
+# ====================================
+# FUNÇÕES DE BACKUP
+# ====================================
 
-# =====================================
+# ============================================
+# ADICIONAR ESTAS FUNÇÕES AO streamlit_app.py
+# ============================================
+
+# No início do arquivo, adicionar import:
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+
+from google_drive_backup_oauth import (
+    criar_backup_automatico,
+    listar_backups_disponiveis,
+    GoogleDriveBackupOAuth
+)
+
+# ============================================
+# FUNÇÕES DE BACKUP
+# ============================================
+
+def gerenciar_backups():
+    """Nova aba para gerenciar backups do sistema"""
+    
+    st.header("💾 Sistema de Backup - Google Drive")
+    
+    # Informações do sistema
+    with st.expander("ℹ️ Sobre o Sistema de Backup", expanded=False):
+        st.markdown("""
+        ### 🎯 Funcionalidades
+        - **Backup Automático**: Todos os dados do Supabase salvos no Google Drive
+        - **Compressão ZIP**: Backups comprimidos para economizar espaço
+        - **Retenção Inteligente**: Mantém apenas os backups mais recentes
+        - **Restauração Fácil**: Restaure dados com um clique
+        
+        ### 📊 Dados Incluídos no Backup
+        - ✅ Candidatos
+        - ✅ Candidatos Qualificados
+        - ✅ Vagas
+        - ✅ Observações de Vagas
+        - ✅ Relacionamentos Candidato-Vaga
+        
+        ### 🔒 Segurança
+        - Conexão criptografada com Google Drive
+        - Service Account com permissões limitadas
+        - Dados armazenados em pasta privada
+        """)
+    
+    st.markdown("---")
+    
+    # ===== SEÇÃO 1: CRIAR NOVO BACKUP =====
+    st.subheader("🆕 Criar Novo Backup")
+    
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
+    with col1:
+        st.info("💡 O backup incluirá todas as tabelas do sistema e será salvo automaticamente no Google Drive")
+    
+    with col2:
+        compress = st.checkbox("🗜️ Comprimir (ZIP)", value=True, key="compress_backup")
+    
+    with col3:
+        if st.button("▶️ Criar Backup", type="primary", use_container_width=True):
+            with st.spinner("⏳ Criando backup..."):
+                try:
+                    sucesso, file_id = criar_backup_automatico()
+                    
+                    if sucesso:
+                        st.success(f"✅ Backup criado com sucesso!")
+                        st.info(f"🆔 File ID: `{file_id}`")
+                        st.balloons()
+                        
+                        # Atualizar lista
+                        st.rerun()
+                    else:
+                        st.error("❌ Falha ao criar backup. Verifique os logs.")
+                        
+                except Exception as e:
+                    st.error(f"❌ Erro: {str(e)}")
+    
+    st.markdown("---")
+    
+    # ===== SEÇÃO 2: BACKUPS DISPONÍVEIS =====
+    st.subheader("📋 Backups Disponíveis")
+    
+    with st.spinner("🔄 Carregando lista de backups..."):
+        try:
+            backups = listar_backups_disponiveis()
+            
+            if not backups:
+                st.warning("⚠️ Nenhum backup encontrado. Crie o primeiro backup acima!")
+            else:
+                st.success(f"✅ {len(backups)} backup(s) disponível(is)")
+                
+                # Exibir em cards
+                for idx, backup in enumerate(backups):
+                    with st.container():
+                        col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+                        
+                        with col1:
+                            st.write(f"**📦 {backup['name']}**")
+                        
+                        with col2:
+                            # Formatar data
+                            from datetime import datetime
+                            try:
+                                data_obj = datetime.fromisoformat(backup['created'].replace('Z', '+00:00'))
+                                data_formatada = data_obj.strftime('%d/%m/%Y %H:%M')
+                            except:
+                                data_formatada = backup['created']
+                            
+                            st.write(f"🕐 {data_formatada}")
+                        
+                        with col3:
+                            st.write(f"💾 {backup['size_mb']} MB")
+                        
+                        with col4:
+                            # Botão de download
+                            if st.button("⬇️", key=f"download_{idx}", help="Baixar backup"):
+                                st.info("💡 Função de download será implementada")
+                        
+                        st.markdown("---")
+                
+        except Exception as e:
+            st.error(f"❌ Erro ao listar backups: {str(e)}")
+    
+    st.markdown("---")
+    
+    # ===== SEÇÃO 3: RESTAURAÇÃO =====
+    st.subheader("♻️ Restaurar Backup")
+    
+    with st.expander("⚠️ ATENÇÃO - Restauração de Dados", expanded=False):
+        st.warning("""
+        ### ⚠️ Importante
+        A restauração irá **SOBRESCREVER** os dados atuais do banco de dados.
+        
+        **Recomendações:**
+        1. Crie um backup dos dados atuais antes de restaurar
+        2. Verifique qual backup deseja restaurar
+        3. Entre em contato com o suporte se tiver dúvidas
+        
+        **Esta ação não pode ser desfeita!**
+        """)
+        
+        # Seleção de backup para restaurar
+        if backups:
+            backup_options = {
+                backup['name']: backup['id'] 
+                for backup in backups
+            }
+            
+            backup_selecionado = st.selectbox(
+                "Selecione o backup para restaurar:",
+                options=list(backup_options.keys()),
+                key="select_backup_restore"
+            )
+            
+            # Opções de restauração
+            st.write("**Tabelas a restaurar:**")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                restore_candidatos = st.checkbox("✅ Candidatos", value=True)
+                restore_qualificados = st.checkbox("✅ Candidatos Qualificados", value=True)
+                restore_vagas = st.checkbox("✅ Vagas", value=True)
+            
+            with col2:
+                restore_observacoes = st.checkbox("✅ Observações de Vagas", value=True)
+                restore_relacionamentos = st.checkbox("✅ Relacionamentos", value=True)
+            
+            st.markdown("---")
+            
+            # Confirmação dupla
+            confirmar1 = st.checkbox("⚠️ Entendo que esta ação sobrescreverá os dados atuais", key="confirm1")
+            confirmar2 = st.checkbox("⚠️ Tenho certeza que quero restaurar este backup", key="confirm2")
+            
+            if confirmar1 and confirmar2:
+                if st.button("♻️ RESTAURAR BACKUP", type="secondary", use_container_width=True):
+                    
+                    # Coletar tabelas selecionadas
+                    tabelas = []
+                    if restore_candidatos:
+                        tabelas.append('candidatos')
+                    if restore_qualificados:
+                        tabelas.append('candidatos_qualificados')
+                    if restore_vagas:
+                        tabelas.append('vagas')
+                    if restore_observacoes:
+                        tabelas.append('vaga_observacoes')
+                    if restore_relacionamentos:
+                        tabelas.append('candidatos_vagas')
+                    
+                    if not tabelas:
+                        st.error("❌ Selecione pelo menos uma tabela para restaurar!")
+                    else:
+                        with st.spinner("⏳ Restaurando backup... Isso pode levar alguns minutos..."):
+                            try:
+                                from dotenv import load_dotenv
+                                load_dotenv()
+                                
+                                service_account_file = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE')
+                                folder_id = os.getenv('GOOGLE_DRIVE_BACKUP_FOLDER_ID')
+                                
+                                backup_manager = GoogleDriveBackup(
+                                    service_account_file=service_account_file,
+                                    folder_id=folder_id
+                                )
+                                
+                                file_id = backup_options[backup_selecionado]
+                                
+                                sucesso = backup_manager.restore_backup(
+                                    file_id=file_id,
+                                    tables=tabelas
+                                )
+                                
+                                if sucesso:
+                                    st.success("✅ Backup restaurado com sucesso!")
+                                    st.info("🔄 Recarregue a página para ver os dados restaurados")
+                                    st.balloons()
+                                else:
+                                    st.error("❌ Falha na restauração. Verifique os logs.")
+                                    
+                            except Exception as e:
+                                st.error(f"❌ Erro: {str(e)}")
+            else:
+                st.info("👆 Marque as duas confirmações acima para habilitar a restauração")
+    
+    st.markdown("---")
+    
+    # ===== SEÇÃO 4: CONFIGURAÇÕES =====
+    st.subheader("⚙️ Configurações de Backup")
+    
+    with st.expander("🔧 Configurações Avançadas", expanded=False):
+        
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**📁 Pasta do Google Drive:**")
+            folder_id = os.getenv('GOOGLE_DRIVE_BACKUP_FOLDER_ID', 'não configurado')
+            st.code(folder_id)
+            
+            st.write("**📊 Retenção de Backups:**")
+            max_retention = os.getenv('BACKUP_MAX_RETENTION', '30')
+            st.info(f"Mantém os {max_retention} backups mais recentes")
+        
+        with col2:
+            st.write("**🔐 Service Account:**")
+            service_account = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE', 'não configurado')
+            st.code(service_account)
+            
+            st.write("**⏰ Backup Automático:**")
+            auto_backup = os.getenv('BACKUP_AUTO_START', 'false')
+            if auto_backup.lower() == 'true':
+                st.success("✅ Ativado")
+            else:
+                st.warning("⚠️ Desativado")
+        
+        st.markdown("---")
+        
+        st.write("**💡 Dicas:**")
+        st.markdown("""
+        - Configure as variáveis no arquivo `.env`
+        - Teste a conexão criando um backup manual
+        - Backups automáticos rodam em segundo plano
+        - Use compressão ZIP para economizar espaço
+        """)
+
+
+# ============================================
+# BACKUP AUTOMÁTICO EM BACKGROUND
+# ============================================
+
+def iniciar_backup_automatico():
+    """
+    Inicia sistema de backup automático em background
+    Usar apenas se BACKUP_AUTO_START=true
+    """
+    from dotenv import load_dotenv
+    import schedule
+    import time
+    import threading
+    
+    load_dotenv()
+    
+    # Verificar se backup automático está ativado
+    auto_start = os.getenv('BACKUP_AUTO_START', 'false').lower() == 'true'
+    
+    if not auto_start:
+        return
+    
+    # Intervalo em horas
+    interval_hours = int(os.getenv('BACKUP_INTERVAL_HOURS', '24'))
+    
+    def job_backup():
+        """Job de backup"""
+        try:
+            logger.info(f"🔄 Iniciando backup automático agendado...")
+            sucesso, file_id = criar_backup_automatico()
+            
+            if sucesso:
+                logger.info(f"✅ Backup automático concluído: {file_id}")
+            else:
+                logger.error("❌ Falha no backup automático")
+                
+        except Exception as e:
+            logger.error(f"❌ Erro no backup automático: {e}")
+    
+    # Agendar backup
+    schedule.every(interval_hours).hours.do(job_backup)
+    
+    # Executar primeiro backup imediatamente
+    job_backup()
+    
+    def run_scheduler():
+        """Roda o agendador em thread separada"""
+        while True:
+            schedule.run_pending()
+            time.sleep(60)  # Verificar a cada minuto
+    
+    # Iniciar thread
+    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+    scheduler_thread.start()
+    
+    logger.info(f"✅ Backup automático ativado (intervalo: {interval_hours}h)")
+
+# ============================================
+# INICIALIZAÇÃO DO APP
+# ============================================
+#===================================
 # PÁGINAS/ABAS DO SISTEMA
 # =====================================
 
@@ -2460,7 +2793,7 @@ def main():
         expirar_relacionamentos_antigos()
     
     # SISTEMA DE ABAS COM MÉTRICAS
-    tab1, tab2, tab3, tab4 = st.tabs(["👥 Candidatos", "💼 Vagas", "🔗 Relacionamentos", "📊 Métricas"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["👥 Candidatos", "💼 Vagas", "🔗 Relacionamentos", "📊 Métricas", "Backups"])
     
     with tab1:
         gerenciar_candidatos()
@@ -2473,6 +2806,9 @@ def main():
     
     with tab4:
         gerenciar_metricas()
+        
+    with tab5:
+        gerenciar_backups()
 
     # RODAPÉ
     st.markdown("---")

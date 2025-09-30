@@ -1,0 +1,267 @@
+# ============================================
+# R.O RECRUTAMENTO - GITIGNORE
+# ============================================
+
+# ===== CREDENCIAIS E SEGURANÇA =====
+# NUNCA commitar estas informações sensíveis!
+.env
+.env.*
+credentials/
+service-account*.json
+*.json
+!package.json
+!requirements.json
+
+# Chaves e tokens
+*.key
+*.pem
+*.p12
+secrets/
+private/
+
+# ===== BACKUPS =====
+# Backups locais (os do Drive são gerenciados automaticamente)
+backups/
+backup_*.json
+backup_*.zip
+*.backup
+*.bak
+
+# Arquivos temporários de backup
+temp_backup/
+tmp_backup/
+
+# ===== PYTHON =====
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ===== STREAMLIT =====
+.streamlit/secrets.toml
+.streamlit/credentials.toml
+
+# ===== IDEs =====
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ===== SISTEMA OPERACIONAL =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ===== ARQUIVOS TEMPORÁRIOS =====
+*.tmp
+*.temp
+temp/
+tmp/
+.temp/
+.tmp/
+
+# ===== PDFs E DOCUMENTOS GERADOS =====
+# PDFs individuais gerados (não commitar)
+fichas_geradas/
+pdfs/
+*.pdf
+!templates/*.pdf
+!docs/*.pdf
+
+# ===== LOGS =====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===== NODE (SE USAR) =====
+node_modules/
+package-lock.json
+yarn.lock
+
+# ===== OUTROS =====
+# Arquivos de teste
+test_*.py
+*_test.py
+teste_*.py
+
+# Dumps de banco
+*.sql
+*.dump
+dump/
+
+# Arquivos de configuração local
+config.local.*
+settings.local.*
+# Credenciais OAuth
+credentials/credentials.json
+credentials/token.pickle
+credentials/service-account.json
+
+# Outros
+.env
+.env.*

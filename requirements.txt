@@ -1,4 +1,4 @@
-# R.O Recrutamento - Dependências com WeasyPrint
+# R.O Recrutamento - Dependï¿½ncias com WeasyPrint
 streamlit==1.39.0
 supabase==2.9.1
 weasyprint==62.3
@@ -12,3 +12,17 @@ cssselect2>=0.1
 html5lib>=1.0.1
 pyphen>=0.9.1
 tinycss2>=1.0.0
+reportlab>=4.0.0
+jinja2>=3.1.2
+# ===== GOOGLE DRIVE API (NOVO) =====
+google-api-python-client>=2.108.0
+google-auth>=2.25.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+# ===== UTILIDADES =====
+pandas>=2.0.0
+pillow>=10.0.0
+# ===== OPCIONAL - AGENDAMENTO DE BACKUPS =====
+schedule>=1.2.0
+apscheduler>=3.10.4
+pytz>=2025.2
