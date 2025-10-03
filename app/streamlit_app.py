@@ -8,6 +8,12 @@ from datetime import datetime, timedelta
 # Adicionar pasta backend ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
+from google_drive_backup_oauth import (
+    criar_backup_automatico,
+    listar_backups_disponiveis,
+    GoogleDriveBackupOAuth
+)
+
 # ⭐ NOVO: Import de autenticação
 from auth import verificar_autenticacao, exibir_info_usuario_sidebar
 
@@ -34,25 +40,6 @@ st.set_page_config(
 name, username, authenticator = verificar_autenticacao()
 
 # Se chegou aqui, usuário está autenticado! ✅
-
-# ============================================
-# CSS PERSONALIZADO (código existente...)
-# ============================================
-
-st.markdown("""
-<style>
-    .main-header {
-        background: linear-gradient(90deg, #a65e2e 0%, #d4a574 100%);
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: white;
-    }
-    
-    /* ... resto do CSS ... */
-</style>
-""", unsafe_allow_html=True)
 
 def gerenciar_vagas():
     """Nova funcionalidade para gestão de vagas + FILTROS AVANÇADOS"""
@@ -186,29 +173,6 @@ def gerenciar_vagas():
                     st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
             else:
                 st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
-                                # app/streamlit_app.py - VERSÃO CORRIGIDA E MELHORADA
-import sys
-import os
-import streamlit as st
-import pandas as pd
-from datetime import datetime, timedelta
-
-# Adicionar pasta backend ao path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-
-from supabase_client import get_supabase_client
-from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa
-
-# =====================================
-# CONFIGURAÇÃO DA PÁGINA (APENAS UMA VEZ!)
-# =====================================
-
-st.set_page_config(
-    page_title="R.O Recrutamento - Dashboard",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # =====================================
 # CSS PERSONALIZADO
@@ -260,15 +224,6 @@ st.markdown("""
 
 # =====================================
 # FUNÇÕES DE CANDIDATOS (PRESERVADAS 100%)
-# =====================================
-
-@st.cache_data(ttl=300)
-# =====================================
-# SUBSTITUIR A FUNÇÃO EXISTENTE POR ESTA
-# =====================================
-
-# =====================================
-# SUBSTITUIR A FUNÇÃO EXISTENTE POR ESTA
 # =====================================
 
 @st.cache_data(ttl=300)
@@ -404,58 +359,6 @@ def exibir_paginacao(total_registros, registros_por_pagina=100, key_prefix=""):
         return pagina_atual, offset
     else:
         return 1, 0
-    """
-    Exibe controles de paginação e retorna página atual e offset
-    
-    Args:
-        total_registros (int): Total de registros disponíveis
-        registros_por_pagina (int): Quantos registros por página
-        key_prefix (str): Prefixo para keys únicos do Streamlit
-    
-    Returns:
-        tuple(int, int): (pagina_atual, offset)
-    """
-    total_paginas = (total_registros // registros_por_pagina) + (1 if total_registros % registros_por_pagina > 0 else 0)
-    
-    if total_paginas > 1:
-        col_prev, col_info, col_next = st.columns([1, 2, 1])
-        
-        # Garantir que página atual existe no session_state
-        if f"{key_prefix}_pagina_atual" not in st.session_state:
-            st.session_state[f"{key_prefix}_pagina_atual"] = 1
-        
-        pagina_atual = st.session_state[f"{key_prefix}_pagina_atual"]
-        
-        with col_prev:
-            if pagina_atual > 1:
-                if st.button("⬅️ Anterior", key=f"{key_prefix}_prev"):
-                    st.session_state[f"{key_prefix}_pagina_atual"] -= 1
-                    st.rerun()
-        
-        with col_info:
-            st.write(f"**Página {pagina_atual} de {total_paginas}** ({total_registros} total)")
-        
-        with col_next:
-            if pagina_atual < total_paginas:
-                if st.button("Próxima ➡️", key=f"{key_prefix}_next"):
-                    st.session_state[f"{key_prefix}_pagina_atual"] += 1
-                    st.rerun()
-        
-        offset = (pagina_atual - 1) * registros_por_pagina
-        return pagina_atual, offset
-    else:
-        return 1, 0
-    """Carrega candidatos com paginação"""
-    query = supabase.table('candidatos').select('*', count='exact')
-    
-    if filtros:
-        if filtros.get('funcao'):
-            query = query.eq('formulario_id', filtros['funcao'])
-        if filtros.get('cidade'):
-            query = query.eq('cidade', filtros['cidade'])
-    
-    response = query.range(offset, offset + limite - 1).order('created_at', desc=True).execute()
-    return pd.DataFrame(response.data), response.count
 
 def qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor):
     """Função simplificada para qualificar candidato"""
@@ -561,45 +464,7 @@ def carregar_candidatos_qualificados(limite=100, offset=0, retornar_contagem=Fal
         if retornar_contagem:
             return pd.DataFrame(), 0
         return pd.DataFrame()
-    """Carrega candidatos qualificados com dados combinados"""
-    try:
-        supabase = get_supabase_client()
-        
-        # Buscar qualificações
-        qualificacoes = supabase.table('candidatos_qualificados').select('*').execute()
-        
-        if not qualificacoes.data:
-            return pd.DataFrame()
-        
-        # Buscar candidatos que estão qualificados
-        candidatos_ids = [q['candidato_id'] for q in qualificacoes.data]
-        candidatos = supabase.table('candidatos').select('*').in_('id', candidatos_ids).execute()
-        
-        if not candidatos.data:
-            return pd.DataFrame()
-        
-        # Combinar dados manualmente
-        dados_combinados = []
-        for candidato in candidatos.data:
-            qualificacao = next((q for q in qualificacoes.data if q['candidato_id'] == candidato['id']), None)
-            
-            if qualificacao:
-                candidato_completo = candidato.copy()
-                candidato_completo.update({
-                    'data_qualificacao': qualificacao.get('data_qualificacao'),
-                    'nota_treinamento': qualificacao.get('nota_treinamento'),
-                    'certificado_emitido': qualificacao.get('certificado_emitido'),
-                    'certificado_numero': qualificacao.get('certificado_numero'),
-                    'instrutor_responsavel': qualificacao.get('instrutor_responsavel')
-                })
-                dados_combinados.append(candidato_completo)
-        
-        return pd.DataFrame(dados_combinados)
-            
-    except Exception as e:
-        st.error(f"Erro ao carregar candidatos qualificados: {str(e)}")
-        return pd.DataFrame()
-
+    
 @st.cache_data(ttl=300)
 def carregar_candidatos_pendentes(limite=100, offset=0, retornar_contagem=False):
     """Carrega candidatos pendentes usando LEFT JOIN no banco"""
@@ -648,35 +513,7 @@ def carregar_candidatos_pendentes(limite=100, offset=0, retornar_contagem=False)
         if retornar_contagem:
             return pd.DataFrame(), 0
         return pd.DataFrame()
-    """Carrega candidatos que ainda não foram qualificados"""
-    try:
-        supabase = get_supabase_client()
-        
-        # Buscar todos os candidatos
-        todos_candidatos = supabase.table('candidatos').select('*').execute()
-        
-        if not todos_candidatos.data:
-            return pd.DataFrame()
-        
-        # Buscar IDs dos candidatos já qualificados
-        qualificacoes = supabase.table('candidatos_qualificados').select('candidato_id').execute()
-        
-        candidatos_qualificados_ids = []
-        if qualificacoes.data:
-            candidatos_qualificados_ids = [q['candidato_id'] for q in qualificacoes.data]
-        
-        # Filtrar candidatos pendentes
-        candidatos_pendentes = [
-            c for c in todos_candidatos.data 
-            if c['id'] not in candidatos_qualificados_ids
-        ]
-        
-        return pd.DataFrame(candidatos_pendentes)
-            
-    except Exception as e:
-        st.error(f"Erro ao carregar candidatos pendentes: {str(e)}")
-        return pd.DataFrame()
-
+    
 def formatar_whatsapp_link(numero_whatsapp):
     """Converte número do WhatsApp em link clicável"""
     if not numero_whatsapp or numero_whatsapp == 'Não informado' or str(numero_whatsapp).lower() == 'nan':
@@ -823,85 +660,7 @@ def calcular_metricas_negocio(data_limite):
             'funcoes_demandadas': {},
             'motivos_rejeicao': []
         }
-    """Calcula métricas de negócio para o período especificado"""
-    try:
-        supabase = get_supabase_client()
-        
-        # 1. Total candidatos/vagas no período
-        candidatos_periodo = supabase.table('candidatos').select('id', count='exact').gte('created_at', data_limite.isoformat()).execute()
-        
-        vagas_periodo = supabase.table('vagas').select('id', count='exact').gte('created_at', data_limite.isoformat()).execute()
-        
-        # 2. Relacionamentos ativos/finalizados no período
-        relacionamentos_periodo = supabase.table('candidatos_vagas').select('*').gte('data_envio', data_limite.isoformat()).execute()
-        
-        total_processos = len(relacionamentos_periodo.data) if relacionamentos_periodo.data else 0
-        
-        # Contar contratações
-        contratacoes = len([r for r in relacionamentos_periodo.data if r.get('status_processo') == 'contratado']) if relacionamentos_periodo.data else 0
-        
-        # Contar rejeições
-        rejeicoes = len([r for r in relacionamentos_periodo.data if r.get('status_processo') == 'rejeitado']) if relacionamentos_periodo.data else 0
-        
-        # 3. Taxa de conversão
-        taxa_conversao = (contratacoes / total_processos * 100) if total_processos > 0 else 0
-        
-        # 4. Tempo médio de processo (aproximado)
-        tempos_processo = []
-        if relacionamentos_periodo.data:
-            hoje = datetime.now()
-            for rel in relacionamentos_periodo.data:
-                if rel.get('status_processo') in ['contratado', 'rejeitado', 'finalizado']:
-                    data_envio = pd.to_datetime(rel.get('data_envio'))
-                    data_update = pd.to_datetime(rel.get('updated_at', rel.get('data_envio')))
-                    tempo_dias = (data_update - data_envio).days
-                    tempos_processo.append(max(1, tempo_dias))  # Mínimo 1 dia
-        
-        tempo_medio = sum(tempos_processo) / len(tempos_processo) if tempos_processo else 0
-        
-        # 5. Funções mais demandadas
-        funcoes_vagas = {}
-        if relacionamentos_periodo.data:
-            for rel in relacionamentos_periodo.data:
-                # Buscar tipo de vaga
-                vaga_resp = supabase.table('vagas').select('formulario_id').eq('id', rel.get('vaga_id')).execute()
-                if vaga_resp.data:
-                    funcao = vaga_resp.data[0].get('formulario_id', 'Não especificado')
-                    funcoes_vagas[funcao] = funcoes_vagas.get(funcao, 0) + 1
-        
-        # 6. Motivos de rejeição
-        motivos_rejeicao = []
-        if relacionamentos_periodo.data:
-            for rel in relacionamentos_periodo.data:
-                if rel.get('status_processo') == 'rejeitado' and rel.get('observacoes'):
-                    motivos_rejeicao.append(rel.get('observacoes', ''))
-        
-        return {
-            'total_candidatos': candidatos_periodo.count,
-            'total_vagas': vagas_periodo.count,
-            'total_processos': total_processos,
-            'contratacoes': contratacoes,
-            'rejeicoes': rejeicoes,
-            'taxa_conversao': taxa_conversao,
-            'tempo_medio': tempo_medio,
-            'funcoes_demandadas': dict(sorted(funcoes_vagas.items(), key=lambda x: x[1], reverse=True)[:5]),
-            'motivos_rejeicao': motivos_rejeicao
-        }
-        
-    except Exception as e:
-        st.error(f"❌ Erro ao calcular métricas: {str(e)}")
-        return {
-            'total_candidatos': 0,
-            'total_vagas': 0,
-            'total_processos': 0,
-            'contratacoes': 0,
-            'rejeicoes': 0,
-            'taxa_conversao': 0,
-            'tempo_medio': 0,
-            'funcoes_demandadas': {},
-            'motivos_rejeicao': []
-        }
-
+    
 def exibir_dashboard_metricas(metricas, periodo_nome):
     """Exibe dashboard de métricas de negócio"""
     
@@ -1461,20 +1220,7 @@ def carregar_vagas(
         if retornar_contagem:
             return pd.DataFrame(), 0
         return pd.DataFrame()
-    """Carrega vagas do Supabase"""
-    try:
-        supabase = get_supabase_client()
-        response = supabase.table('vagas').select('*').order('created_at', desc=True).execute()
-        
-        if response.data:
-            return pd.DataFrame(response.data)
-        else:
-            return pd.DataFrame()
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao carregar vagas: {str(e)}")
-        return pd.DataFrame()
-
+    
 def carregar_observacoes_vaga(vaga_id):
     """Carrega observações de uma vaga específica"""
     try:
@@ -1754,24 +1500,6 @@ def excluir_relacionamento(relacionamento_id):
         st.error(f"❌ Erro ao excluir relacionamento: {str(e)}")
         return False
     
-# ====================================
-# FUNÇÕES DE BACKUP
-# ====================================
-
-# ============================================
-# ADICIONAR ESTAS FUNÇÕES AO streamlit_app.py
-# ============================================
-
-# No início do arquivo, adicionar import:
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-
-from google_drive_backup_oauth import (
-    criar_backup_automatico,
-    listar_backups_disponiveis,
-    GoogleDriveBackupOAuth
-)
-
 # ============================================
 # FUNÇÕES DE BACKUP
 # ============================================
@@ -2027,63 +1755,6 @@ def gerenciar_backups():
         """)
 
 
-# ============================================
-# BACKUP AUTOMÁTICO EM BACKGROUND
-# ============================================
-
-def iniciar_backup_automatico():
-    """
-    Inicia sistema de backup automático em background
-    Usar apenas se BACKUP_AUTO_START=true
-    """
-    from dotenv import load_dotenv
-    import schedule
-    import time
-    import threading
-    
-    load_dotenv()
-    
-    # Verificar se backup automático está ativado
-    auto_start = os.getenv('BACKUP_AUTO_START', 'false').lower() == 'true'
-    
-    if not auto_start:
-        return
-    
-    # Intervalo em horas
-    interval_hours = int(os.getenv('BACKUP_INTERVAL_HOURS', '24'))
-    
-    def job_backup():
-        """Job de backup"""
-        try:
-            logger.info(f"🔄 Iniciando backup automático agendado...")
-            sucesso, file_id = criar_backup_automatico()
-            
-            if sucesso:
-                logger.info(f"✅ Backup automático concluído: {file_id}")
-            else:
-                logger.error("❌ Falha no backup automático")
-                
-        except Exception as e:
-            logger.error(f"❌ Erro no backup automático: {e}")
-    
-    # Agendar backup
-    schedule.every(interval_hours).hours.do(job_backup)
-    
-    # Executar primeiro backup imediatamente
-    job_backup()
-    
-    def run_scheduler():
-        """Roda o agendador em thread separada"""
-        while True:
-            schedule.run_pending()
-            time.sleep(60)  # Verificar a cada minuto
-    
-    # Iniciar thread
-    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-    scheduler_thread.start()
-    
-    logger.info(f"✅ Backup automático ativado (intervalo: {interval_hours}h)")
-
 #===================================
 # PÁGINAS/ABAS DO SISTEMA
 # =====================================
@@ -2249,19 +1920,23 @@ def gerenciar_candidatos():
                         st.write(f"**📄 Ficha gerada em:** {data_ficha}")
                 else:
                     st.warning("⏳ Ficha pendente")
-            
+
             with col2:
-                # Geração de PDF
-                nome_arquivo = f"ficha_{candidato.get('nome_completo', 'candidato').replace(' ', '_')}_{candidato.get('id', 'sem_id')}.pdf"
+                # ✅ SOLUÇÃO: Geração e download DIRETO sem session_state
+                candidato_id = candidato.get('id')
+                btn_gen_key = f"pdf_gen_{candidato_id}_{idx}"
                 
-            if st.button(f"📄 Gerar Ficha PDF", key=f"pdf_{unique_key}"):
-                    
-                with st.spinner("Gerando PDF..."):
-                    
+                # Verificar se já tem ficha gerada
+                if candidato.get('ficha_emitida'):
+                    st.success("✅ Ficha já gerada anteriormente")
+                    if candidato.get('data_ficha_gerada'):
+                        data_ficha = pd.to_datetime(candidato['data_ficha_gerada']).strftime('%d/%m/%Y às %H:%M')
+                        st.caption(f"📅 {data_ficha}")
+                
+                if st.button("📄 Gerar e Baixar Ficha PDF", key=btn_gen_key, type="primary"):
                     try:
-                        with st.spinner("Gerando PDF..."):
-                            st.write("🔍 Preparando dados do candidato...")
-                            
+                        with st.spinner("🔄 Gerando PDF..."):
+                            # Gerar PDF
                             resultado = gerar_ficha_candidato_completa(candidato)
                             
                             if isinstance(resultado, tuple):
@@ -2271,29 +1946,31 @@ def gerenciar_candidatos():
                                 nome_limpo = candidato.get('nome_completo', 'candidato').replace(' ', '_').lower()
                                 import re
                                 nome_limpo = re.sub(r'[^a-zA-Z0-9_]', '', nome_limpo)
-                                data_criacao = datetime.now().strftime('%d%m%Y')
-                                nome_arquivo = f"{nome_limpo}-{data_criacao}.pdf"
+                                nome_arquivo = f"{nome_limpo}-{datetime.now().strftime('%d%m%Y')}.pdf"
                             
-                            st.session_state[f"pdf_data_{candidato.get('id')}"] = pdf_bytes
-                            st.session_state[f"pdf_nome_{candidato.get('id')}"] = nome_arquivo
+                            # Atualizar status no banco ANTES do download
+                            atualizar_status_ficha(candidato_id)
                             
-                            st.success(f"✅ PDF gerado! Tamanho: {len(pdf_bytes)} bytes")
-                            st.info("👇 Clique no botão verde abaixo para baixar!")
+                            # ✅ Download DIRETO sem armazenar
+                            st.download_button(
+                                label="💾 CLIQUE PARA BAIXAR O PDF",
+                                data=pdf_bytes,
+                                file_name=nome_arquivo,
+                                mime="application/pdf",
+                                key=f"download_{candidato_id}_{idx}",
+                                type="primary",
+                                use_container_width=True
+                            )
                             
-                            if atualizar_status_ficha(candidato.get('id')):
-                                st.success("✅ Status atualizado no banco!")
-                                st.cache_data.clear()
-                            else:
-                                st.info("ℹ️ PDF gerado, mas status não atualizado")
+                            st.success("✅ PDF gerado com sucesso! Clique no botão acima para baixar.")
+                            st.info("💡 Dica: O download iniciará automaticamente ao clicar.")
                             
                     except Exception as e:
                         st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-                        st.error(f"🔧 Tipo do erro: {type(e).__name__}")
-                        
                         import traceback
-                        with st.expander("🔍 Detalhes técnicos do erro"):
-                            st.code(traceback.format_exc())
-
+                        st.error(f"🔍 Detalhes: {traceback.format_exc()}")
+                
+                
                 # Sistema de qualificação
                 if 'data_qualificacao' not in candidato:
                     candidato_id = candidato.get('id')
@@ -2336,185 +2013,6 @@ def gerenciar_candidatos():
                                         else:
                                             st.error("❌ Erro ao qualificar candidato. Tente novamente.")      
                 
-                # Botão de download
-                    
-                    st.download_button(
-                        label="📥 Baixar PDF",
-                        data=pdf_data,
-                        file_name=nome_arquivo,
-                        mime="application/pdf",
-                        key=f"download_{unique_key}"
-                    )
-                    
-                    st.success(f"✅ PDF pronto: {nome_arquivo}")
-
-def gerenciar_vagas():
-    """Nova funcionalidade para gestão de vagas"""
-    st.header("💼 Gestão de Vagas")
-    
-    # SIDEBAR - FILTROS
-    with st.sidebar:
-        st.subheader("🔍 Filtros de Vagas")
-        
-        filtro_status = st.selectbox(
-            "Status da vaga:",
-            ["Todas", "ativa", "preenchida", "pausada", "cancelada", "em_andamento"],
-            key="filtro_status_vagas"
-        )
-        
-        filtro_urgencia = st.selectbox(
-            "Urgência:",
-            ["Todas", "imediato", "ate-30-dias", "flexivel"],
-            key="filtro_urgencia_vagas"
-        )
-        
-        filtro_salario_min = st.number_input("Salário mínimo:", min_value=0, value=0)
-    
-    # CARREGAR VAGAS
-    with st.spinner("Carregando vagas..."):
-        df_vagas = carregar_vagas()
-    
-    if df_vagas.empty:
-        st.warning("⚠️ Nenhuma vaga encontrada.")
-        return
-    
-    df_vagas, total_vagas = carregar_vagas(limite=100, offset=0, retornar_contagem=True)
-    
-    # APLICAR FILTROS
-    df_filtrado = df_vagas.copy()
-    
-    if filtro_status != "Todas":
-        df_filtrado = df_filtrado[df_filtrado.get('status_detalhado', df_filtrado.get('status', '')) == filtro_status]
-    
-    if filtro_urgencia != "Todas":
-        df_filtrado = df_filtrado[df_filtrado.get('inicio_urgente', '') == filtro_urgencia]
-    
-    if filtro_salario_min > 0:
-        df_filtrado = df_filtrado[pd.to_numeric(df_filtrado.get('salario_oferecido', 0), errors='coerce') >= filtro_salario_min]
-    
-    # MÉTRICAS DE VAGAS
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("📊 Total Vagas", len(df_vagas))
-    
-    with col2:
-        vagas_ativas = len(df_vagas[df_vagas.get('status_detalhado', df_vagas.get('status', '')) == 'ativa'])
-        st.metric("🟢 Ativas", vagas_ativas)
-    
-    with col3:
-        vagas_preenchidas = len(df_vagas[df_vagas.get('status_detalhado', df_vagas.get('status', '')) == 'preenchida'])
-        st.metric("✅ Preenchidas", vagas_preenchidas)
-    
-    with col4:
-        vagas_urgentes = len(df_vagas[df_vagas.get('inicio_urgente', '') == 'imediato'])
-        st.metric("🔥 Urgentes", vagas_urgentes)
-    
-    # LISTA DE VAGAS
-    st.subheader(f"📋 Vagas Disponíveis ({len(df_filtrado)} encontradas)")
-    
-    pagina_atual, offset = exibir_paginacao(
-    total_registros=total_vagas,
-    registros_por_pagina=100,
-    key_prefix="vagas"
-    )
-    
-    for idx, vaga in df_filtrado.iterrows():
-        # OBTER STATUS FORMATADO
-        status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
-        status_display, status_color = formatar_status_vaga(status_atual)
-        
-        with st.expander(
-            f"{formatar_funcao_vaga(vaga.get('formulario_id', ''))} | "
-            f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')} | "
-            f"💰 R$ {vaga.get('salario_oferecido', 'N/A')} | "
-            f"📍 {vaga.get('cidade', 'N/A')} | "
-            f"{status_display}",
-            expanded=False
-        ):
-            
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # INFORMAÇÕES DA VAGA
-                st.write(f"**📧 Email:** {vaga.get('email', 'Não informado')}")
-                st.write(f"**📞 Telefone:** {vaga.get('telefone_principal', 'Não informado')}")
-                st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
-                st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
-                st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
-            
-            with col2:
-                # CONTROLES DE STATUS
-                st.subheader("🎛️ Controles")
-                
-                novo_status = st.selectbox(
-                    "Alterar status:",
-                    ["ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
-                    index=["ativa", "em_andamento", "preenchida", "pausada", "cancelada"].index(status_atual),
-                    key=f"status_{vaga.get('id')}"
-                )
-                
-                if st.button(f"💾 Atualizar Status", key=f"update_status_{vaga.get('id')}"):
-                    if atualizar_status_vaga(vaga.get('id'), novo_status):
-                        st.success("✅ Status atualizado!")
-                        # Adicionar observação automática
-                        obs_status = f"Status alterado para: {novo_status}"
-                        adicionar_observacao_vaga(vaga.get('id'), obs_status, 'status_change')
-                        st.rerun()
-                    else:
-                        st.error("❌ Erro ao atualizar")
-                
-                # BOTÃO GERAR PDF
-                if st.button(f"📄 Gerar Ficha Vaga", key=f"pdf_vaga_{vaga.get('id')}"):
-                    try:
-                        with st.spinner("Gerando PDF da vaga..."):
-                            # Usar sistema de PDF existente adaptado para vagas
-                            pdf_bytes, nome_arquivo = gerar_ficha_vaga_completa(vaga.to_dict())
-                            
-                            st.download_button(
-                                label="💾 Download Ficha Vaga",
-                                data=pdf_bytes,
-                                file_name=nome_arquivo,
-                                mime="application/pdf",
-                                key=f"download_vaga_{vaga.get('id')}"
-                            )
-                            
-                    except Exception as e:
-                        st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-            
-            # SEÇÃO DE OBSERVAÇÕES
-            st.subheader("📝 Observações e Histórico")
-            
-            # ADICIONAR NOVA OBSERVAÇÃO
-            with st.form(f"obs_form_{vaga.get('id')}"):
-                nova_obs = st.text_area("Nova observação:", placeholder="Ex: Enviado candidato João Silva em 15/09/2025")
-                
-                if st.form_submit_button("➕ Adicionar Observação"):
-                    if nova_obs.strip():
-                        if adicionar_observacao_vaga(vaga.get('id'), nova_obs):
-                            st.success("✅ Observação adicionada!")
-                            st.rerun()
-                        else:
-                            st.error("❌ Erro ao adicionar observação")
-                    else:
-                        st.warning("⚠️ Digite uma observação válida")
-            
-            # EXIBIR OBSERVAÇÕES EXISTENTES
-            observacoes = carregar_observacoes_vaga(vaga.get('id'))
-            
-            if observacoes:
-                st.write("**📚 Histórico de Observações:**")
-                for obs in observacoes:
-                    data_obs = pd.to_datetime(obs['data_criacao']).strftime('%d/%m/%Y às %H:%M')
-                    tipo_icon = {
-                        'geral': '📝',
-                        'candidato_enviado': '👤',
-                        'status_change': '🔄'
-                    }.get(obs.get('tipo_observacao', 'geral'), '📝')
-                    
-                    st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
-            else:
-                st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
 
 def gerenciar_relacionamentos():
     """Gestão de relacionamentos com interface melhorada"""
@@ -2727,10 +2225,10 @@ def gerenciar_relacionamentos():
         df_relacionamentos = carregar_relacionamentos(limite=100, offset=offset)
         
         # INTERFACE MELHORADA COM STREAMLIT NATIVO
-        for idx, rel in df_relacionamentos.iterrows():
-            # CALCULAR MÉTRICAS DE TEMPO
+        for rel in df_relacionamentos.to_dict('records'):  # ✅ RÁPIDO
             data_envio = pd.to_datetime(rel.get('data_envio'))
             data_criacao = pd.to_datetime(rel.get('created_at', rel.get('data_envio')))
+            # rel.get('data_envio') is already used above, so no need to reference it here
             
             # Normalizar timezone
             if data_envio.tz is not None:
@@ -3045,58 +2543,44 @@ def gerenciar_relacionamentos():
             st.metric("📊 Total", len(df_relacionamentos))
         
         with col2:
-            criticos = 0
-            for idx, r in df_relacionamentos.iterrows():
-                try:
-                    data_envio = pd.to_datetime(r.get('data_envio'))
-                    if data_envio.tz is not None:
-                        hoje_calc = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
-                    else:
-                        hoje_calc = pd.Timestamp.now().tz_localize(None)
-                        data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
-                    
-                    if (hoje_calc - data_envio).days >= 75:
-                        criticos += 1
-                except:
-                    pass
+            # ✅ VETORIZADO: 100x mais rápido
+            try:
+                # Converter datas uma vez só
+                df_temp = df_relacionamentos.copy()
+                df_temp['data_envio'] = pd.to_datetime(df_temp['data_envio'], errors='coerce')
+                
+                # Normalizar timezone
+                hoje_calc = pd.Timestamp.now(tz='UTC')
+                if df_temp['data_envio'].dt.tz is None:
+                    df_temp['data_envio'] = df_temp['data_envio'].dt.tz_localize(None)
+                    hoje_calc = hoje_calc.tz_localize(None)
+                
+                # Calcular dias (vetorizado)
+                df_temp['dias_passados'] = (hoje_calc - df_temp['data_envio']).dt.days
+                
+                # Contar críticos
+                criticos = len(df_temp[df_temp['dias_passados'] >= 75])
+            except:
+                criticos = 0
+            
             st.metric("🚨 Críticos", criticos)
         
-        with col3:
-            vencidos = 0
-            for idx, r in df_relacionamentos.iterrows():
+            with col3:
                 try:
-                    data_envio = pd.to_datetime(r.get('data_envio'))
-                    if data_envio.tz is not None:
-                        hoje_calc = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
-                    else:
-                        hoje_calc = pd.Timestamp.now().tz_localize(None)
-                        data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
-                    
-                    if (hoje_calc - data_envio).days >= 90:
-                        vencidos += 1
+                    vencidos = len(df_temp[df_temp['dias_passados'] >= 90])
                 except:
-                    pass
-            st.metric("⏰ Vencidos", vencidos)
+                    vencidos = 0
+                
+                st.metric("⏰ Vencidos", vencidos)
         
-        with col4:
-            ativos = 0
-            for idx, r in df_relacionamentos.iterrows():
+            with col4:
+                # ✅ REUTILIZA cálculo anterior (df_temp já existe)
                 try:
-                    data_envio = pd.to_datetime(r.get('data_envio'))
-                    if data_envio.tz is not None:
-                        hoje_calc = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
-                    else:
-                        hoje_calc = pd.Timestamp.now().tz_localize(None)
-                        data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
-                    
-                    if (hoje_calc - data_envio).days < 90:
-                        ativos += 1
+                    ativos = len(df_temp[df_temp['dias_passados'] < 90])
                 except:
-                    pass
-            st.metric("✅ Ativos", ativos)
-            
-    else:
-        st.info("ℹ️ Nenhum relacionamento encontrado.")
+                    ativos = 0
+                
+                st.metric("✅ Ativos", ativos)
 
 # =====================================
 # FUNÇÃO PRINCIPAL
