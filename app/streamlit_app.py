@@ -54,253 +54,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def gerenciar_candidatos():
-    """Função com código existente dos candidatos + FILTROS AVANÇADOS"""
-    
-    # SIDEBAR - FILTROS BÁSICOS
-    st.sidebar.header("🔍 Filtros de Candidatos")
-
-    # Filtro de qualificação
-    tipo_visualizacao = st.sidebar.selectbox(
-        "Visualizar:",
-        [
-            "Todos os candidatos",
-            "Candidatos qualificados", 
-            "Pendentes de qualificação"
-        ],
-        key="tipo_visualizacao_candidatos"
-    )
-
-    # Carregamento condicional baseado no filtro
-    with st.spinner("Carregando candidatos..."):
-        if tipo_visualizacao == "Candidatos qualificados":
-            df = carregar_candidatos_qualificados()
-            st.header("👑 Candidatos Qualificados")
-            
-        elif tipo_visualizacao == "Pendentes de qualificação":
-            df = carregar_candidatos_pendentes()
-            st.header("⏳ Pendentes de Qualificação")
-            
-        else:
-            df = carregar_candidatos()
-            st.header("📋 Todos os Candidatos")
-    
-    if df.empty:
-        st.warning("⚠️ Nenhum candidato encontrado no banco de dados.")
-        st.info("🔄 Certifique-se que existem candidatos cadastrados no Supabase.")
-        return
-    
-    # ✅ APLICAR FILTROS AVANÇADOS (NOVO)
-    df_filtrado = aplicar_filtros_avancados_candidatos(df)
-    
-    # MÉTRICAS
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("📊 Total Candidatos", len(df))
-    
-    with col2:
-        fichas_geradas = len(df[df.get('ficha_emitida', pd.Series([False] * len(df))) == True])
-        st.metric("📄 Fichas Geradas", fichas_geradas)
-    
-    with col3:
-        pendentes = len(df) - fichas_geradas
-        st.metric("⏳ Pendentes", pendentes)
-    
-    with col4:
-        if 'created_at' in df.columns:
-            hoje = datetime.now().date()
-            novos_hoje = len(df[pd.to_datetime(df['created_at']).dt.date == hoje])
-            st.metric("🆕 Hoje", novos_hoje)
-        else:
-            st.metric("🆕 Hoje", 0)
-    
-    # FILTROS NA SIDEBAR (BÁSICOS MANTIDOS)
-    if 'nome_completo' in df.columns:
-        filtro_nome = st.sidebar.text_input("🔍 Buscar por nome", "", key="busca_basica_nome")
-    else:
-        filtro_nome = ""
-    
-    if 'formulario_id' in df.columns:
-        funcoes_unicas = ['Todas'] + sorted(df['formulario_id'].dropna().unique().tolist())
-        filtro_funcao = st.sidebar.selectbox("💼 Filtrar por função", funcoes_unicas, key="filtro_basico_funcao")
-    else:
-        filtro_funcao = "Todas"
-    
-    # Filtro por status de ficha
-    filtro_status = st.sidebar.radio(
-        "📋 Status da ficha",
-        ["Todos", "Apenas pendentes", "Apenas com ficha gerada"],
-        key="filtro_status_ficha"
-    )
-    
-    # APLICAR FILTROS BÁSICOS TAMBÉM
-    if filtro_nome:
-        if 'nome_completo' in df_filtrado.columns:
-            df_filtrado = df_filtrado[
-                df_filtrado['nome_completo'].str.contains(filtro_nome, case=False, na=False)
-            ]
-    
-    if filtro_funcao != "Todas":
-        if 'formulario_id' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['formulario_id'] == filtro_funcao]
-    
-    # Filtro por status
-    if filtro_status == "Apenas pendentes":
-        df_filtrado = df_filtrado[df_filtrado.get('ficha_emitida', pd.Series([False] * len(df_filtrado))) != True]
-    elif filtro_status == "Apenas com ficha gerada":
-        df_filtrado = df_filtrado[df_filtrado.get('ficha_emitida', pd.Series([False] * len(df_filtrado))) == True]
-    
-    # EXIBIR RESULTADOS
-    st.header(f"📋 Candidatos ({len(df_filtrado)} encontrados)")
-    
-    if df_filtrado.empty:
-        st.info("🔍 Nenhum candidato encontrado com os filtros aplicados.")
-        return
-    
-    # LISTA DE CANDIDATOS (código preservado)
-    for idx, candidato in df_filtrado.iterrows():
-        with st.expander(
-            f"{formatar_funcao(candidato.get('formulario_id', ''))} | "
-            f"{candidato.get('nome_completo', 'Nome não informado')} | "
-            f"📞 {candidato.get('telefone', 'Tel. não informado')}",
-            expanded=False
-        ):
-            
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # Informações básicas
-                st.write(f"**📧 Email:** {candidato.get('email', 'Não informado')}")
-                whatsapp_link = formatar_whatsapp_link(candidato.get('whatsapp'))
-                st.markdown(f"**📲 Whatsapp:** {whatsapp_link}", unsafe_allow_html=True)
-                st.write(f"**📍 Endereço:** {candidato.get('endereco', 'Não informado')}")
-                st.write(f"**👨‍👩‍👧‍👦 Filhos:** {'Sim' if candidato.get('tem_filhos') else 'Não'}")
-                st.write(f"**🚗 CNH:** {'Sim' if candidato.get('possui_cnh') else 'Não'}")
-                
-                if candidato.get('created_at'):
-                    data_cadastro = pd.to_datetime(candidato['created_at']).strftime('%d/%m/%Y às %H:%M')
-                    st.write(f"**📅 Cadastrado em:** {data_cadastro}")
-
-                # Status de qualificação
-                if 'data_qualificacao' in candidato:
-                    st.success(f"✅ Qualificado em {candidato['data_qualificacao']}")
-                    if candidato.get('certificado_numero'):
-                        st.info(f"🎓 Certificado: {candidato['certificado_numero']}")
-                else:
-                    st.warning("⏳ Pendente de qualificação")
-                
-                # Status da ficha
-                if candidato.get('ficha_emitida'):
-                    st.success("✅ Ficha já gerada")
-                    if candidato.get('data_ficha_gerada'):
-                        data_ficha = pd.to_datetime(candidato['data_ficha_gerada']).strftime('%d/%m/%Y às %H:%M')
-                        st.write(f"**📄 Ficha gerada em:** {data_ficha}")
-                else:
-                    st.warning("⏳ Ficha pendente")
-            
-            with col2:
-                # Geração de PDF
-                nome_arquivo = f"ficha_{candidato.get('nome_completo', 'candidato').replace(' ', '_')}_{candidato.get('id', 'sem_id')}.pdf"
-                
-                if f"pdf_data_{candidato.get('id')}" not in st.session_state:
-                    st.session_state[f"pdf_data_{candidato.get('id')}"] = None
-                
-                if st.button(f"📄 Gerar Ficha PDF", key=f"pdf_{candidato.get('id')}"):
-                    try:
-                        with st.spinner("Gerando PDF..."):
-                            st.write("🔍 Preparando dados do candidato...")
-                            
-                            resultado = gerar_ficha_candidato_completa(candidato.to_dict())
-                            
-                            if isinstance(resultado, tuple):
-                                pdf_bytes, nome_arquivo = resultado
-                            else:
-                                pdf_bytes = resultado
-                                nome_limpo = candidato.get('nome_completo', 'candidato').replace(' ', '_').lower()
-                                import re
-                                nome_limpo = re.sub(r'[^a-zA-Z0-9_]', '', nome_limpo)
-                                data_criacao = datetime.now().strftime('%d%m%Y')
-                                nome_arquivo = f"{nome_limpo}-{data_criacao}.pdf"
-                            
-                            st.session_state[f"pdf_data_{candidato.get('id')}"] = pdf_bytes
-                            st.session_state[f"pdf_nome_{candidato.get('id')}"] = nome_arquivo
-                            
-                            st.success(f"✅ PDF gerado! Tamanho: {len(pdf_bytes)} bytes")
-                            st.info("👇 Clique no botão verde abaixo para baixar!")
-                            
-                            if atualizar_status_ficha(candidato.get('id')):
-                                st.success("✅ Status atualizado no banco!")
-                                st.cache_data.clear()
-                            else:
-                                st.info("ℹ️ PDF gerado, mas status não atualizado")
-                            
-                    except Exception as e:
-                        st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-                        st.error(f"🔧 Tipo do erro: {type(e).__name__}")
-                        
-                        import traceback
-                        with st.expander("🔍 Detalhes técnicos do erro"):
-                            st.code(traceback.format_exc())
-
-                # Sistema de qualificação
-                if 'data_qualificacao' not in candidato.index:
-                    candidato_id = candidato.get('id')
-                    
-                    with st.container():
-                        st.markdown("### 🎓 Qualificar Candidato")
-                        
-                        with st.form(key=f"qualificacao_form_{candidato_id}", clear_on_submit=False):
-                            
-                            col1, col2 = st.columns(2)
-                            
-                            with col1:
-                                nota = st.slider("Nota do treinamento (0-10)", 0, 10, 7)
-                                
-                            with col2:
-                                instrutor = st.text_input("Nome do instrutor")
-                            
-                            observacoes = st.text_area("Observações sobre o treinamento", height=100)
-                            
-                            submitted = st.form_submit_button("✅ QUALIFICAR CANDIDATO", type="primary")
-                            
-                            if submitted:
-                                if not instrutor.strip():
-                                    st.error("❌ O nome do instrutor é obrigatório!")
-                                else:
-                                    with st.spinner("Processando qualificação..."):
-                                        sucesso, certificado = qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor)
-                                        
-                                        if sucesso:
-                                            st.success(f"🎉 Candidato qualificado com sucesso!")
-                                            st.success(f"🎓 Certificado: {certificado}")
-                                            st.balloons()
-                                            
-                                            import time
-                                            time.sleep(2)
-                                            
-                                            st.cache_data.clear()
-                                            st.info("🔄 Recarregando página...")
-                                            st.rerun()
-                                        else:
-                                            st.error("❌ Erro ao qualificar candidato. Tente novamente.")      
-                
-                # Botão de download
-                if st.session_state.get(f"pdf_data_{candidato.get('id')}") is not None:
-                    pdf_data = st.session_state[f"pdf_data_{candidato.get('id')}"]
-                    nome_arquivo = st.session_state.get(f"pdf_nome_{candidato.get('id')}", f"ficha_{candidato.get('id')}.pdf")
-                    
-                    st.download_button(
-                        label="📥 📱 BAIXAR FICHA PDF",
-                        data=pdf_data,
-                        file_name=nome_arquivo,
-                        mime="application/pdf",
-                        key=f"download_{candidato.get('id')}",
-                        type="primary"
-                    )
-                    
-                    st.success(f"✅ PDF pronto: {nome_arquivo}")
-
 def gerenciar_vagas():
     """Nova funcionalidade para gestão de vagas + FILTROS AVANÇADOS"""
     st.header("💼 Gestão de Vagas")
@@ -337,7 +90,7 @@ def gerenciar_vagas():
     # LISTA DE VAGAS
     st.subheader(f"📋 Vagas Disponíveis ({len(df_filtrado)} encontradas)")
     
-    for idx, vaga in df_filtrado.iterrows():
+    for vaga in df_filtrado.to_dict('records'):
         # OBTER STATUS FORMATADO
         status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
         status_display, status_color = formatar_status_vaga(status_atual)
@@ -510,20 +263,199 @@ st.markdown("""
 # =====================================
 
 @st.cache_data(ttl=300)
-def carregar_candidatos():
-    """Carrega candidatos do Supabase com cache"""
+# =====================================
+# SUBSTITUIR A FUNÇÃO EXISTENTE POR ESTA
+# =====================================
+
+# =====================================
+# SUBSTITUIR A FUNÇÃO EXISTENTE POR ESTA
+# =====================================
+
+@st.cache_data(ttl=300)
+def carregar_candidatos(
+    limite=100, 
+    offset=0, 
+    filtros=None, 
+    retornar_contagem=False
+):
+    """
+    Carrega candidatos do Supabase com paginação e filtros otimizados
+    
+    Args:
+        limite (int): Número máximo de registros a retornar (padrão: 100)
+        offset (int): Número de registros a pular para paginação (padrão: 0)
+        filtros (dict): Dicionário com filtros opcionais:
+            - 'funcao': str - Filtrar por formulario_id
+            - 'cidade': str - Filtrar por cidade
+            - 'status': str - Filtrar por status_candidato
+            - 'busca': str - Busca em nome_completo, email, telefone
+        retornar_contagem (bool): Se True, retorna (DataFrame, total_count)
+    
+    Returns:
+        pd.DataFrame ou tuple(pd.DataFrame, int): Dados dos candidatos e opcionalmente contagem total
+    """
     try:
         supabase = get_supabase_client()
-        response = supabase.table('candidatos').select('*').order('created_at', desc=True).execute()
         
-        if response.data:
-            return pd.DataFrame(response.data)
+        # Iniciar query com contagem total se solicitado
+        if retornar_contagem:
+            query = supabase.table('candidatos').select('*', count='exact')
         else:
-            return pd.DataFrame()
+            query = supabase.table('candidatos').select('*')
+        
+        # APLICAR FILTROS (se fornecidos)
+        if filtros:
+            # Filtro por função
+            if filtros.get('funcao') and filtros['funcao'] != 'Todas':
+                query = query.eq('formulario_id', filtros['funcao'])
+            
+            # Filtro por cidade
+            if filtros.get('cidade') and filtros['cidade'] != 'Todas':
+                query = query.eq('cidade', filtros['cidade'])
+            
+            # Filtro por status
+            if filtros.get('status') and filtros['status'] != 'Todos':
+                query = query.eq('status_candidato', filtros['status'])
+            
+            # Busca textual (nome, email, telefone)
+            # Nota: Supabase não tem busca LIKE em múltiplos campos nativamente
+            # Então faremos busca em Python após carregar (ainda otimizado pelo limite)
+        
+        # APLICAR PAGINAÇÃO (sempre aplica range, mesmo sem filtros)
+        query = query.range(offset, offset + limite - 1)
+        
+        # ORDENAR por data de criação (mais recentes primeiro)
+        query = query.order('created_at', desc=True)
+        
+        # EXECUTAR query
+        response = query.execute()
+        
+        # Criar DataFrame
+        if response.data:
+            df = pd.DataFrame(response.data)
+            
+            # BUSCA TEXTUAL (se fornecida) - aplicada após query otimizada
+            if filtros and filtros.get('busca'):
+                busca_termo = filtros['busca'].lower()
+                mascara = (
+                    df['nome_completo'].str.lower().str.contains(busca_termo, na=False) |
+                    df['email'].str.lower().str.contains(busca_termo, na=False)
+                )
+                # Adicionar telefone se coluna existe
+                if 'telefone' in df.columns:
+                    mascara |= df['telefone'].astype(str).str.contains(busca_termo, na=False)
+                
+                df = df[mascara]
+        else:
+            df = pd.DataFrame()
+        
+        # RETORNAR com ou sem contagem
+        if retornar_contagem:
+            total_count = response.count if hasattr(response, 'count') else len(df)
+            return df, total_count
+        else:
+            return df
             
     except Exception as e:
         st.error(f"❌ Erro ao carregar candidatos: {str(e)}")
+        if retornar_contagem:
+            return pd.DataFrame(), 0
         return pd.DataFrame()
+
+def exibir_paginacao(total_registros, registros_por_pagina=100, key_prefix=""):
+    """
+    Exibe controles de paginação e retorna página atual e offset
+    
+    Args:
+        total_registros (int): Total de registros disponíveis
+        registros_por_pagina (int): Quantos registros por página
+        key_prefix (str): Prefixo para keys únicos do Streamlit
+    
+    Returns:
+        tuple(int, int): (pagina_atual, offset)
+    """
+    total_paginas = (total_registros // registros_por_pagina) + (1 if total_registros % registros_por_pagina > 0 else 0)
+    
+    if total_paginas > 1:
+        col_prev, col_info, col_next = st.columns([1, 2, 1])
+        
+        # Garantir que página atual existe no session_state
+        if f"{key_prefix}_pagina_atual" not in st.session_state:
+            st.session_state[f"{key_prefix}_pagina_atual"] = 1
+        
+        pagina_atual = st.session_state[f"{key_prefix}_pagina_atual"]
+        
+        with col_prev:
+            if pagina_atual > 1:
+                if st.button("⬅️ Anterior", key=f"{key_prefix}_prev"):
+                    st.session_state[f"{key_prefix}_pagina_atual"] -= 1
+                    st.rerun()
+        
+        with col_info:
+            st.write(f"**Página {pagina_atual} de {total_paginas}** ({total_registros} total)")
+        
+        with col_next:
+            if pagina_atual < total_paginas:
+                if st.button("Próxima ➡️", key=f"{key_prefix}_next"):
+                    st.session_state[f"{key_prefix}_pagina_atual"] += 1
+                    st.rerun()
+        
+        offset = (pagina_atual - 1) * registros_por_pagina
+        return pagina_atual, offset
+    else:
+        return 1, 0
+    """
+    Exibe controles de paginação e retorna página atual e offset
+    
+    Args:
+        total_registros (int): Total de registros disponíveis
+        registros_por_pagina (int): Quantos registros por página
+        key_prefix (str): Prefixo para keys únicos do Streamlit
+    
+    Returns:
+        tuple(int, int): (pagina_atual, offset)
+    """
+    total_paginas = (total_registros // registros_por_pagina) + (1 if total_registros % registros_por_pagina > 0 else 0)
+    
+    if total_paginas > 1:
+        col_prev, col_info, col_next = st.columns([1, 2, 1])
+        
+        # Garantir que página atual existe no session_state
+        if f"{key_prefix}_pagina_atual" not in st.session_state:
+            st.session_state[f"{key_prefix}_pagina_atual"] = 1
+        
+        pagina_atual = st.session_state[f"{key_prefix}_pagina_atual"]
+        
+        with col_prev:
+            if pagina_atual > 1:
+                if st.button("⬅️ Anterior", key=f"{key_prefix}_prev"):
+                    st.session_state[f"{key_prefix}_pagina_atual"] -= 1
+                    st.rerun()
+        
+        with col_info:
+            st.write(f"**Página {pagina_atual} de {total_paginas}** ({total_registros} total)")
+        
+        with col_next:
+            if pagina_atual < total_paginas:
+                if st.button("Próxima ➡️", key=f"{key_prefix}_next"):
+                    st.session_state[f"{key_prefix}_pagina_atual"] += 1
+                    st.rerun()
+        
+        offset = (pagina_atual - 1) * registros_por_pagina
+        return pagina_atual, offset
+    else:
+        return 1, 0
+    """Carrega candidatos com paginação"""
+    query = supabase.table('candidatos').select('*', count='exact')
+    
+    if filtros:
+        if filtros.get('funcao'):
+            query = query.eq('formulario_id', filtros['funcao'])
+        if filtros.get('cidade'):
+            query = query.eq('cidade', filtros['cidade'])
+    
+    response = query.range(offset, offset + limite - 1).order('created_at', desc=True).execute()
+    return pd.DataFrame(response.data), response.count
 
 def qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor):
     """Função simplificada para qualificar candidato"""
@@ -567,7 +499,68 @@ def qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor):
         st.error(f"Erro técnico: {str(e)}")
         return False, None
 
-def carregar_candidatos_qualificados():
+@st.cache_data(ttl=300)
+def carregar_candidatos_qualificados(limite=100, offset=0, retornar_contagem=False):
+    """Carrega candidatos qualificados usando dados combinados otimizados"""
+    try:
+        supabase = get_supabase_client()
+        
+        # 1. Buscar IDs de candidatos qualificados com paginação
+        if retornar_contagem:
+            query_qual = supabase.table('candidatos_qualificados').select('*', count='exact')
+        else:
+            query_qual = supabase.table('candidatos_qualificados').select('*')
+        
+        query_qual = query_qual.range(offset, offset + limite - 1).order('data_qualificacao', desc=True)
+        qualificacoes_response = query_qual.execute()
+        
+        if not qualificacoes_response.data:
+            if retornar_contagem:
+                return pd.DataFrame(), 0
+            return pd.DataFrame()
+        
+        # 2. Extrair IDs dos candidatos qualificados
+        candidato_ids = [q['candidato_id'] for q in qualificacoes_response.data]
+        
+        # 3. Buscar dados completos dos candidatos (1 query com IN)
+        candidatos_response = supabase.table('candidatos').select('*').in_('id', candidato_ids).execute()
+        
+        if not candidatos_response.data:
+            if retornar_contagem:
+                return pd.DataFrame(), qualificacoes_response.count if hasattr(qualificacoes_response, 'count') else 0
+            return pd.DataFrame()
+        
+        # 4. Criar lookup de candidatos por ID
+        candidatos_dict = {c['id']: c for c in candidatos_response.data}
+        
+        # 5. Combinar dados (em memória, rápido)
+        dados_combinados = []
+        for qualificacao in qualificacoes_response.data:
+            candidato_id = qualificacao['candidato_id']
+            if candidato_id in candidatos_dict:
+                candidato_completo = candidatos_dict[candidato_id].copy()
+                candidato_completo.update({
+                    'data_qualificacao': qualificacao.get('data_qualificacao'),
+                    'nota_treinamento': qualificacao.get('nota_treinamento'),
+                    'certificado_emitido': qualificacao.get('certificado_emitido'),
+                    'certificado_numero': qualificacao.get('certificado_numero'),
+                    'instrutor_responsavel': qualificacao.get('instrutor_responsavel')
+                })
+                dados_combinados.append(candidato_completo)
+        
+        df = pd.DataFrame(dados_combinados)
+        
+        if retornar_contagem:
+            total = qualificacoes_response.count if hasattr(qualificacoes_response, 'count') else len(df)
+            return df, total
+        
+        return df
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao carregar candidatos qualificados: {str(e)}")
+        if retornar_contagem:
+            return pd.DataFrame(), 0
+        return pd.DataFrame()
     """Carrega candidatos qualificados com dados combinados"""
     try:
         supabase = get_supabase_client()
@@ -607,7 +600,54 @@ def carregar_candidatos_qualificados():
         st.error(f"Erro ao carregar candidatos qualificados: {str(e)}")
         return pd.DataFrame()
 
-def carregar_candidatos_pendentes():
+@st.cache_data(ttl=300)
+def carregar_candidatos_pendentes(limite=100, offset=0, retornar_contagem=False):
+    """Carrega candidatos pendentes usando LEFT JOIN no banco"""
+    try:
+        supabase = get_supabase_client()
+        
+        # Query otimizada: LEFT JOIN que retorna apenas candidatos SEM qualificação
+        query = """
+        SELECT c.*
+        FROM candidatos c
+        LEFT JOIN candidatos_qualificados q ON c.id = q.candidato_id
+        WHERE q.candidato_id IS NULL
+        ORDER BY c.created_at DESC
+        """
+        
+        # Supabase não suporta SQL direto via PostgREST nativamente
+        # Solução: usar filtro NOT IN com IDs qualificados
+        
+        # 1. Buscar IDs qualificados (query pequena)
+        qualificados = supabase.table('candidatos_qualificados').select('candidato_id').execute()
+        ids_qualificados = [q['candidato_id'] for q in qualificados.data] if qualificados.data else []
+        
+        # 2. Buscar candidatos excluindo IDs qualificados
+        if retornar_contagem:
+            query = supabase.table('candidatos').select('*', count='exact')
+        else:
+            query = supabase.table('candidatos').select('*')
+        
+        # Aplicar filtro NOT IN (se houver qualificados)
+        if ids_qualificados:
+            query = query.not_.in_('id', ids_qualificados)
+        
+        # Paginação
+        query = query.range(offset, offset + limite - 1).order('created_at', desc=True)
+        
+        response = query.execute()
+        
+        if retornar_contagem:
+            total = response.count if hasattr(response, 'count') else len(response.data) if response.data else 0
+            return pd.DataFrame(response.data) if response.data else pd.DataFrame(), total
+        
+        return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao carregar candidatos pendentes: {str(e)}")
+        if retornar_contagem:
+            return pd.DataFrame(), 0
+        return pd.DataFrame()
     """Carrega candidatos que ainda não foram qualificados"""
     try:
         supabase = get_supabase_client()
@@ -697,10 +737,92 @@ def formatar_funcao(formulario_id):
     return funcoes.get(formulario_id, formulario_id or 'Não especificado')
 
 # =====================================
-# FUNÇÕES DE MÉTRICAS DE NEGÓCIO (FASE 2)
+# FUNÇÕES DE MÉTRICAS DE NEGÓCIO
 # =====================================
 
 def calcular_metricas_negocio(data_limite):
+    """Calcula métricas com queries otimizadas"""
+    try:
+        supabase = get_supabase_client()
+        
+        # 1. Total candidatos/vagas no período
+        candidatos_periodo = supabase.table('candidatos').select('id', count='exact').gte('created_at', data_limite.isoformat()).execute()
+        vagas_periodo = supabase.table('vagas').select('id', count='exact').gte('created_at', data_limite.isoformat()).execute()
+        
+        # 2. Relacionamentos no período
+        relacionamentos_periodo = supabase.table('candidatos_vagas').select('*').gte('data_envio', data_limite.isoformat()).execute()
+        total_processos = len(relacionamentos_periodo.data) if relacionamentos_periodo.data else 0
+        
+        # Contar por status
+        contratacoes = len([r for r in relacionamentos_periodo.data if r.get('status_processo') == 'contratado']) if relacionamentos_periodo.data else 0
+        rejeicoes = len([r for r in relacionamentos_periodo.data if r.get('status_processo') == 'rejeitado']) if relacionamentos_periodo.data else 0
+        
+        # 3. Taxa de conversão
+        taxa_conversao = (contratacoes / total_processos * 100) if total_processos > 0 else 0
+        
+        # 4. Tempo médio de processo
+        tempos_processo = []
+        if relacionamentos_periodo.data:
+            for rel in relacionamentos_periodo.data:
+                if rel.get('status_processo') in ['contratado', 'rejeitado', 'finalizado']:
+                    data_envio = pd.to_datetime(rel.get('data_envio'))
+                    data_update = pd.to_datetime(rel.get('updated_at', rel.get('data_envio')))
+                    tempo_dias = (data_update - data_envio).days
+                    tempos_processo.append(max(1, tempo_dias))
+        
+        tempo_medio = sum(tempos_processo) / len(tempos_processo) if tempos_processo else 0
+        
+        # 5. Funções mais demandadas - OTIMIZADO
+        funcoes_vagas = {}
+        if relacionamentos_periodo.data:
+            # CARREGAR TODAS AS VAGAS DE UMA VEZ (1 query apenas)
+            vaga_ids = list(set([r.get('vaga_id') for r in relacionamentos_periodo.data if r.get('vaga_id')]))
+            
+            if vaga_ids:
+                vagas_info = supabase.table('vagas').select('id, formulario_id').in_('id', vaga_ids).execute()
+                
+                # Criar dicionário de lookup {vaga_id: formulario_id}
+                vaga_lookup = {v['id']: v['formulario_id'] for v in vagas_info.data} if vagas_info.data else {}
+                
+                # Contar funções usando lookup (em memória, rápido)
+                for rel in relacionamentos_periodo.data:
+                    vaga_id = rel.get('vaga_id')
+                    if vaga_id and vaga_id in vaga_lookup:
+                        funcao = vaga_lookup[vaga_id]
+                        funcoes_vagas[funcao] = funcoes_vagas.get(funcao, 0) + 1
+        
+        # 6. Motivos de rejeição
+        motivos_rejeicao = [
+            rel.get('observacoes', '') 
+            for rel in relacionamentos_periodo.data 
+            if rel.get('status_processo') == 'rejeitado' and rel.get('observacoes')
+        ] if relacionamentos_periodo.data else []
+        
+        return {
+            'total_candidatos': candidatos_periodo.count,
+            'total_vagas': vagas_periodo.count,
+            'total_processos': total_processos,
+            'contratacoes': contratacoes,
+            'rejeicoes': rejeicoes,
+            'taxa_conversao': taxa_conversao,
+            'tempo_medio': tempo_medio,
+            'funcoes_demandadas': dict(sorted(funcoes_vagas.items(), key=lambda x: x[1], reverse=True)[:5]),
+            'motivos_rejeicao': motivos_rejeicao
+        }
+        
+    except Exception as e:
+        st.error(f"❌ Erro ao calcular métricas: {str(e)}")
+        return {
+            'total_candidatos': 0,
+            'total_vagas': 0,
+            'total_processos': 0,
+            'contratacoes': 0,
+            'rejeicoes': 0,
+            'taxa_conversao': 0,
+            'tempo_medio': 0,
+            'funcoes_demandadas': {},
+            'motivos_rejeicao': []
+        }
     """Calcula métricas de negócio para o período especificado"""
     try:
         supabase = get_supabase_client()
@@ -1259,7 +1381,86 @@ def finalizar_relacionamento(relacionamento_id, resultado_final, motivo=""):
         return False, f"Erro técnico: {str(e)}"
 
 @st.cache_data(ttl=300)
-def carregar_vagas():
+def carregar_vagas(
+    limite=100,
+    offset=0,
+    filtros=None,
+    retornar_contagem=False
+):
+    """
+    Carrega vagas do Supabase com paginação e filtros otimizados
+    
+    Args:
+        limite (int): Número máximo de registros a retornar (padrão: 100)
+        offset (int): Número de registros a pular para paginação (padrão: 0)
+        filtros (dict): Dicionário com filtros opcionais:
+            - 'status': str - Filtrar por status_detalhado
+            - 'urgencia': str - Filtrar por inicio_urgente
+            - 'cidade': str - Filtrar por cidade
+            - 'salario_min': float - Salário mínimo
+            - 'salario_max': float - Salário máximo
+        retornar_contagem (bool): Se True, retorna (DataFrame, total_count)
+    
+    Returns:
+        pd.DataFrame ou tuple(pd.DataFrame, int): Dados das vagas e opcionalmente contagem total
+    """
+    try:
+        supabase = get_supabase_client()
+        
+        # Iniciar query com contagem se solicitado
+        if retornar_contagem:
+            query = supabase.table('vagas').select('*', count='exact')
+        else:
+            query = supabase.table('vagas').select('*')
+        
+        # APLICAR FILTROS
+        if filtros:
+            # Filtro por status
+            if filtros.get('status') and filtros['status'] != 'Todas':
+                query = query.eq('status_detalhado', filtros['status'])
+            
+            # Filtro por urgência
+            if filtros.get('urgencia') and filtros['urgencia'] != 'Todas':
+                query = query.eq('inicio_urgente', filtros['urgencia'])
+            
+            # Filtro por cidade
+            if filtros.get('cidade') and filtros['cidade'] != 'Todas':
+                query = query.eq('cidade', filtros['cidade'])
+            
+            # Filtro por faixa salarial
+            if filtros.get('salario_min') and filtros['salario_min'] > 0:
+                query = query.gte('salario_oferecido', filtros['salario_min'])
+            
+            if filtros.get('salario_max') and filtros['salario_max'] > 0:
+                query = query.lte('salario_oferecido', filtros['salario_max'])
+        
+        # APLICAR PAGINAÇÃO
+        query = query.range(offset, offset + limite - 1)
+        
+        # ORDENAR por data de criação
+        query = query.order('created_at', desc=True)
+        
+        # EXECUTAR query
+        response = query.execute()
+        
+        # Criar DataFrame
+        if response.data:
+            df = pd.DataFrame(response.data)
+        else:
+            df = pd.DataFrame()
+        
+        # RETORNAR com ou sem contagem
+        if retornar_contagem:
+            total_count = response.count if hasattr(response, 'count') else len(df)
+            return df, total_count
+        else:
+            return df
+            
+    except Exception as e:
+        st.error(f"❌ Erro ao carregar vagas: {str(e)}")
+        if retornar_contagem:
+            return pd.DataFrame(), 0
+        return pd.DataFrame()
     """Carrega vagas do Supabase"""
     try:
         supabase = get_supabase_client()
@@ -1446,19 +1647,52 @@ def relacionar_candidato_vaga_com_status(candidato_id, vaga_id, observacao="", s
     except Exception as e:
         return False, f"❌ Erro técnico: {str(e)}"
 
-def carregar_relacionamentos():
-    """Carrega relacionamentos candidatos-vagas"""
+@st.cache_data(ttl=300)
+def carregar_relacionamentos(limite=100, offset=0, filtros=None, retornar_contagem=False):
+    """Carrega relacionamentos com paginação e filtros"""
     try:
         supabase = get_supabase_client()
-        response = supabase.table('candidatos_vagas_detalhado').select('*').order('data_envio', desc=True).execute()
         
-        if response.data:
-            return pd.DataFrame(response.data)
+        # Query com contagem opcional
+        if retornar_contagem:
+            query = supabase.table('candidatos_vagas_detalhado').select('*', count='exact')
         else:
-            return pd.DataFrame()
+            query = supabase.table('candidatos_vagas_detalhado').select('*')
+        
+        # APLICAR FILTROS
+        if filtros:
+            # Filtro por status
+            if filtros.get('status') and filtros['status'] != 'Todos':
+                query = query.eq('status_processo', filtros['status'])
             
+            # Filtro por período (últimos 90 dias por padrão)
+            if filtros.get('dias_recentes'):
+                data_limite = (datetime.now() - timedelta(days=filtros['dias_recentes'])).isoformat()
+                query = query.gte('data_envio', data_limite)
+        else:
+            # Padrão: últimos 90 dias se não houver filtro
+            data_limite = (datetime.now() - timedelta(days=90)).isoformat()
+            query = query.gte('data_envio', data_limite)
+        
+        # PAGINAÇÃO
+        query = query.range(offset, offset + limite - 1)
+        
+        # ORDENAR por data mais recente
+        query = query.order('data_envio', desc=True)
+        
+        # EXECUTAR
+        response = query.execute()
+        
+        if retornar_contagem:
+            total = response.count if hasattr(response, 'count') else len(response.data) if response.data else 0
+            return pd.DataFrame(response.data) if response.data else pd.DataFrame(), total
+        
+        return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+        
     except Exception as e:
         st.error(f"❌ Erro ao carregar relacionamentos: {str(e)}")
+        if retornar_contagem:
+            return pd.DataFrame(), 0
         return pd.DataFrame()
 
 def atualizar_relacionamento(relacionamento_id, novo_candidato_id=None, nova_observacao=None, novo_status=None, data_entrevista=None, reiniciar_prazo=False):
@@ -1850,9 +2084,6 @@ def iniciar_backup_automatico():
     
     logger.info(f"✅ Backup automático ativado (intervalo: {interval_hours}h)")
 
-# ============================================
-# INICIALIZAÇÃO DO APP
-# ============================================
 #===================================
 # PÁGINAS/ABAS DO SISTEMA
 # =====================================
@@ -1959,10 +2190,27 @@ def gerenciar_candidatos():
     
     if df_filtrado.empty:
         st.info("🔍 Nenhum candidato encontrado com os filtros aplicados.")
-        return
-    
+        
+    # Primeiro: carregar com contagem
+    df, total = carregar_candidatos(limite=100, offset=0, retornar_contagem=True)
+
+    # Segundo: mostrar controles de paginação
+    pagina_atual, offset = exibir_paginacao(
+        total_registros=total,
+        registros_por_pagina=100,
+        key_prefix="candidatos"
+    )
+
+    # Terceiro: se mudou página, recarregar com novo offset
+    if offset > 0:
+        df = carregar_candidatos(limite=100, offset=offset)
+        
     # LISTA DE CANDIDATOS
-    for idx, candidato in df_filtrado.iterrows():
+    for idx, candidato in enumerate(df_filtrado.to_dict('records')):
+        
+        candidato_id = candidato.get('id')
+        unique_key = f"{candidato_id}_{idx}"
+        
         with st.expander(
             f"{formatar_funcao(candidato.get('formulario_id', ''))} | "
             f"{candidato.get('nome_completo', 'Nome não informado')} | "
@@ -2006,15 +2254,15 @@ def gerenciar_candidatos():
                 # Geração de PDF
                 nome_arquivo = f"ficha_{candidato.get('nome_completo', 'candidato').replace(' ', '_')}_{candidato.get('id', 'sem_id')}.pdf"
                 
-                if f"pdf_data_{candidato.get('id')}" not in st.session_state:
-                    st.session_state[f"pdf_data_{candidato.get('id')}"] = None
-                
-                if st.button(f"📄 Gerar Ficha PDF", key=f"pdf_{candidato.get('id')}"):
+            if st.button(f"📄 Gerar Ficha PDF", key=f"pdf_{unique_key}"):
+                    
+                with st.spinner("Gerando PDF..."):
+                    
                     try:
                         with st.spinner("Gerando PDF..."):
                             st.write("🔍 Preparando dados do candidato...")
                             
-                            resultado = gerar_ficha_candidato_completa(candidato.to_dict())
+                            resultado = gerar_ficha_candidato_completa(candidato)
                             
                             if isinstance(resultado, tuple):
                                 pdf_bytes, nome_arquivo = resultado
@@ -2047,7 +2295,7 @@ def gerenciar_candidatos():
                             st.code(traceback.format_exc())
 
                 # Sistema de qualificação
-                if 'data_qualificacao' not in candidato.index:
+                if 'data_qualificacao' not in candidato:
                     candidato_id = candidato.get('id')
                     
                     with st.container():
@@ -2089,17 +2337,13 @@ def gerenciar_candidatos():
                                             st.error("❌ Erro ao qualificar candidato. Tente novamente.")      
                 
                 # Botão de download
-                if st.session_state.get(f"pdf_data_{candidato.get('id')}") is not None:
-                    pdf_data = st.session_state[f"pdf_data_{candidato.get('id')}"]
-                    nome_arquivo = st.session_state.get(f"pdf_nome_{candidato.get('id')}", f"ficha_{candidato.get('id')}.pdf")
                     
                     st.download_button(
-                        label="📥 📱 BAIXAR FICHA PDF",
+                        label="📥 Baixar PDF",
                         data=pdf_data,
                         file_name=nome_arquivo,
                         mime="application/pdf",
-                        key=f"download_{candidato.get('id')}",
-                        type="primary"
+                        key=f"download_{unique_key}"
                     )
                     
                     st.success(f"✅ PDF pronto: {nome_arquivo}")
@@ -2134,6 +2378,8 @@ def gerenciar_vagas():
         st.warning("⚠️ Nenhuma vaga encontrada.")
         return
     
+    df_vagas, total_vagas = carregar_vagas(limite=100, offset=0, retornar_contagem=True)
+    
     # APLICAR FILTROS
     df_filtrado = df_vagas.copy()
     
@@ -2166,6 +2412,12 @@ def gerenciar_vagas():
     
     # LISTA DE VAGAS
     st.subheader(f"📋 Vagas Disponíveis ({len(df_filtrado)} encontradas)")
+    
+    pagina_atual, offset = exibir_paginacao(
+    total_registros=total_vagas,
+    registros_por_pagina=100,
+    key_prefix="vagas"
+    )
     
     for idx, vaga in df_filtrado.iterrows():
         # OBTER STATUS FORMATADO
@@ -2271,6 +2523,11 @@ def gerenciar_relacionamentos():
     # CARREGAR DADOS
     df_candidatos = carregar_candidatos()
     df_vagas = carregar_vagas()
+    df_relacionamentos, total_relacionamentos = carregar_relacionamentos(
+    limite=100,
+    offset=0,
+    retornar_contagem=True
+    )
     
     if df_candidatos.empty or df_vagas.empty:
         st.warning("⚠️ É necessário ter candidatos e vagas cadastrados.")
@@ -2458,6 +2715,17 @@ def gerenciar_relacionamentos():
     df_relacionamentos = carregar_relacionamentos()
     
     if not df_relacionamentos.empty:
+    
+        pagina_atual, offset = exibir_paginacao(
+        total_registros=total_relacionamentos,
+        registros_por_pagina=100,
+        key_prefix="relacionamentos"
+    )
+        
+        # Se mudou página, recarregar
+    if offset > 0:
+        df_relacionamentos = carregar_relacionamentos(limite=100, offset=offset)
+        
         # INTERFACE MELHORADA COM STREAMLIT NATIVO
         for idx, rel in df_relacionamentos.iterrows():
             # CALCULAR MÉTRICAS DE TEMPO
