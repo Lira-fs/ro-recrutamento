@@ -4,9 +4,8 @@ import os
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-
-# Adicionar pasta backend ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+from validators import validar_relacionamento_candidato_vaga
 
 from google_drive_backup_oauth import (
     criar_backup_automatico,
@@ -20,6 +19,10 @@ from auth import verificar_autenticacao, exibir_info_usuario_sidebar
 # Imports existentes do backend...
 from supabase_client import get_supabase_client
 from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+from logger import log_erro, log_aviso, log_info, log_sucesso, log_auditoria, tratar_erros
+
 
 # ============================================
 # CONFIGURAÇÃO DA PÁGINA (APENAS UMA VEZ!)
@@ -250,28 +253,38 @@ def carregar_candidatos(
         pd.DataFrame ou tuple(pd.DataFrame, int): Dados dos candidatos e opcionalmente contagem total
     """
     try:
+        # ✅ SANITIZAR FILTROS PRIMEIRO
+        from validators import validar_e_sanitizar_filtros_query
+        
+        if filtros:
+            valido, filtros_limpos, msg = validar_e_sanitizar_filtros_query(filtros)
+            if not valido:
+                st.error(f"Filtros inválidos: {msg}")
+                if retornar_contagem:
+                    return pd.DataFrame(), 0
+                return pd.DataFrame()
+        else:
+            filtros_limpos = {}
+        
         supabase = get_supabase_client()
         
-        # Iniciar query com contagem total se solicitado
+        # Iniciar query
         if retornar_contagem:
             query = supabase.table('candidatos').select('*', count='exact')
         else:
             query = supabase.table('candidatos').select('*')
         
-        # APLICAR FILTROS (se fornecidos)
-        if filtros:
-            # Filtro por função
-            if filtros.get('funcao') and filtros['funcao'] != 'Todas':
-                query = query.eq('formulario_id', filtros['funcao'])
+        # ✅ USAR FILTROS SANITIZADOS
+        if filtros_limpos:
+            if filtros_limpos.get('funcao') and filtros_limpos['funcao'] != 'Todas':
+                query = query.eq('formulario_id', filtros_limpos['funcao'])
             
-            # Filtro por cidade
-            if filtros.get('cidade') and filtros['cidade'] != 'Todas':
-                query = query.eq('cidade', filtros['cidade'])
+            if filtros_limpos.get('cidade') and filtros_limpos['cidade'] != 'Todas':
+                query = query.eq('cidade', filtros_limpos['cidade'])
             
-            # Filtro por status
-            if filtros.get('status') and filtros['status'] != 'Todos':
-                query = query.eq('status_candidato', filtros['status'])
-            
+            if filtros_limpos.get('status') and filtros_limpos['status'] != 'Todos':
+                query = query.eq('status_candidato', filtros_limpos['status'])
+                        
             # Busca textual (nome, email, telefone)
             # Nota: Supabase não tem busca LIKE em múltiplos campos nativamente
             # Então faremos busca em Python após carregar (ainda otimizado pelo limite)
@@ -312,7 +325,15 @@ def carregar_candidatos(
             return df
             
     except Exception as e:
-        st.error(f"❌ Erro ao carregar candidatos: {str(e)}")
+        log_erro(
+            mensagem_usuario="Erro ao carregar candidatos",
+            excecao=e,
+            contexto={
+                'limite': limite,
+                'offset': offset,
+                'tem_filtros': bool(filtros)
+            }
+        )
         if retornar_contagem:
             return pd.DataFrame(), 0
         return pd.DataFrame()
@@ -460,7 +481,11 @@ def carregar_candidatos_qualificados(limite=100, offset=0, retornar_contagem=Fal
         return df
         
     except Exception as e:
-        st.error(f"❌ Erro ao carregar candidatos qualificados: {str(e)}")
+        log_erro(
+            mensagem_usuario="Erro ao carregar candidatos pendentes",
+            excecao=e,
+            contexto={'limite': limite, 'offset': offset}
+        )
         if retornar_contagem:
             return pd.DataFrame(), 0
         return pd.DataFrame()
@@ -648,18 +673,22 @@ def calcular_metricas_negocio(data_limite):
         }
         
     except Exception as e:
-        st.error(f"❌ Erro ao calcular métricas: {str(e)}")
-        return {
-            'total_candidatos': 0,
-            'total_vagas': 0,
-            'total_processos': 0,
-            'contratacoes': 0,
-            'rejeicoes': 0,
-            'taxa_conversao': 0,
-            'tempo_medio': 0,
-            'funcoes_demandadas': {},
-            'motivos_rejeicao': []
-        }
+        log_erro(
+            mensagem_usuario="Erro ao calcular métricas de negócio",
+            excecao=e,
+            contexto={'data_limite': data_limite.isoformat()}
+        )
+    return {
+        'total_candidatos': 0,
+        'total_vagas': 0,
+        'total_processos': 0,
+        'contratacoes': 0,
+        'rejeicoes': 0,
+        'taxa_conversao': 0,
+        'tempo_medio': 0,
+        'funcoes_demandadas': {},
+        'motivos_rejeicao': []
+    }
     
 def exibir_dashboard_metricas(metricas, periodo_nome):
     """Exibe dashboard de métricas de negócio"""
@@ -855,9 +884,18 @@ def aplicar_filtros_avancados_candidatos(df_candidatos):
         )
         
         if busca_global.strip():
+            # ✅ SANITIZAR BUSCA
+            from validators import sanitizar_filtro_busca
+            busca_limpa = sanitizar_filtro_busca(busca_global)
+            
+            if not busca_limpa:
+                st.warning("⚠️ Termo de busca contém caracteres inválidos")
+                return df_filtrado
+            
+            # ✅ USAR BUSCA SANITIZADA
             mascara_busca = (
-                df_filtrado['nome_completo'].str.contains(busca_global, case=False, na=False) |
-                df_filtrado['email'].str.contains(busca_global, case=False, na=False)
+                df_filtrado['nome_completo'].str.contains(busca_limpa, case=False, na=False) |
+                df_filtrado['email'].str.contains(busca_limpa, case=False, na=False)
             )
             
             # Adicionar busca por cidade se disponível
@@ -941,15 +979,24 @@ def aplicar_filtros_avancados_vagas(df_vagas):
         )
         
         if busca_global_vagas.strip():
-            # Criar coluna nome completo se não existir
+            # ✅ SANITIZAR BUSCA
+            from validators import sanitizar_filtro_busca
+            busca_limpa = sanitizar_filtro_busca(busca_global_vagas)
+            
+            if not busca_limpa:
+                st.warning("⚠️ Termo de busca contém caracteres inválidos")
+                return df_filtrado
+            
+            # Criar coluna se não existir
             if 'nome_completo_proprietario' not in df_filtrado.columns:
                 df_filtrado['nome_completo_proprietario'] = (
                     df_filtrado['nome'].fillna('') + ' ' + df_filtrado['sobrenome'].fillna('')
                 ).str.strip()
             
+            # ✅ USAR BUSCA SANITIZADA
             mascara_busca = (
-                df_filtrado['nome_completo_proprietario'].str.contains(busca_global_vagas, case=False, na=False) |
-                df_filtrado['email'].str.contains(busca_global_vagas, case=False, na=False)
+                df_filtrado['nome_completo_proprietario'].str.contains(busca_limpa, case=False, na=False) |
+                df_filtrado['email'].str.contains(busca_limpa, case=False, na=False)
             )
             
             # Adicionar busca por cidade se disponível
@@ -1003,7 +1050,11 @@ def expirar_relacionamentos_antigos():
                 st.info(f"🔄 {count_expirados} relacionamentos antigos foram expirados automaticamente")
                 
     except Exception as e:
-        st.error(f"❌ Erro ao expirar relacionamentos antigos: {str(e)}")
+        log_erro(
+            mensagem_usuario="Erro ao expirar relacionamentos antigos",
+            excecao=e,
+            contexto={'data_limite': data_limite}
+        )
 
 def validar_limite_candidatos_vaga(vaga_id):
     """Valida se vaga já atingiu limite máximo de 5 candidatos ativos"""
@@ -1016,8 +1067,12 @@ def validar_limite_candidatos_vaga(vaga_id):
         return relacionamentos_ativos.count < 5, relacionamentos_ativos.count
         
     except Exception as e:
-        st.error(f"❌ Erro ao validar limite de candidatos: {str(e)}")
-        return False, 0
+        log_erro(
+            mensagem_usuario="Erro ao validar limite de candidatos por vaga",
+            excecao=e,
+            contexto={'vaga_id': vaga_id}
+        )
+    return False, 0
 
 def verificar_relacionamento_existente(candidato_id, vaga_id):
     """Verifica se já existe relacionamento entre candidato e vaga"""
@@ -1035,8 +1090,12 @@ def verificar_relacionamento_existente(candidato_id, vaga_id):
         return False, None
         
     except Exception as e:
-        st.error(f"❌ Erro ao verificar relacionamento existente: {str(e)}")
-        return True, "erro"  # Em caso de erro, bloquear por segurança
+        log_erro(
+            mensagem_usuario="Erro ao verificar relacionamento existente",
+            excecao=e,
+            contexto={'candidato_id': candidato_id, 'vaga_id': vaga_id}
+        )
+    return True, "erro"
 
 def atualizar_status_automatico(candidato_id, vaga_id, acao='criar'):
     """Atualiza status automático de candidatos e vagas"""
@@ -1074,8 +1133,12 @@ def atualizar_status_automatico(candidato_id, vaga_id, acao='criar'):
         return True
         
     except Exception as e:
-        st.error(f"❌ Erro ao atualizar status automático: {str(e)}")
-        return False
+        log_erro(
+            mensagem_usuario="Erro ao atualizar status automático",
+            excecao=e,
+            contexto={'candidato_id': candidato_id, 'vaga_id': vaga_id, 'acao': acao}
+        )
+    return False
 
 def finalizar_relacionamento(relacionamento_id, resultado_final, motivo=""):
     """Finaliza um relacionamento e libera status de candidato/vaga"""
@@ -1119,6 +1182,18 @@ def finalizar_relacionamento(relacionamento_id, resultado_final, motivo=""):
         }).eq('id', relacionamento_id).execute()
         
         if resultado_update.data:
+            
+            log_auditoria(
+        acao='finalizar_relacionamento',
+        usuario=username if 'username' in globals() else 'sistema',
+        dados={
+            'relacionamento_id': relacionamento_id,
+            'resultado_final': resultado_final,
+            'motivo': motivo[:100] if motivo else 'N/A',
+            'timestamp': datetime.now().isoformat()
+        }
+        )
+            
             # Atualizar status automático apenas se NÃO foi contratado
             if resultado_final != 'contratado':
                 atualizar_status_automatico(rel['candidato_id'], rel['vaga_id'], 'finalizar')
@@ -1237,6 +1312,35 @@ def carregar_observacoes_vaga(vaga_id):
         return []
 
 def adicionar_observacao_vaga(vaga_id, observacao, tipo='geral'):
+    """Adiciona observação com validação server-side"""
+    try:
+        # ✅ VALIDAR E SANITIZAR
+        from validators import validar_observacao_vaga, validar_enum
+        
+        sucesso, mensagem, observacao_limpa = validar_observacao_vaga(vaga_id, observacao)
+        if not sucesso:
+            return False
+        
+        # Validar tipo
+        tipos_permitidos = ['geral', 'candidato_enviado', 'status_change']
+        sucesso, _ = validar_enum(tipo, tipos_permitidos, "Tipo de observação")
+        if not sucesso:
+            tipo = 'geral'  # Fallback seguro
+        
+        supabase = get_supabase_client()
+        
+        dados_observacao = {
+            'vaga_id': vaga_id,
+            'observacao': observacao_limpa,
+            'tipo_observacao': tipo
+        }
+        
+        result = supabase.table('vaga_observacoes').insert(dados_observacao).execute()
+        
+        return result.data is not None
+        
+    except Exception as e:
+        return False
     """Adiciona nova observação à vaga"""
     try:
         supabase = get_supabase_client()
@@ -1258,8 +1362,15 @@ def adicionar_observacao_vaga(vaga_id, observacao, tipo='geral'):
         return False
 
 def atualizar_status_vaga(vaga_id, novo_status):
-    """Atualiza status da vaga e sua situação"""
+    """Atualiza status da vaga com validação server-side"""
     try:
+        # ✅ VALIDAR PRIMEIRO
+        from validators import validar_atualizacao_status_vaga
+        
+        sucesso, mensagem = validar_atualizacao_status_vaga(vaga_id, novo_status)
+        if not sucesso:
+            return False
+        
         supabase = get_supabase_client()
         
         # Mapear status para situação
@@ -1275,16 +1386,27 @@ def atualizar_status_vaga(vaga_id, novo_status):
         
         result = supabase.table('vagas').update({
             'status_detalhado': novo_status,
-            'status': nova_situacao,  # Atualizar situação também
+            'status': nova_situacao,
             'updated_at': datetime.now().isoformat()
         }).eq('id', vaga_id).execute()
         
-        return result.data is not None
+        if result.data is not None:
+            log_auditoria(
+                acao='atualizar_status_vaga',
+                usuario=username if 'username' in globals() else 'sistema',
+                dados={
+                    'vaga_id': vaga_id,
+                    'status_antigo': '?',  # Poderia buscar antes
+                    'status_novo': novo_status,
+                    'timestamp': datetime.now().isoformat()
+                }
+            )
+            return True
+        return False
         
     except Exception as e:
-        st.error(f"❌ Erro ao atualizar status: {str(e)}")
         return False
-
+    
 def formatar_funcao_vaga(formulario_id):
     """Converte ID da vaga em nome amigável"""
     funcoes = {
@@ -1312,87 +1434,87 @@ def formatar_status_vaga(status):
     return f"{info['icon']} {info['text']}", info['color']
 
 def relacionar_candidato_vaga_com_status(candidato_id, vaga_id, observacao="", status_inicial="enviado", data_entrevista=None):
-    """Relaciona candidato com vaga com validações robustas"""
+    """Relaciona candidato com vaga com validação server-side"""
     try:
+        # ✅ VALIDAÇÃO SERVER-SIDE COMPLETA
+        sucesso, mensagem, dados_validados = validar_relacionamento_candidato_vaga(
+            candidato_id=candidato_id,
+            vaga_id=vaga_id,
+            status_processo=status_inicial,
+            observacao=observacao
+        )
+        
+        # Se validação falhar, retornar erro
+        if not sucesso:
+            return False, f"❌ Validação falhou: {mensagem}"
+        
+        # ✅ DADOS JÁ ESTÃO LIMPOS E VALIDADOS
         supabase = get_supabase_client()
         
-        # ✅ VALIDAÇÃO 1: Verificar se relacionamento já existe
-        existe_relacionamento, status_existente = verificar_relacionamento_existente(candidato_id, vaga_id)
-        if existe_relacionamento:
-            return False, f"❌ Candidato já está relacionado a esta vaga com status '{status_existente}'"
-        
-        # ✅ VALIDAÇÃO 2: Verificar limite máximo de candidatos por vaga (5)
-        dentro_do_limite, count_atual = validar_limite_candidatos_vaga(vaga_id)
-        if not dentro_do_limite:
-            return False, f"❌ Vaga já possui o limite máximo de 5 candidatos ativos (atual: {count_atual})"
-        
-        # ✅ VALIDAÇÃO 3: Verificar se candidato não está em processo em outra vaga
-        candidato_ativo = supabase.table('candidatos_vagas').select('id', 'vaga_id').eq('candidato_id', candidato_id).not_.in_('status_processo', ['finalizado', 'expirado', 'rejeitado', 'cancelado']).execute()
-        
-        if candidato_ativo.data:
-            return False, f"❌ Candidato já está em processo ativo em outra vaga"
-        
-        # Criar observação automática baseada no status
+        # Construir observação com histórico
+        from datetime import datetime
         timestamp = datetime.now().strftime('%d/%m/%Y %H:%M')
-        status_map = {
-            'enviado': 'Candidato enviado ao cliente',
-            'em_analise': 'Cliente recebeu candidato e está analisando',
-            'entrevista_agendada': 'Entrevista foi agendada',
-            'aprovado': 'Cliente aprovou o candidato',
-            'rejeitado': 'Cliente rejeitou o candidato',
-            'contratado': 'Candidato foi contratado',
-            'cancelado': 'Processo foi cancelado'
-        }
+        observacao_automatica = f"[SISTEMA - {timestamp}] Relacionamento criado com status: {status_inicial.upper()}"
         
-        # Construir observação inicial com histórico automático
-        observacao_automatica = f"[SISTEMA - {timestamp}] Relacionamento criado com status: {status_inicial.upper().replace('_', ' ')}. {status_map.get(status_inicial, '')}"
-        
-        if data_entrevista:
-            data_formatada = data_entrevista.strftime('%d/%m/%Y às %H:%M')
-            observacao_automatica += f"\n[SISTEMA - {timestamp}] Entrevista agendada para: {data_formatada}"
-        
-        # Combinar observação do usuário com a automática
-        observacao_final = observacao.strip() if observacao.strip() else ""
-        if observacao_final:
-            observacao_completa = f"{observacao_final}\n\n{observacao_automatica}"
+        if dados_validados['observacoes']:
+            dados_validados['observacoes'] = f"{dados_validados['observacoes']}\n\n{observacao_automatica}"
         else:
-            observacao_completa = observacao_automatica
+            dados_validados['observacoes'] = observacao_automatica
         
-        # Dados para inserir no relacionamento
-        dados_relacao = {
-            'candidato_id': candidato_id,
-            'vaga_id': vaga_id,
-            'status_processo': status_inicial,
-            'observacoes': observacao_completa
-        }
-        
-        # Adicionar data da entrevista se fornecida
+        # Adicionar data de entrevista se fornecida
         if data_entrevista:
-            dados_relacao['data_entrevista'] = data_entrevista.isoformat()
+            dados_validados['data_entrevista'] = data_entrevista.isoformat()
         
-        # ✅ CRIAR RELACIONAMENTO
-        result = supabase.table('candidatos_vagas').insert(dados_relacao).execute()
+        # ✅ INSERIR DADOS VALIDADOS
+        result = supabase.table('candidatos_vagas').insert(dados_validados).execute()
         
         if result.data:
-            # ✅ VALIDAÇÃO 4: Atualizar status automático
-            if atualizar_status_automatico(candidato_id, vaga_id, 'criar'):
-                
-                # Adicionar observação automática na vaga
-                obs_vaga = f"Candidato relacionado com status '{status_inicial.upper().replace('_', ' ')}'. {observacao.strip()}"
-                if data_entrevista:
-                    obs_vaga += f" Entrevista: {data_entrevista.strftime('%d/%m/%Y às %H:%M')}"
-                
-                adicionar_observacao_vaga(vaga_id, obs_vaga, 'candidato_enviado')
-                
-                return True, "✅ Relacionamento criado com sucesso! Status automático atualizado."
-            else:
-                return True, "✅ Relacionamento criado, mas houve problema ao atualizar status automático."
+            # Atualizar status automático
+            atualizar_status_automatico(candidato_id, vaga_id, 'criar')
+            
+            # Adicionar observação na vaga
+            from validators import sanitizar_texto
+            obs_limpa = sanitizar_texto(f"Candidato relacionado. {observacao}")
+            adicionar_observacao_vaga(vaga_id, obs_limpa, 'candidato_enviado')
+            
+            return True, "✅ Relacionamento criado com sucesso!"
         
-        return False, "❌ Erro técnico ao criar relacionamento"
+        return False, "❌ Erro ao criar relacionamento"
         
     except Exception as e:
-        return False, f"❌ Erro técnico: {str(e)}"
-
+        log_erro(
+            mensagem_usuario="Erro ao criar relacionamento candidato-vaga",
+            excecao=e,
+            contexto={
+                'candidato_id': candidato_id,
+                'vaga_id': vaga_id,
+                'status': status_inicial
+            }
+        )
+    
+    if result.data:
+    # ✅ LOG DE AUDITORIA
+        log_auditoria(
+            acao='criar_relacionamento',
+            usuario=username if 'username' in globals() else 'sistema',
+            dados={
+                'candidato_id': candidato_id,
+                'vaga_id': vaga_id,
+                'status_inicial': status_inicial,
+                'timestamp': datetime.now().isoformat()
+            }
+        )
+        
+        log_sucesso(
+            acao="Relacionamento criado",
+            usuario=username if 'username' in globals() else 'sistema',
+            detalhes={'candidato': candidato_id[:8], 'vaga': vaga_id[:8]}
+    )
+    
+    # ... resto do código
+    
+    return False, "❌ Erro ao criar relacionamento. Contate o administrador."
+    
 @st.cache_data(ttl=300)
 def carregar_relacionamentos(limite=100, offset=0, filtros=None, retornar_contagem=False):
     """Carrega relacionamentos com paginação e filtros"""
@@ -1436,10 +1558,14 @@ def carregar_relacionamentos(limite=100, offset=0, filtros=None, retornar_contag
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
         
     except Exception as e:
-        st.error(f"❌ Erro ao carregar relacionamentos: {str(e)}")
-        if retornar_contagem:
-            return pd.DataFrame(), 0
-        return pd.DataFrame()
+        log_erro(
+            mensagem_usuario="Erro ao carregar relacionamentos",
+            excecao=e,
+            contexto={'limite': limite, 'offset': offset}
+        )
+    if retornar_contagem:
+        return pd.DataFrame(), 0
+    return pd.DataFrame()
 
 def atualizar_relacionamento(relacionamento_id, novo_candidato_id=None, nova_observacao=None, novo_status=None, data_entrevista=None, reiniciar_prazo=False):
     """Atualiza relacionamento com histórico automático"""
@@ -1966,9 +2092,14 @@ def gerenciar_candidatos():
                             st.info("💡 Dica: O download iniciará automaticamente ao clicar.")
                             
                     except Exception as e:
-                        st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-                        import traceback
-                        st.error(f"🔍 Detalhes: {traceback.format_exc()}")
+                        log_erro(
+                            mensagem_usuario="Erro ao gerar PDF do candidato",
+                            excecao=e,
+                            contexto={
+                                'candidato_id': candidato_id,
+                                'nome': candidato.get('nome_completo', 'N/A')
+                            }
+                        )
                 
                 
                 # Sistema de qualificação
@@ -2054,32 +2185,39 @@ def gerenciar_relacionamentos():
                 key="filtro_funcao_candidato"
             )
         
-        # FILTRAR CANDIDATOS BASEADO NA BUSCA
-        df_candidatos_filtrados = df_candidatos.copy()
+    # FILTRAR CANDIDATOS BASEADO NA BUSCA
+    df_candidatos_filtrados = df_candidatos.copy()
         
-        if busca_candidato.strip():
-            df_candidatos_filtrados = df_candidatos_filtrados[
-                df_candidatos_filtrados['nome_completo'].str.contains(busca_candidato, case=False, na=False)
-            ]
+    if busca_candidato.strip():
+        # ✅ SANITIZAR
+        from validators import sanitizar_nome
+        busca_limpa = sanitizar_nome(busca_candidato)
         
-        if filtro_funcao_candidato != "Todas":
-            df_candidatos_filtrados = df_candidatos_filtrados[
-                df_candidatos_filtrados['formulario_id'] == filtro_funcao_candidato
-            ]
-        
-        if df_candidatos_filtrados.empty:
-            st.warning("⚠️ Nenhum candidato encontrado com os filtros aplicados. Ajuste a busca.")
-            candidato_selecionado = None
+        if not busca_limpa:
+            st.warning("⚠️ Nome contém caracteres inválidos")
         else:
-            st.info(f"📊 Encontrados {len(df_candidatos_filtrados)} candidatos")
-            candidato_selecionado = st.selectbox(
-                f"Escolher candidato ({len(df_candidatos_filtrados)} opções):",
-                options=df_candidatos_filtrados['id'].tolist(),
-                format_func=lambda x: f"{df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['nome_completo'].iloc[0]} - {formatar_funcao(df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['formulario_id'].iloc[0])}",
-                key="select_candidato_filtrado"
-            )
-        
-        st.markdown("---")
+            df_candidatos_filtrados = df_candidatos_filtrados[
+                df_candidatos_filtrados['nome_completo'].str.contains(busca_limpa, case=False, na=False)
+            ]
+            
+            if filtro_funcao_candidato != "Todas":
+                df_candidatos_filtrados = df_candidatos_filtrados[
+                    df_candidatos_filtrados['formulario_id'] == filtro_funcao_candidato
+                ]
+            
+            if df_candidatos_filtrados.empty:
+                st.warning("⚠️ Nenhum candidato encontrado com os filtros aplicados. Ajuste a busca.")
+                candidato_selecionado = None
+            else:
+                st.info(f"📊 Encontrados {len(df_candidatos_filtrados)} candidatos")
+                candidato_selecionado = st.selectbox(
+                    f"Escolher candidato ({len(df_candidatos_filtrados)} opções):",
+                    options=df_candidatos_filtrados['id'].tolist(),
+                    format_func=lambda x: f"{df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['nome_completo'].iloc[0]} - {formatar_funcao(df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['formulario_id'].iloc[0])}",
+                    key="select_candidato_filtrado"
+                )
+            
+            st.markdown("---")
         
         # SEÇÃO DE BUSCA DE VAGAS
         st.markdown("#### 💼 Selecionar Vaga")
@@ -2100,41 +2238,50 @@ def gerenciar_relacionamentos():
                 key="filtro_tipo_vaga"
             )
         
-        # FILTRAR VAGAS BASEADO NA BUSCA
-        df_vagas_filtradas = df_vagas.copy()
+    # FILTRAR VAGAS BASEADO NA BUSCA
+    df_vagas_filtradas = df_vagas.copy()
+    
+    if busca_vaga.strip():
+        # ✅ SANITIZAR
+        from validators import sanitizar_nome
+        busca_limpa = sanitizar_nome(busca_vaga)
         
-        if busca_vaga.strip():
-            # Criar coluna nome_completo_proprietario se não existir
+        if not busca_limpa:
+            st.warning("⚠️ Nome contém caracteres inválidos")
+        else:
+            # Criar coluna se não existir
             if 'nome_completo_proprietario' not in df_vagas_filtradas.columns:
-                df_vagas_filtradas['nome_completo_proprietario'] = df_vagas_filtradas['nome'].fillna('') + ' ' + df_vagas_filtradas['sobrenome'].fillna('')
+                df_vagas_filtradas['nome_completo_proprietario'] = (
+                    df_vagas_filtradas['nome'].fillna('') + ' ' + df_vagas_filtradas['sobrenome'].fillna('')
+                ).str.strip()
             
             df_vagas_filtradas = df_vagas_filtradas[
-                df_vagas_filtradas['nome_completo_proprietario'].str.contains(busca_vaga, case=False, na=False)
+                df_vagas_filtradas['nome_completo_proprietario'].str.contains(busca_limpa, case=False, na=False)
             ]
-        
-        if filtro_tipo_vaga != "Todas":
+            
+            if filtro_tipo_vaga != "Todas":
+                df_vagas_filtradas = df_vagas_filtradas[
+                    df_vagas_filtradas['formulario_id'] == filtro_tipo_vaga
+                ]
+            
+            # Filtrar apenas vagas ativas por padrão
             df_vagas_filtradas = df_vagas_filtradas[
-                df_vagas_filtradas['formulario_id'] == filtro_tipo_vaga
+                df_vagas_filtradas.get('status_detalhado', df_vagas_filtradas.get('status', 'ativa')).isin(['ativa', 'em_andamento'])
             ]
-        
-        # Filtrar apenas vagas ativas por padrão
-        df_vagas_filtradas = df_vagas_filtradas[
-            df_vagas_filtradas.get('status_detalhado', df_vagas_filtradas.get('status', 'ativa')).isin(['ativa', 'em_andamento'])
-        ]
-        
-        if df_vagas_filtradas.empty:
-            st.warning("⚠️ Nenhuma vaga ativa encontrada com os filtros aplicados. Ajuste a busca.")
-            vaga_selecionada = None
-        else:
-            st.info(f"📊 Encontradas {len(df_vagas_filtradas)} vagas ativas")
-            vaga_selecionada = st.selectbox(
-                f"Escolher vaga ({len(df_vagas_filtradas)} opções):",
-                options=df_vagas_filtradas['id'].tolist(),
-                format_func=lambda x: f"{df_vagas_filtradas[df_vagas_filtradas['id'] == x]['nome'].iloc[0]} {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['sobrenome'].iloc[0]} - {formatar_funcao_vaga(df_vagas_filtradas[df_vagas_filtradas['id'] == x]['formulario_id'].iloc[0])} - R$ {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['salario_oferecido'].iloc[0]}",
-                key="select_vaga_filtrada"
-            )
-        
-        st.markdown("---")
+            
+            if df_vagas_filtradas.empty:
+                st.warning("⚠️ Nenhuma vaga ativa encontrada com os filtros aplicados. Ajuste a busca.")
+                vaga_selecionada = None
+            else:
+                st.info(f"📊 Encontradas {len(df_vagas_filtradas)} vagas ativas")
+                vaga_selecionada = st.selectbox(
+                    f"Escolher vaga ({len(df_vagas_filtradas)} opções):",
+                    options=df_vagas_filtradas['id'].tolist(),
+                    format_func=lambda x: f"{df_vagas_filtradas[df_vagas_filtradas['id'] == x]['nome'].iloc[0]} {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['sobrenome'].iloc[0]} - {formatar_funcao_vaga(df_vagas_filtradas[df_vagas_filtradas['id'] == x]['formulario_id'].iloc[0])} - R$ {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['salario_oferecido'].iloc[0]}",
+                    key="select_vaga_filtrada"
+                )
+            
+            st.markdown("---")
         
         # RESTO DO FORMULÁRIO (status, entrevista, etc.)
         # NOVO: Campo para definir status inicial

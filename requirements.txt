@@ -37,3 +37,5 @@ pytz>=2024.1
 # ===== OPCIONAL - AGENDAMENTO DE BACKUPS =====
 schedule>=1.2.0
 apscheduler>=3.10.4
+
+cryptography==41.0.7
