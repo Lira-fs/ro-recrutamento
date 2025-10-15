@@ -1,27 +1,47 @@
-# Imports existentes...
 import sys
 import os
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-from validators import validar_relacionamento_candidato_vaga
 
+# ✅ 1. CARREGAR VARIÁVEIS DE AMBIENTE PRIMEIRO
+from dotenv import load_dotenv
+load_dotenv()
+
+# ✅ 2. ADICIONAR PASTA BACKEND AO PATH
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+
+# ✅ 3. AGORA IMPORTAR DO BACKEND (sem "backend." no import)
 from google_drive_backup_oauth import (
     criar_backup_automatico,
     listar_backups_disponiveis,
     GoogleDriveBackupOAuth
 )
 
-# ⭐ NOVO: Import de autenticação
 from auth import verificar_autenticacao, exibir_info_usuario_sidebar
-
-# Imports existentes do backend...
 from supabase_client import get_supabase_client
 from pdf_utils import gerar_ficha_candidato_completa, gerar_ficha_vaga_completa
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-from logger import log_erro, log_aviso, log_info, log_sucesso, log_auditoria, tratar_erros
+# ✅ 4. IMPORTS DE SEGURANÇA
+from validators import (
+    validar_relacionamento_candidato_vaga,
+    validar_atualizacao_status_vaga,
+    validar_observacao_vaga,
+    sanitizar_filtro_busca,
+    sanitizar_nome
+)
+
+from logger import log_erro, log_aviso, log_info, log_sucesso, log_auditoria
+
+# ✅ 5. IMPORTS DE CRIPTOGRAFIA (SEM "backend.")
+from encryption import (
+    encrypt_candidato, 
+    decrypt_candidato, 
+    encrypt_vaga, 
+    decrypt_vaga,
+    decrypt_lista_candidatos, 
+    decrypt_lista_vagas
+)
 
 
 # ============================================
@@ -44,138 +64,456 @@ name, username, authenticator = verificar_autenticacao()
 
 # Se chegou aqui, usuário está autenticado! ✅
 
+@st.cache_data(ttl=300)
+def carregar_dados_vagas_completo():
+    """
+    Carrega todas as vagas do sistema
+    
+    Returns:
+        DataFrame: Dados das vagas
+    """
+    try:
+        df_vagas = carregar_vagas()
+        return df_vagas
+        
+    except Exception as e:
+        log_erro(
+            mensagem_usuario="Erro ao carregar dados de vagas",
+            excecao=e,
+            contexto={}
+        )
+        return pd.DataFrame()
+    
+# =====================================
+# MÓDULO 1: CARREGAR DADOS DE VAGAS
+# =====================================
+
+@st.cache_data(ttl=300)
+def carregar_dados_vagas_completo():
+    """
+    Carrega todas as vagas do sistema
+    
+    Returns:
+        DataFrame: Dados das vagas
+    """
+    try:
+        df_vagas = carregar_vagas()
+        return df_vagas
+        
+    except Exception as e:
+        log_erro(
+            mensagem_usuario="Erro ao carregar dados de vagas",
+            excecao=e,
+            contexto={}
+        )
+        return pd.DataFrame()
+
+
+# =====================================
+# MÓDULO 2: SIDEBAR COM FILTROS DE VAGAS
+# =====================================
+
+def criar_sidebar_filtros_vagas(df):
+    """
+    Cria sidebar com todos os filtros de vagas
+    
+    Args:
+        df (DataFrame): DataFrame com vagas
+        
+    Returns:
+        dict: Dicionário com valores dos filtros selecionados
+    """
+    filtros = {}
+    
+    with st.sidebar:
+        st.header("🔍 Filtros de Vagas")
+        
+        # Filtro por status
+        filtros['status'] = st.selectbox(
+            "📊 Status:",
+            ["Todas", "ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
+            key="filtro_status_vaga"
+        )
+        
+        # Filtro por urgência
+        filtros['urgente'] = st.checkbox(
+            "🚨 Apenas urgentes",
+            key="filtro_urgente"
+        )
+        
+        st.markdown("---")
+        
+        # Filtros avançados
+        if not df.empty:
+            with st.expander("🔧 Filtros Avançados", expanded=False):
+                
+                # Filtro por cidade
+                if 'cidade' in df.columns:
+                    cidades = ['Todas'] + sorted(
+                        df['cidade'].dropna().unique().tolist()
+                    )
+                    filtros['cidade'] = st.selectbox(
+                        "🏙️ Cidade:",
+                        cidades,
+                        key="filtro_cidade_vaga"
+                    )
+                else:
+                    filtros['cidade'] = "Todas"
+                
+                # Filtro por tipo de vaga
+                if 'formulario_id' in df.columns:
+                    tipos = ['Todas'] + sorted(
+                        df['formulario_id'].dropna().unique().tolist()
+                    )
+                    filtros['tipo'] = st.selectbox(
+                        "💼 Tipo de vaga:",
+                        tipos,
+                        format_func=lambda x: formatar_funcao_vaga(x) if x != 'Todas' else x,
+                        key="filtro_tipo_vaga"
+                    )
+                else:
+                    filtros['tipo'] = "Todas"
+                
+                # Filtro por faixa salarial
+                if 'salario_oferecido' in df.columns:
+                    salarios = pd.to_numeric(df['salario_oferecido'], errors='coerce').dropna()
+                    if not salarios.empty:
+                        salario_min_val = int(salarios.min())
+                        salario_max_val = int(salarios.max())
+                        
+                        if salario_max_val > salario_min_val:
+                            filtros['salario_min'], filtros['salario_max'] = st.slider(
+                                "💰 Faixa salarial:",
+                                min_value=salario_min_val,
+                                max_value=salario_max_val,
+                                value=(salario_min_val, salario_max_val),
+                                step=100,
+                                key="filtro_salario_vaga"
+                            )
+                        else:
+                            filtros['salario_min'] = salario_min_val
+                            filtros['salario_max'] = salario_max_val
+                    else:
+                        filtros['salario_min'] = 0
+                        filtros['salario_max'] = 0
+                else:
+                    filtros['salario_min'] = 0
+                    filtros['salario_max'] = 0
+                
+                # Busca global
+                filtros['busca'] = st.text_input(
+                    "🔎 Busca geral:",
+                    placeholder="Nome do proprietário, cidade...",
+                    key="busca_global_vaga"
+                )
+    
+    return filtros
+
+def aplicar_filtros_vagas(df, filtros):
+    """
+    Aplica todos os filtros selecionados no DataFrame de vagas
+    
+    Args:
+        df (DataFrame): DataFrame original
+        filtros (dict): Dicionário com filtros
+        
+    Returns:
+        DataFrame: DataFrame filtrado
+    """
+    df_filtrado = df.copy()
+    
+    # Filtro por status
+    if filtros.get('status') and filtros['status'] != "Todas":
+        status_col = df_filtrado.get('status_detalhado', df_filtrado.get('status', ''))
+        df_filtrado = df_filtrado[status_col == filtros['status']]
+    
+    # Filtro por urgência
+    if filtros.get('urgente'):
+        df_filtrado = df_filtrado[
+            df_filtrado.get('inicio_urgente', '') == 'imediato'
+        ]
+    
+    # Filtro por cidade
+    if filtros.get('cidade') and filtros['cidade'] != "Todas":
+        if 'cidade' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['cidade'] == filtros['cidade']]
+    
+    # Filtro por tipo de vaga
+    if filtros.get('tipo') and filtros['tipo'] != "Todas":
+        if 'formulario_id' in df_filtrado.columns:
+            df_filtrado = df_filtrado[df_filtrado['formulario_id'] == filtros['tipo']]
+    
+    # Filtro por faixa salarial
+    if filtros.get('salario_min') and filtros.get('salario_max'):
+        if 'salario_oferecido' in df_filtrado.columns:
+            df_filtrado = df_filtrado[
+                (pd.to_numeric(df_filtrado['salario_oferecido'], errors='coerce') >= filtros['salario_min']) &
+                (pd.to_numeric(df_filtrado['salario_oferecido'], errors='coerce') <= filtros['salario_max'])
+            ]
+    
+    # Busca global
+    if filtros.get('busca') and filtros['busca'].strip():
+        from validators import sanitizar_filtro_busca
+        busca_limpa = sanitizar_filtro_busca(filtros['busca'])
+        
+        if busca_limpa:
+            # Criar coluna temporária com nome completo
+            if 'nome_completo_proprietario' not in df_filtrado.columns:
+                df_filtrado['nome_completo_proprietario'] = (
+                    df_filtrado['nome'].fillna('') + ' ' + 
+                    df_filtrado['sobrenome'].fillna('')
+                ).str.strip()
+            
+            mascara_busca = (
+                df_filtrado['nome_completo_proprietario'].str.contains(
+                    busca_limpa, case=False, na=False
+                ) |
+                df_filtrado['email'].str.contains(
+                    busca_limpa, case=False, na=False
+                )
+            )
+            
+            if 'cidade' in df_filtrado.columns:
+                mascara_busca |= df_filtrado['cidade'].str.contains(
+                    busca_limpa, case=False, na=False
+                )
+            
+            df_filtrado = df_filtrado[mascara_busca]
+    
+    return df_filtrado
+
+def exibir_metricas_vagas(df):
+    """
+    Exibe métricas das vagas em cards
+    
+    Args:
+        df (DataFrame): DataFrame com vagas
+    """
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("📊 Total Vagas", len(df))
+    
+    with col2:
+        vagas_ativas = len(
+            df[df.get('status_detalhado', df.get('status', '')) == 'ativa']
+        )
+        st.metric("🟢 Ativas", vagas_ativas)
+    
+    with col3:
+        vagas_preenchidas = len(
+            df[df.get('status_detalhado', df.get('status', '')) == 'preenchida']
+        )
+        st.metric("✅ Preenchidas", vagas_preenchidas)
+    
+    with col4:
+        vagas_urgentes = len(df[df.get('inicio_urgente', '') == 'imediato'])
+        st.metric("🔥 Urgentes", vagas_urgentes)
+        
+def exibir_card_vaga(vaga, idx):
+    """
+    Exibe card individual de uma vaga com todas as informações e ações
+    
+    Args:
+        vaga (dict): Dados da vaga
+        idx (int): Índice para keys únicas
+    """
+    vaga_id = vaga.get('id')
+    
+    # Obter status formatado
+    status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
+    status_display, status_color = formatar_status_vaga(status_atual)
+    
+    # Título do expander
+    titulo_expander = (
+        f"{formatar_funcao_vaga(vaga.get('formulario_id', ''))} | "
+        f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')} | "
+        f"💰 R$ {vaga.get('salario_oferecido', 'N/A')} | "
+        f"📍 {vaga.get('cidade', 'N/A')} | "
+        f"{status_display}"
+    )
+    
+    with st.expander(titulo_expander, expanded=False):
+        
+        col1, col2 = st.columns([2, 1])
+        
+        # ===== COLUNA 1: INFORMAÇÕES DA VAGA =====
+        with col1:
+            st.write(f"**📧 Email:** {vaga.get('email', 'Não informado')}")
+            st.write(f"**📞 Telefone:** {vaga.get('telefone_principal', 'Não informado')}")
+            st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
+            st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
+            st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
+            
+            # Data de cadastro
+            if vaga.get('created_at'):
+                data_cadastro = pd.to_datetime(vaga['created_at']).strftime('%d/%m/%Y às %H:%M')
+                st.write(f"**📅 Cadastrada em:** {data_cadastro}")
+        
+        # ===== COLUNA 2: CONTROLES =====
+        with col2:
+            st.subheader("🎛️ Controles")
+            
+            # Selectbox de status
+            novo_status = st.selectbox(
+                "Alterar status:",
+                ["ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
+                index=["ativa", "em_andamento", "preenchida", "pausada", "cancelada"].index(status_atual),
+                key=f"status_{vaga_id}_{idx}"
+            )
+            
+            # Botão atualizar status
+            if st.button(f"💾 Atualizar Status", key=f"update_status_{vaga_id}_{idx}"):
+                if atualizar_status_vaga(vaga_id, novo_status):
+                    st.success("✅ Status atualizado!")
+                    # Adicionar observação automática
+                    obs_status = f"Status alterado para: {novo_status}"
+                    adicionar_observacao_vaga(vaga_id, obs_status, 'status_change')
+                    st.cache_data.clear()
+                    st.rerun()
+                else:
+                    st.error("❌ Erro ao atualizar")
+            
+            st.markdown("---")
+            
+            # Botão gerar PDF
+            exibir_botao_gerar_pdf_vaga(vaga, idx)
+        
+        st.markdown("---")
+        
+        # ===== SEÇÃO DE OBSERVAÇÕES =====
+        exibir_secao_observacoes_vaga(vaga, idx)
+
+
+# =====================================
+# MÓDULO 5A: BOTÃO GERAR PDF DE VAGA
+# =====================================
+
+def exibir_botao_gerar_pdf_vaga(vaga, idx):
+    """
+    Exibe botão para gerar PDF da vaga
+    
+    Args:
+        vaga (dict): Dados da vaga
+        idx (int): Índice para keys únicas
+    """
+    vaga_id = vaga.get('id')
+    
+    if st.button("📄 Gerar Ficha Vaga", key=f"pdf_vaga_{vaga_id}_{idx}", type="primary"):
+        try:
+            with st.spinner("Gerando PDF da vaga..."):
+                # Usar sistema de PDF existente adaptado para vagas
+                pdf_bytes, nome_arquivo = gerar_ficha_vaga_completa(vaga)
+                
+                st.download_button(
+                    label="💾 Download Ficha Vaga",
+                    data=pdf_bytes,
+                    file_name=nome_arquivo,
+                    mime="application/pdf",
+                    key=f"download_vaga_{vaga_id}_{idx}",
+                    type="primary",
+                    use_container_width=True
+                )
+                
+                st.success("✅ PDF gerado! Clique acima para baixar.")
+                
+        except Exception as e:
+            log_erro(
+                mensagem_usuario="Erro ao gerar PDF da vaga",
+                excecao=e,
+                contexto={
+                    'vaga_id': vaga_id,
+                    'proprietario': f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')}"
+                }
+            )
+
+def exibir_secao_observacoes_vaga(vaga, idx):
+    """
+    Exibe seção de observações da vaga com formulário e histórico
+    
+    Args:
+        vaga (dict): Dados da vaga
+        idx (int): Índice para keys únicas
+    """
+    vaga_id = vaga.get('id')
+    
+    st.subheader("📝 Observações e Histórico")
+    
+    # ===== ADICIONAR NOVA OBSERVAÇÃO =====
+    with st.form(f"obs_form_{vaga_id}_{idx}"):
+        nova_obs = st.text_area(
+            "Nova observação:",
+            placeholder="Ex: Enviado candidato João Silva em 15/09/2025",
+            key=f"nova_obs_{vaga_id}_{idx}"
+        )
+        
+        submitted = st.form_submit_button("➕ Adicionar Observação")
+        
+        if submitted:
+            if nova_obs.strip():
+                if adicionar_observacao_vaga(vaga_id, nova_obs):
+                    st.success("✅ Observação adicionada!")
+                    st.cache_data.clear()
+                    st.rerun()
+                else:
+                    st.error("❌ Erro ao adicionar observação")
+            else:
+                st.warning("⚠️ Digite uma observação válida")
+    
+    # ===== EXIBIR OBSERVAÇÕES EXISTENTES =====
+    observacoes = carregar_observacoes_vaga(vaga_id)
+    
+    if observacoes:
+        st.write("**📚 Histórico de Observações:**")
+        for obs in observacoes:
+            data_obs = pd.to_datetime(obs['data_criacao']).strftime('%d/%m/%Y às %H:%M')
+            tipo_icon = {
+                'geral': '📝',
+                'candidato_enviado': '👤',
+                'status_change': '🔄'
+            }.get(obs.get('tipo_observacao', 'geral'), '📝')
+            
+            st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
+    else:
+        st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
+        
 def gerenciar_vagas():
-    """Nova funcionalidade para gestão de vagas + FILTROS AVANÇADOS"""
+    """
+    Função orquestradora de gestão de vagas
+    MODULARIZADA - Apenas coordena os módulos
+    """
+    
     st.header("💼 Gestão de Vagas")
     
-    # CARREGAR VAGAS
+    # 1. CARREGAR DADOS
     with st.spinner("Carregando vagas..."):
-        df_vagas = carregar_vagas()
+        df_vagas = carregar_dados_vagas_completo()
     
     if df_vagas.empty:
         st.warning("⚠️ Nenhuma vaga encontrada.")
         return
     
-    # ✅ APLICAR FILTROS AVANÇADOS (NOVO)
-    df_filtrado = aplicar_filtros_avancados_vagas(df_vagas)
+    # 2. CRIAR SIDEBAR COM FILTROS
+    filtros = criar_sidebar_filtros_vagas(df_vagas)
     
-    # MÉTRICAS DE VAGAS
-    col1, col2, col3, col4 = st.columns(4)
+    # 3. EXIBIR MÉTRICAS
+    exibir_metricas_vagas(df_vagas)
     
-    with col1:
-        st.metric("📊 Total Vagas", len(df_vagas))
+    st.markdown("---")
     
-    with col2:
-        vagas_ativas = len(df_vagas[df_vagas.get('status_detalhado', df_vagas.get('status', '')) == 'ativa'])
-        st.metric("🟢 Ativas", vagas_ativas)
+    # 4. APLICAR FILTROS
+    df_filtrado = aplicar_filtros_vagas(df_vagas, filtros)
     
-    with col3:
-        vagas_preenchidas = len(df_vagas[df_vagas.get('status_detalhado', df_vagas.get('status', '')) == 'preenchida'])
-        st.metric("✅ Preenchidas", vagas_preenchidas)
-    
-    with col4:
-        vagas_urgentes = len(df_vagas[df_vagas.get('inicio_urgente', '') == 'imediato'])
-        st.metric("🔥 Urgentes", vagas_urgentes)
-    
-    # LISTA DE VAGAS
+    # 5. EXIBIR RESULTADOS
     st.subheader(f"📋 Vagas Disponíveis ({len(df_filtrado)} encontradas)")
     
-    for vaga in df_filtrado.to_dict('records'):
-        # OBTER STATUS FORMATADO
-        status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
-        status_display, status_color = formatar_status_vaga(status_atual)
-        
-        with st.expander(
-            f"{formatar_funcao_vaga(vaga.get('formulario_id', ''))} | "
-            f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')} | "
-            f"💰 R$ {vaga.get('salario_oferecido', 'N/A')} | "
-            f"📍 {vaga.get('cidade', 'N/A')} | "
-            f"{status_display}",
-            expanded=False
-        ):
-            
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # INFORMAÇÕES DA VAGA
-                st.write(f"**📧 Email:** {vaga.get('email', 'Não informado')}")
-                st.write(f"**📞 Telefone:** {vaga.get('telefone_principal', 'Não informado')}")
-                st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
-                st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
-                st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
-            
-            with col2:
-                # CONTROLES DE STATUS
-                st.subheader("🎛️ Controles")
-                
-                novo_status = st.selectbox(
-                    "Alterar status:",
-                    ["ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
-                    index=["ativa", "em_andamento", "preenchida", "pausada", "cancelada"].index(status_atual),
-                    key=f"status_{vaga.get('id')}"
-                )
-                
-                if st.button(f"💾 Atualizar Status", key=f"update_status_{vaga.get('id')}"):
-                    if atualizar_status_vaga(vaga.get('id'), novo_status):
-                        st.success("✅ Status atualizado!")
-                        # Adicionar observação automática
-                        obs_status = f"Status alterado para: {novo_status}"
-                        adicionar_observacao_vaga(vaga.get('id'), obs_status, 'status_change')
-                        st.rerun()
-                    else:
-                        st.error("❌ Erro ao atualizar")
-                
-                # BOTÃO GERAR PDF
-                if st.button(f"📄 Gerar Ficha Vaga", key=f"pdf_vaga_{vaga.get('id')}"):
-                    try:
-                        with st.spinner("Gerando PDF da vaga..."):
-                            # Usar sistema de PDF existente adaptado para vagas
-                            pdf_bytes, nome_arquivo = gerar_ficha_vaga_completa(vaga.to_dict())
-                            
-                            st.download_button(
-                                label="💾 Download Ficha Vaga",
-                                data=pdf_bytes,
-                                file_name=nome_arquivo,
-                                mime="application/pdf",
-                                key=f"download_vaga_{vaga.get('id')}"
-                            )
-                            
-                    except Exception as e:
-                        st.error(f"❌ Erro ao gerar PDF: {str(e)}")
-            
-            # SEÇÃO DE OBSERVAÇÕES
-            st.subheader("📝 Observações e Histórico")
-            
-            # ADICIONAR NOVA OBSERVAÇÃO
-            with st.form(f"obs_form_{vaga.get('id')}"):
-                nova_obs = st.text_area("Nova observação:", placeholder="Ex: Enviado candidato João Silva em 15/09/2025")
-                
-                if st.form_submit_button("➕ Adicionar Observação"):
-                    if nova_obs.strip():
-                        if adicionar_observacao_vaga(vaga.get('id'), nova_obs):
-                            st.success("✅ Observação adicionada!")
-                            st.rerun()
-                        else:
-                            st.error("❌ Erro ao adicionar observação")
-                    else:
-                        st.warning("⚠️ Digite uma observação válida")
-            
-            # EXIBIR OBSERVAÇÕES EXISTENTES
-            observacoes = carregar_observacoes_vaga(vaga.get('id'))
-            
-            if observacoes:
-                st.write("**📚 Histórico de Observações:**")
-                for obs in observacoes:
-                    data_obs = pd.to_datetime(obs['data_criacao']).strftime('%d/%m/%Y às %H:%M')
-                    tipo_icon = {
-                        'geral': '📝',
-                        'candidato_enviado': '👤',
-                        'status_change': '🔄'
-                    }.get(obs.get('tipo_observacao', 'geral'), '📝')
-                    
-                    st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
-            else:
-                st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
+    if df_filtrado.empty:
+        st.info("🔍 Nenhuma vaga encontrada com os filtros aplicados.")
+        return
+    
+    # 6. LISTA DE CARDS
+    for idx, vaga in enumerate(df_filtrado.to_dict('records')):
+        exibir_card_vaga(vaga, idx)
 
 # =====================================
 # CSS PERSONALIZADO
@@ -300,7 +638,9 @@ def carregar_candidatos(
         
         # Criar DataFrame
         if response.data:
-            df = pd.DataFrame(response.data)
+            dados_descriptografados = decrypt_lista_candidatos(response.data)
+            df = pd.DataFrame(dados_descriptografados)
+            
             
             # BUSCA TEXTUAL (se fornecida) - aplicada após query otimizada
             if filtros and filtros.get('busca'):
@@ -472,7 +812,8 @@ def carregar_candidatos_qualificados(limite=100, offset=0, retornar_contagem=Fal
                 })
                 dados_combinados.append(candidato_completo)
         
-        df = pd.DataFrame(dados_combinados)
+        dados_descriptografados = decrypt_lista_candidatos(dados_combinados)
+        df = pd.DataFrame(dados_descriptografados)
         
         if retornar_contagem:
             total = qualificacoes_response.count if hasattr(qualificacoes_response, 'count') else len(df)
@@ -531,7 +872,10 @@ def carregar_candidatos_pendentes(limite=100, offset=0, retornar_contagem=False)
             total = response.count if hasattr(response, 'count') else len(response.data) if response.data else 0
             return pd.DataFrame(response.data) if response.data else pd.DataFrame(), total
         
-        return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+        if response.data:
+            dados_descriptografados = decrypt_lista_candidatos(response.data)
+            return pd.DataFrame(dados_descriptografados)
+        return pd.DataFrame()
         
     except Exception as e:
         st.error(f"❌ Erro ao carregar candidatos pendentes: {str(e)}")
@@ -1279,7 +1623,8 @@ def carregar_vagas(
         
         # Criar DataFrame
         if response.data:
-            df = pd.DataFrame(response.data)
+            dados_descriptografados = decrypt_lista_vagas(response.data)
+            df = pd.DataFrame(dados_descriptografados)
         else:
             df = pd.DataFrame()
         
@@ -1885,50 +2230,207 @@ def gerenciar_backups():
 # PÁGINAS/ABAS DO SISTEMA
 # =====================================
 
-def gerenciar_candidatos():
-    """Função com código existente dos candidatos - PRESERVADO TOTALMENTE"""
+def carregar_dados_candidatos_por_tipo(tipo_visualizacao):
+    """
+    Carrega candidatos baseado no tipo de visualização selecionado
     
-    # SIDEBAR - FILTROS
-    st.sidebar.header("🔍 Filtros de Candidatos")
-
-    # Filtro de qualificação
-    tipo_visualizacao = st.sidebar.selectbox(
-        "Visualizar:",
-        [
-            "Todos os candidatos",
-            "Candidatos qualificados", 
-            "Pendentes de qualificação"
-        ],
-        key="tipo_visualizacao_candidatos"
-    )
-
-    # Carregamento condicional baseado no filtro
-    with st.spinner("Carregando candidatos..."):
+    Args:
+        tipo_visualizacao (str): Tipo de candidatos a carregar
+        
+    Returns:
+        tuple: (DataFrame, título_header)
+    """
+    try:
         if tipo_visualizacao == "Candidatos qualificados":
             df = carregar_candidatos_qualificados()
-            st.header("👑 Candidatos Qualificados")
+            titulo = "👑 Candidatos Qualificados"
             
         elif tipo_visualizacao == "Pendentes de qualificação":
             df = carregar_candidatos_pendentes()
-            st.header("⏳ Pendentes de Qualificação")
+            titulo = "⏳ Pendentes de Qualificação"
             
         else:
             df = carregar_candidatos()
-            st.header("📋 Todos os Candidatos")
+            titulo = "📋 Todos os Candidatos"
+        
+        return df, titulo
+        
+    except Exception as e:
+        log_erro(
+            mensagem_usuario="Erro ao carregar dados de candidatos",
+            excecao=e,
+            contexto={'tipo_visualizacao': tipo_visualizacao}
+        )
+        return pd.DataFrame(), "📋 Candidatos"
     
-    if df.empty:
-        st.warning("⚠️ Nenhum candidato encontrado no banco de dados.")
-        st.info("🔄 Certifique-se que existem candidatos cadastrados no Supabase.")
-        return
+def criar_sidebar_filtros_candidatos(df):
+    """
+    Cria sidebar com todos os filtros de candidatos
     
-    # MÉTRICAS
+    Args:
+        df (DataFrame): DataFrame com candidatos
+        
+    Returns:
+        dict: Dicionário com valores dos filtros selecionados
+    """
+    filtros = {}
+    
+    with st.sidebar:
+        st.header("🔍 Filtros de Candidatos")
+        
+        # Filtro de qualificação
+        filtros['tipo_visualizacao'] = st.selectbox(
+            "Visualizar:",
+            [
+                "Todos os candidatos",
+                "Candidatos qualificados", 
+                "Pendentes de qualificação"
+            ],
+            key="tipo_visualizacao_candidatos"
+        )
+        
+        st.markdown("---")
+        
+        # Filtro por nome
+        if 'nome_completo' in df.columns:
+            filtros['nome'] = st.text_input(
+                "🔎 Buscar por nome", 
+                "",
+                placeholder="Digite o nome...",
+                key="filtro_nome_candidato"
+            )
+        else:
+            filtros['nome'] = ""
+        
+        # Filtro por função
+        if 'formulario_id' in df.columns:
+            funcoes_unicas = ['Todas'] + sorted(
+                df['formulario_id'].dropna().unique().tolist()
+            )
+            filtros['funcao'] = st.selectbox(
+                "💼 Filtrar por função", 
+                funcoes_unicas,
+                key="filtro_funcao_candidato"
+            )
+        else:
+            filtros['funcao'] = "Todas"
+        
+        # Filtro por status de ficha
+        filtros['status_ficha'] = st.radio(
+            "📋 Status da ficha",
+            ["Todos", "Apenas pendentes", "Apenas com ficha gerada"],
+            key="filtro_status_ficha"
+        )
+        
+        st.markdown("---")
+        
+        # Filtros avançados (se houver dados)
+        if not df.empty:
+            with st.expander("🔧 Filtros Avançados", expanded=False):
+                
+                # Filtro por cidade
+                if 'cidade' in df.columns:
+                    cidades = ['Todas'] + sorted(
+                        df['cidade'].dropna().unique().tolist()
+                    )
+                    filtros['cidade'] = st.selectbox(
+                        "🏙️ Cidade:",
+                        cidades,
+                        key="filtro_cidade_candidato"
+                    )
+                else:
+                    filtros['cidade'] = "Todas"
+                
+                # Filtro por status do candidato
+                if 'status_candidato' in df.columns:
+                    status_opcoes = ['Todos'] + sorted(
+                        df['status_candidato'].dropna().unique().tolist()
+                    )
+                    filtros['status_candidato'] = st.selectbox(
+                        "📊 Status:",
+                        status_opcoes,
+                        key="filtro_status_candidato"
+                    )
+                else:
+                    filtros['status_candidato'] = "Todos"
+    
+    return filtros
+
+def aplicar_filtros_candidatos(df, filtros):
+    """
+    Aplica todos os filtros selecionados no DataFrame
+    
+    Args:
+        df (DataFrame): DataFrame original
+        filtros (dict): Dicionário com filtros
+        
+    Returns:
+        DataFrame: DataFrame filtrado
+    """
+    df_filtrado = df.copy()
+    
+    # Filtro por nome
+    if filtros.get('nome') and filtros['nome'].strip():
+        from validators import sanitizar_filtro_busca
+        busca_limpa = sanitizar_filtro_busca(filtros['nome'])
+        
+        if busca_limpa and 'nome_completo' in df_filtrado.columns:
+            df_filtrado = df_filtrado[
+                df_filtrado['nome_completo'].str.contains(
+                    busca_limpa, case=False, na=False
+                )
+            ]
+    
+    # Filtro por função
+    if filtros.get('funcao') and filtros['funcao'] != "Todas":
+        if 'formulario_id' in df_filtrado.columns:
+            df_filtrado = df_filtrado[
+                df_filtrado['formulario_id'] == filtros['funcao']
+            ]
+    
+    # Filtro por status de ficha
+    if filtros.get('status_ficha'):
+        if filtros['status_ficha'] == "Apenas pendentes":
+            df_filtrado = df_filtrado[
+                df_filtrado.get('ficha_emitida', pd.Series([False] * len(df_filtrado))) != True
+            ]
+        elif filtros['status_ficha'] == "Apenas com ficha gerada":
+            df_filtrado = df_filtrado[
+                df_filtrado.get('ficha_emitida', pd.Series([False] * len(df_filtrado))) == True
+            ]
+    
+    # Filtro por cidade (avançado)
+    if filtros.get('cidade') and filtros['cidade'] != "Todas":
+        if 'cidade' in df_filtrado.columns:
+            df_filtrado = df_filtrado[
+                df_filtrado['cidade'] == filtros['cidade']
+            ]
+    
+    # Filtro por status do candidato (avançado)
+    if filtros.get('status_candidato') and filtros['status_candidato'] != "Todos":
+        if 'status_candidato' in df_filtrado.columns:
+            df_filtrado = df_filtrado[
+                df_filtrado['status_candidato'] == filtros['status_candidato']
+            ]
+    
+    return df_filtrado
+
+def exibir_metricas_candidatos(df):
+    """
+    Exibe métricas dos candidatos em cards
+    
+    Args:
+        df (DataFrame): DataFrame com candidatos
+    """
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.metric("📊 Total Candidatos", len(df))
     
     with col2:
-        fichas_geradas = len(df[df.get('ficha_emitida', pd.Series([False] * len(df))) == True])
+        fichas_geradas = len(
+            df[df.get('ficha_emitida', pd.Series([False] * len(df))) == True]
+        )
         st.metric("📄 Fichas Geradas", fichas_geradas)
     
     with col3:
@@ -1938,849 +2440,757 @@ def gerenciar_candidatos():
     with col4:
         if 'created_at' in df.columns:
             hoje = datetime.now().date()
-            novos_hoje = len(df[pd.to_datetime(df['created_at']).dt.date == hoje])
+            novos_hoje = len(
+                df[pd.to_datetime(df['created_at']).dt.date == hoje]
+            )
             st.metric("🆕 Hoje", novos_hoje)
         else:
             st.metric("🆕 Hoje", 0)
+            
+def exibir_card_candidato(candidato, idx):
+    """
+    Exibe card individual de um candidato com todas as ações
     
-    # FILTROS NA SIDEBAR
-    if 'nome_completo' in df.columns:
-        filtro_nome = st.sidebar.text_input("🔍 Buscar por nome", "")
-    else:
-        filtro_nome = ""
+    Args:
+        candidato (dict): Dados do candidato
+        idx (int): Índice para keys únicas
+    """
+    candidato_id = candidato.get('id')
+    unique_key = f"{candidato_id}_{idx}"
     
-    if 'formulario_id' in df.columns:
-        funcoes_unicas = ['Todas'] + sorted(df['formulario_id'].dropna().unique().tolist())
-        filtro_funcao = st.sidebar.selectbox("💼 Filtrar por função", funcoes_unicas)
-    else:
-        filtro_funcao = "Todas"
-    
-    # Filtro por status de ficha
-    filtro_status = st.sidebar.radio(
-        "📋 Status da ficha",
-        ["Todos", "Apenas pendentes", "Apenas com ficha gerada"]
+    # Título do expander
+    titulo_expander = (
+        f"{formatar_funcao(candidato.get('formulario_id', ''))} | "
+        f"{candidato.get('nome_completo', 'Nome não informado')} | "
+        f"📞 {candidato.get('telefone', 'Tel. não informado')}"
     )
     
-    # APLICAR FILTROS
-    df_filtrado = df.copy()
-    
-    # Filtro por nome
-    if filtro_nome:
-        if 'nome_completo' in df_filtrado.columns:
-            df_filtrado = df_filtrado[
-                df_filtrado['nome_completo'].str.contains(filtro_nome, case=False, na=False)
-            ]
-    
-    # Filtro por função
-    if filtro_funcao != "Todas":
-        if 'formulario_id' in df_filtrado.columns:
-            df_filtrado = df_filtrado[df_filtrado['formulario_id'] == filtro_funcao]
-    
-    # Filtro por status
-    if filtro_status == "Apenas pendentes":
-        df_filtrado = df_filtrado[df_filtrado.get('ficha_emitida', pd.Series([False] * len(df_filtrado))) != True]
-    elif filtro_status == "Apenas com ficha gerada":
-        df_filtrado = df_filtrado[df_filtrado.get('ficha_emitida', pd.Series([False] * len(df_filtrado))) == True]
-    
-    # EXIBIR RESULTADOS
-    st.header(f"📋 Candidatos ({len(df_filtrado)} encontrados)")
-    
-    if df_filtrado.empty:
-        st.info("🔍 Nenhum candidato encontrado com os filtros aplicados.")
+    with st.expander(titulo_expander, expanded=False):
         
-    # Primeiro: carregar com contagem
-    df, total = carregar_candidatos(limite=100, offset=0, retornar_contagem=True)
+        col1, col2 = st.columns([2, 1])
+        
+        # ===== COLUNA 1: INFORMAÇÕES =====
+        with col1:
+            # Informações básicas
+            st.write(f"**📧 Email:** {candidato.get('email', 'Não informado')}")
+            
+            whatsapp_link = formatar_whatsapp_link(candidato.get('whatsapp'))
+            st.markdown(f"**📲 Whatsapp:** {whatsapp_link}", unsafe_allow_html=True)
+            
+            st.write(f"**📍 Endereço:** {candidato.get('endereco', 'Não informado')}")
+            st.write(f"**👨‍👩‍👧‍👦 Filhos:** {'Sim' if candidato.get('tem_filhos') else 'Não'}")
+            st.write(f"**🚗 CNH:** {'Sim' if candidato.get('possui_cnh') else 'Não'}")
+            
+            # Data de cadastro
+            if candidato.get('created_at'):
+                data_cadastro = pd.to_datetime(candidato['created_at']).strftime('%d/%m/%Y às %H:%M')
+                st.write(f"**📅 Cadastrado em:** {data_cadastro}")
+            
+            st.markdown("---")
+            
+            # Status de qualificação
+            if 'data_qualificacao' in candidato:
+                st.success(f"✅ Qualificado em {candidato['data_qualificacao']}")
+                if candidato.get('certificado_numero'):
+                    st.info(f"🎓 Certificado: {candidato['certificado_numero']}")
+            else:
+                st.warning("⏳ Pendente de qualificação")
+            
+            # Status da ficha
+            if candidato.get('ficha_emitida'):
+                st.success("✅ Ficha já gerada")
+                if candidato.get('data_ficha_gerada'):
+                    data_ficha = pd.to_datetime(candidato['data_ficha_gerada']).strftime('%d/%m/%Y às %H:%M')
+                    st.write(f"**📄 Ficha gerada em:** {data_ficha}")
+            else:
+                st.warning("⏳ Ficha pendente")
+        
+        # ===== COLUNA 2: AÇÕES =====
+        with col2:
+            st.subheader("🎛️ Ações")
+            
+            # Botão gerar PDF
+            exibir_botao_gerar_pdf(candidato, idx)
+            
+            st.markdown("---")
+            
+            # Sistema de qualificação (se não qualificado)
+            if 'data_qualificacao' not in candidato:
+                exibir_formulario_qualificacao(candidato, idx)
 
-    # Segundo: mostrar controles de paginação
+def exibir_botao_gerar_pdf(candidato, idx):
+    """
+    Exibe botão para gerar PDF do candidato
+    
+    Args:
+        candidato (dict): Dados do candidato
+        idx (int): Índice para keys únicas
+    """
+    candidato_id = candidato.get('id')
+    btn_gen_key = f"pdf_gen_{candidato_id}_{idx}"
+    
+    if st.button("📄 Gerar e Baixar Ficha PDF", key=btn_gen_key, type="primary"):
+        try:
+            with st.spinner("📄 Gerando PDF..."):
+                # Gerar PDF
+                resultado = gerar_ficha_candidato_completa(candidato)
+                
+                if isinstance(resultado, tuple):
+                    pdf_bytes, nome_arquivo = resultado
+                else:
+                    pdf_bytes = resultado
+                    nome_limpo = candidato.get('nome_completo', 'candidato').replace(' ', '_').lower()
+                    import re
+                    nome_limpo = re.sub(r'[^a-zA-Z0-9_]', '', nome_limpo)
+                    nome_arquivo = f"{nome_limpo}-{datetime.now().strftime('%d%m%Y')}.pdf"
+                
+                # Atualizar status no banco ANTES do download
+                atualizar_status_ficha(candidato_id)
+                
+                # Download direto
+                st.download_button(
+                    label="💾 CLIQUE PARA BAIXAR O PDF",
+                    data=pdf_bytes,
+                    file_name=nome_arquivo,
+                    mime="application/pdf",
+                    key=f"download_{candidato_id}_{idx}",
+                    type="primary",
+                    use_container_width=True
+                )
+                
+                st.success("✅ PDF gerado com sucesso! Clique no botão acima para baixar.")
+                st.info("💡 Dica: O download iniciará automaticamente ao clicar.")
+                
+        except Exception as e:
+            log_erro(
+                mensagem_usuario="Erro ao gerar PDF do candidato",
+                excecao=e,
+                contexto={
+                    'candidato_id': candidato_id,
+                    'nome': candidato.get('nome_completo', 'N/A')
+                }
+            )
+
+
+def exibir_formulario_qualificacao(candidato, idx):
+    """
+    Exibe formulário de qualificação de candidato
+    
+    Args:
+        candidato (dict): Dados do candidato
+        idx (int): Índice para keys únicas
+    """
+    candidato_id = candidato.get('id')
+    
+    st.markdown("### 🎓 Qualificar Candidato")
+    
+    with st.form(key=f"qualificacao_form_{candidato_id}_{idx}", clear_on_submit=False):
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            nota = st.slider(
+                "Nota do treinamento (0-10)", 
+                0, 10, 7,
+                key=f"nota_{candidato_id}_{idx}"
+            )
+        
+        with col2:
+            instrutor = st.text_input(
+                "Nome do instrutor",
+                key=f"instrutor_{candidato_id}_{idx}"
+            )
+        
+        observacoes = st.text_area(
+            "Observações sobre o treinamento", 
+            height=100,
+            key=f"obs_qual_{candidato_id}_{idx}"
+        )
+        
+        submitted = st.form_submit_button(
+            "✅ QUALIFICAR CANDIDATO", 
+            type="primary"
+        )
+        
+        if submitted:
+            if not instrutor.strip():
+                st.error("❌ O nome do instrutor é obrigatório!")
+            else:
+                with st.spinner("Processando qualificação..."):
+                    sucesso, certificado = qualificar_candidato_simples(
+                        candidato_id, nota, observacoes, instrutor
+                    )
+                    
+                    if sucesso:
+                        st.success(f"🎉 Candidato qualificado com sucesso!")
+                        st.success(f"🎓 Certificado: {certificado}")
+                        st.balloons()
+                        
+                        import time
+                        time.sleep(2)
+                        
+                        st.cache_data.clear()
+                        st.info("🔄 Recarregando página...")
+                        st.rerun()
+                    else:
+                        st.error("❌ Erro ao qualificar candidato. Tente novamente.")
+
+def gerenciar_candidatos():
+    """
+    Função orquestradora de gestão de candidatos
+    MODULARIZADA - Apenas coordena os módulos
+    """
+    
+    # 1. CRIAR SIDEBAR COM FILTROS (ANTES DE TUDO!)
+    # Carregar dados iniciais para popular filtros
+    df_inicial = carregar_candidatos()
+    
+    if df_inicial.empty:
+        st.warning("⚠️ Nenhum candidato encontrado no banco de dados.")
+        st.info("📄 Certifique-se que existem candidatos cadastrados no Supabase.")
+        return
+    
+    filtros = criar_sidebar_filtros_candidatos(df_inicial)
+    
+    # 2. CARREGAR DADOS BASEADO NO TIPO SELECIONADO
+    with st.spinner("Carregando candidatos..."):
+        df, titulo = carregar_dados_candidatos_por_tipo(filtros['tipo_visualizacao'])
+    
+    # Exibir título
+    st.header(titulo)
+    
+    if df.empty:
+        st.warning("⚠️ Nenhum candidato encontrado para este tipo de visualização.")
+        return
+    
+    # 3. EXIBIR MÉTRICAS
+    exibir_metricas_candidatos(df)
+    
+    st.markdown("---")
+    
+    # 4. APLICAR FILTROS
+    df_filtrado = aplicar_filtros_candidatos(df, filtros)
+    
+    # 5. PAGINAÇÃO
+    df_paginado, total = carregar_candidatos(limite=100, offset=0, retornar_contagem=True)
+    
     pagina_atual, offset = exibir_paginacao(
         total_registros=total,
         registros_por_pagina=100,
         key_prefix="candidatos"
     )
-
-    # Terceiro: se mudou página, recarregar com novo offset
-    if offset > 0:
-        df = carregar_candidatos(limite=100, offset=offset)
-        
-    # LISTA DE CANDIDATOS
-    for idx, candidato in enumerate(df_filtrado.to_dict('records')):
-        
-        candidato_id = candidato.get('id')
-        unique_key = f"{candidato_id}_{idx}"
-        
-        with st.expander(
-            f"{formatar_funcao(candidato.get('formulario_id', ''))} | "
-            f"{candidato.get('nome_completo', 'Nome não informado')} | "
-            f"📞 {candidato.get('telefone', 'Tel. não informado')}",
-            expanded=False
-        ):
-            
-            col1, col2 = st.columns([2, 1])
-            
-            with col1:
-                # Informações básicas
-                st.write(f"**📧 Email:** {candidato.get('email', 'Não informado')}")
-                whatsapp_link = formatar_whatsapp_link(candidato.get('whatsapp'))
-                st.markdown(f"**📲 Whatsapp:** {whatsapp_link}", unsafe_allow_html=True)
-                st.write(f"**📍 Endereço:** {candidato.get('endereco', 'Não informado')}")
-                st.write(f"**👨‍👩‍👧‍👦 Filhos:** {'Sim' if candidato.get('tem_filhos') else 'Não'}")
-                st.write(f"**🚗 CNH:** {'Sim' if candidato.get('possui_cnh') else 'Não'}")
-                
-                if candidato.get('created_at'):
-                    data_cadastro = pd.to_datetime(candidato['created_at']).strftime('%d/%m/%Y às %H:%M')
-                    st.write(f"**📅 Cadastrado em:** {data_cadastro}")
-
-                # Status de qualificação
-                if 'data_qualificacao' in candidato:
-                    st.success(f"✅ Qualificado em {candidato['data_qualificacao']}")
-                    if candidato.get('certificado_numero'):
-                        st.info(f"🎓 Certificado: {candidato['certificado_numero']}")
-                else:
-                    st.warning("⏳ Pendente de qualificação")
-                
-                # Status da ficha
-                if candidato.get('ficha_emitida'):
-                    st.success("✅ Ficha já gerada")
-                    if candidato.get('data_ficha_gerada'):
-                        data_ficha = pd.to_datetime(candidato['data_ficha_gerada']).strftime('%d/%m/%Y às %H:%M')
-                        st.write(f"**📄 Ficha gerada em:** {data_ficha}")
-                else:
-                    st.warning("⏳ Ficha pendente")
-
-            with col2:
-                # ✅ SOLUÇÃO: Geração e download DIRETO sem session_state
-                candidato_id = candidato.get('id')
-                btn_gen_key = f"pdf_gen_{candidato_id}_{idx}"
-                
-                # Verificar se já tem ficha gerada
-                if candidato.get('ficha_emitida'):
-                    st.success("✅ Ficha já gerada anteriormente")
-                    if candidato.get('data_ficha_gerada'):
-                        data_ficha = pd.to_datetime(candidato['data_ficha_gerada']).strftime('%d/%m/%Y às %H:%M')
-                        st.caption(f"📅 {data_ficha}")
-                
-                if st.button("📄 Gerar e Baixar Ficha PDF", key=btn_gen_key, type="primary"):
-                    try:
-                        with st.spinner("🔄 Gerando PDF..."):
-                            # Gerar PDF
-                            resultado = gerar_ficha_candidato_completa(candidato)
-                            
-                            if isinstance(resultado, tuple):
-                                pdf_bytes, nome_arquivo = resultado
-                            else:
-                                pdf_bytes = resultado
-                                nome_limpo = candidato.get('nome_completo', 'candidato').replace(' ', '_').lower()
-                                import re
-                                nome_limpo = re.sub(r'[^a-zA-Z0-9_]', '', nome_limpo)
-                                nome_arquivo = f"{nome_limpo}-{datetime.now().strftime('%d%m%Y')}.pdf"
-                            
-                            # Atualizar status no banco ANTES do download
-                            atualizar_status_ficha(candidato_id)
-                            
-                            # ✅ Download DIRETO sem armazenar
-                            st.download_button(
-                                label="💾 CLIQUE PARA BAIXAR O PDF",
-                                data=pdf_bytes,
-                                file_name=nome_arquivo,
-                                mime="application/pdf",
-                                key=f"download_{candidato_id}_{idx}",
-                                type="primary",
-                                use_container_width=True
-                            )
-                            
-                            st.success("✅ PDF gerado com sucesso! Clique no botão acima para baixar.")
-                            st.info("💡 Dica: O download iniciará automaticamente ao clicar.")
-                            
-                    except Exception as e:
-                        log_erro(
-                            mensagem_usuario="Erro ao gerar PDF do candidato",
-                            excecao=e,
-                            contexto={
-                                'candidato_id': candidato_id,
-                                'nome': candidato.get('nome_completo', 'N/A')
-                            }
-                        )
-                
-                
-                # Sistema de qualificação
-                if 'data_qualificacao' not in candidato:
-                    candidato_id = candidato.get('id')
-                    
-                    with st.container():
-                        st.markdown("### 🎓 Qualificar Candidato")
-                        
-                        with st.form(key=f"qualificacao_form_{candidato_id}", clear_on_submit=False):
-                            
-                            col1, col2 = st.columns(2)
-                            
-                            with col1:
-                                nota = st.slider("Nota do treinamento (0-10)", 0, 10, 7)
-                                
-                            with col2:
-                                instrutor = st.text_input("Nome do instrutor")
-                            
-                            observacoes = st.text_area("Observações sobre o treinamento", height=100)
-                            
-                            submitted = st.form_submit_button("✅ QUALIFICAR CANDIDATO", type="primary")
-                            
-                            if submitted:
-                                if not instrutor.strip():
-                                    st.error("❌ O nome do instrutor é obrigatório!")
-                                else:
-                                    with st.spinner("Processando qualificação..."):
-                                        sucesso, certificado = qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor)
-                                        
-                                        if sucesso:
-                                            st.success(f"🎉 Candidato qualificado com sucesso!")
-                                            st.success(f"🎓 Certificado: {certificado}")
-                                            st.balloons()
-                                            
-                                            import time
-                                            time.sleep(2)
-                                            
-                                            st.cache_data.clear()
-                                            st.info("🔄 Recarregando página...")
-                                            st.rerun()
-                                        else:
-                                            st.error("❌ Erro ao qualificar candidato. Tente novamente.")      
-                
-
-def gerenciar_relacionamentos():
-    """Gestão de relacionamentos com interface melhorada"""
-    st.header("🔗 Relacionar Candidatos com Vagas")
     
-    # CARREGAR DADOS
-    df_candidatos = carregar_candidatos()
-    df_vagas = carregar_vagas()
-    df_relacionamentos, total_relacionamentos = carregar_relacionamentos(
-    limite=100,
-    offset=0,
-    retornar_contagem=True
-    )
+    if offset > 0:
+        df_filtrado = carregar_candidatos(limite=100, offset=offset)
+        df_filtrado = aplicar_filtros_candidatos(df_filtrado, filtros)
+    
+    # 6. EXIBIR RESULTADOS
+    st.subheader(f"📋 Candidatos ({len(df_filtrado)} encontrados)")
+    
+    if df_filtrado.empty:
+        st.info("🔍 Nenhum candidato encontrado com os filtros aplicados.")
+        return
+    
+    # 7. LISTA DE CARDS
+    for idx, candidato in enumerate(df_filtrado.to_dict('records')):
+        exibir_card_candidato(candidato, idx)
+
+@st.cache_data(ttl=300)
+def carregar_dados_relacionamentos():
+    """
+    Carrega todos os dados necessários para gestão de relacionamentos
+    
+    Returns:
+        tuple: (df_candidatos, df_vagas, df_relacionamentos, total_count)
+    """
+    try:
+        df_candidatos = carregar_candidatos()
+        df_vagas = carregar_vagas()
+        df_relacionamentos, total = carregar_relacionamentos(
+            limite=100,
+            offset=0,
+            retornar_contagem=True
+        )
+        
+        return df_candidatos, df_vagas, df_relacionamentos, total
+        
+    except Exception as e:
+        log_erro(
+            mensagem_usuario="Erro ao carregar dados de relacionamentos",
+            excecao=e,
+            contexto={}
+        )
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), 0
+    
+def criar_formulario_novo_relacionamento(df_candidatos, df_vagas):
+    """
+    Exibe formulário para criar novo relacionamento candidato-vaga
+    ✅ CORRIGIDO: Keys únicas e submit button adicionado
+    
+    Args:
+        df_candidatos: DataFrame com candidatos
+        df_vagas: DataFrame com vagas
+        
+    Returns:
+        bool: True se relacionamento foi criado
+    """
+    st.subheader("➕ Criar Novo Relacionamento")
     
     if df_candidatos.empty or df_vagas.empty:
         st.warning("⚠️ É necessário ter candidatos e vagas cadastrados.")
-        return
+        return False
     
-    # FORMULÁRIO DE RELACIONAMENTO
-    st.subheader("➕ Criar Novo Relacionamento")
-    
-    with st.form("relacionar_candidato_vaga"):
-        # SEÇÃO DE BUSCA DE CANDIDATOS
+    with st.form("form_novo_relacionamento", clear_on_submit=True):
+        
+        # ===== SEÇÃO 1: CANDIDATO =====
         st.markdown("#### 👤 Selecionar Candidato")
         
         col_busca_cand, col_filtro_cand = st.columns([2, 1])
         
         with col_busca_cand:
             busca_candidato = st.text_input(
-                "🔍 Buscar candidato por nome:",
+                "🔎 Buscar por nome:",
                 placeholder="Digite nome do candidato...",
-                key="busca_candidato_relacionamento"
+                key="busca_candidato_rel"  # ✅ KEY ÚNICA
             )
         
         with col_filtro_cand:
-            filtro_funcao_candidato = st.selectbox(
+            funcoes_candidatos = ["Todas"] + sorted(
+                df_candidatos['formulario_id'].dropna().unique().tolist()
+            )
+            filtro_funcao = st.selectbox(
                 "Filtrar por função:",
-                ["Todas"] + sorted(df_candidatos['formulario_id'].dropna().unique().tolist()),
-                key="filtro_funcao_candidato"
+                funcoes_candidatos,
+                key="filtro_funcao_candidato_rel"  # ✅ KEY ÚNICA
             )
         
-    # FILTRAR CANDIDATOS BASEADO NA BUSCA
-    df_candidatos_filtrados = df_candidatos.copy()
+        # Filtrar candidatos
+        df_cand_filtrado = df_candidatos.copy()
         
-    if busca_candidato.strip():
-        # ✅ SANITIZAR
-        from validators import sanitizar_nome
-        busca_limpa = sanitizar_nome(busca_candidato)
-        
-        if not busca_limpa:
-            st.warning("⚠️ Nome contém caracteres inválidos")
-        else:
-            df_candidatos_filtrados = df_candidatos_filtrados[
-                df_candidatos_filtrados['nome_completo'].str.contains(busca_limpa, case=False, na=False)
-            ]
-            
-            if filtro_funcao_candidato != "Todas":
-                df_candidatos_filtrados = df_candidatos_filtrados[
-                    df_candidatos_filtrados['formulario_id'] == filtro_funcao_candidato
+        if busca_candidato.strip():
+            from validators import sanitizar_nome
+            busca_limpa = sanitizar_nome(busca_candidato)
+            if busca_limpa:
+                df_cand_filtrado = df_cand_filtrado[
+                    df_cand_filtrado['nome_completo'].str.contains(
+                        busca_limpa, case=False, na=False
+                    )
                 ]
-            
-            if df_candidatos_filtrados.empty:
-                st.warning("⚠️ Nenhum candidato encontrado com os filtros aplicados. Ajuste a busca.")
-                candidato_selecionado = None
-            else:
-                st.info(f"📊 Encontrados {len(df_candidatos_filtrados)} candidatos")
-                candidato_selecionado = st.selectbox(
-                    f"Escolher candidato ({len(df_candidatos_filtrados)} opções):",
-                    options=df_candidatos_filtrados['id'].tolist(),
-                    format_func=lambda x: f"{df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['nome_completo'].iloc[0]} - {formatar_funcao(df_candidatos_filtrados[df_candidatos_filtrados['id'] == x]['formulario_id'].iloc[0])}",
-                    key="select_candidato_filtrado"
-                )
-            
-            st.markdown("---")
         
-        # SEÇÃO DE BUSCA DE VAGAS
+        if filtro_funcao != "Todas":
+            df_cand_filtrado = df_cand_filtrado[
+                df_cand_filtrado['formulario_id'] == filtro_funcao
+            ]
+        
+        # Selectbox de candidatos
+        if df_cand_filtrado.empty:
+            st.warning("⚠️ Nenhum candidato encontrado. Ajuste os filtros.")
+            candidato_id = None
+        else:
+            st.info(f"📊 {len(df_cand_filtrado)} candidatos encontrados")
+            candidato_id = st.selectbox(
+                "Escolher candidato:",
+                options=df_cand_filtrado['id'].tolist(),
+                format_func=lambda x: (
+                    f"{df_cand_filtrado[df_cand_filtrado['id'] == x]['nome_completo'].iloc[0]} - "
+                    f"{formatar_funcao(df_cand_filtrado[df_cand_filtrado['id'] == x]['formulario_id'].iloc[0])}"
+                ),
+                key="select_candidato_rel"  # ✅ KEY ÚNICA
+            )
+        
+        st.markdown("---")
+        
+        # ===== SEÇÃO 2: VAGA =====
         st.markdown("#### 💼 Selecionar Vaga")
         
         col_busca_vaga, col_filtro_vaga = st.columns([2, 1])
         
         with col_busca_vaga:
             busca_vaga = st.text_input(
-                "🔍 Buscar vaga por proprietário:",
+                "🔎 Buscar por proprietário:",
                 placeholder="Digite nome do proprietário...",
-                key="busca_vaga_relacionamento"
+                key="busca_vaga_rel"  # ✅ KEY ÚNICA
             )
         
         with col_filtro_vaga:
+            tipos_vagas = ["Todas"] + sorted(
+                df_vagas['formulario_id'].dropna().unique().tolist()
+            )
             filtro_tipo_vaga = st.selectbox(
                 "Filtrar por tipo:",
-                ["Todas"] + sorted(df_vagas['formulario_id'].dropna().unique().tolist()),
-                key="filtro_tipo_vaga"
+                tipos_vagas,
+                key="filtro_tipo_vaga_rel"  # ✅ KEY ÚNICA
             )
         
-    # FILTRAR VAGAS BASEADO NA BUSCA
-    df_vagas_filtradas = df_vagas.copy()
-    
-    if busca_vaga.strip():
-        # ✅ SANITIZAR
-        from validators import sanitizar_nome
-        busca_limpa = sanitizar_nome(busca_vaga)
+        # Filtrar vagas
+        df_vagas_filtrado = df_vagas.copy()
         
-        if not busca_limpa:
-            st.warning("⚠️ Nome contém caracteres inválidos")
-        else:
-            # Criar coluna se não existir
-            if 'nome_completo_proprietario' not in df_vagas_filtradas.columns:
-                df_vagas_filtradas['nome_completo_proprietario'] = (
-                    df_vagas_filtradas['nome'].fillna('') + ' ' + df_vagas_filtradas['sobrenome'].fillna('')
+        if busca_vaga.strip():
+            from validators import sanitizar_nome
+            busca_limpa_vaga = sanitizar_nome(busca_vaga)
+            if busca_limpa_vaga:
+                # Criar coluna temporária
+                df_vagas_filtrado['nome_completo_prop'] = (
+                    df_vagas_filtrado['nome'].fillna('') + ' ' + 
+                    df_vagas_filtrado['sobrenome'].fillna('')
                 ).str.strip()
-            
-            df_vagas_filtradas = df_vagas_filtradas[
-                df_vagas_filtradas['nome_completo_proprietario'].str.contains(busca_limpa, case=False, na=False)
-            ]
-            
-            if filtro_tipo_vaga != "Todas":
-                df_vagas_filtradas = df_vagas_filtradas[
-                    df_vagas_filtradas['formulario_id'] == filtro_tipo_vaga
+                
+                df_vagas_filtrado = df_vagas_filtrado[
+                    df_vagas_filtrado['nome_completo_prop'].str.contains(
+                        busca_limpa_vaga, case=False, na=False
+                    )
                 ]
-            
-            # Filtrar apenas vagas ativas por padrão
-            df_vagas_filtradas = df_vagas_filtradas[
-                df_vagas_filtradas.get('status_detalhado', df_vagas_filtradas.get('status', 'ativa')).isin(['ativa', 'em_andamento'])
+        
+        if filtro_tipo_vaga != "Todas":
+            df_vagas_filtrado = df_vagas_filtrado[
+                df_vagas_filtrado['formulario_id'] == filtro_tipo_vaga
             ]
-            
-            if df_vagas_filtradas.empty:
-                st.warning("⚠️ Nenhuma vaga ativa encontrada com os filtros aplicados. Ajuste a busca.")
-                vaga_selecionada = None
-            else:
-                st.info(f"📊 Encontradas {len(df_vagas_filtradas)} vagas ativas")
-                vaga_selecionada = st.selectbox(
-                    f"Escolher vaga ({len(df_vagas_filtradas)} opções):",
-                    options=df_vagas_filtradas['id'].tolist(),
-                    format_func=lambda x: f"{df_vagas_filtradas[df_vagas_filtradas['id'] == x]['nome'].iloc[0]} {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['sobrenome'].iloc[0]} - {formatar_funcao_vaga(df_vagas_filtradas[df_vagas_filtradas['id'] == x]['formulario_id'].iloc[0])} - R$ {df_vagas_filtradas[df_vagas_filtradas['id'] == x]['salario_oferecido'].iloc[0]}",
-                    key="select_vaga_filtrada"
-                )
-            
-            st.markdown("---")
         
-        # RESTO DO FORMULÁRIO (status, entrevista, etc.)
-        # NOVO: Campo para definir status inicial
-        col_status1, col_status2 = st.columns(2)
+        # Apenas vagas ativas
+        df_vagas_filtrado = df_vagas_filtrado[
+            df_vagas_filtrado.get('status_detalhado', 'ativa').isin(['ativa', 'em_andamento'])
+        ]
         
-        with col_status1:
-            status_inicial = st.selectbox(
-                "📋 Status inicial do relacionamento:",
-                ["enviado", "em_analise", "entrevista_agendada", "aprovado", "rejeitado", "contratado", "cancelado"],
-                index=0,  # Padrão é "enviado"
-                key="status_inicial_relacionamento"
+        # Selectbox de vagas
+        if df_vagas_filtrado.empty:
+            st.warning("⚠️ Nenhuma vaga ativa encontrada. Ajuste os filtros.")
+            vaga_id = None
+        else:
+            st.info(f"📊 {len(df_vagas_filtrado)} vagas encontradas")
+            vaga_id = st.selectbox(
+                "Escolher vaga:",
+                options=df_vagas_filtrado['id'].tolist(),
+                format_func=lambda x: (
+                    f"{df_vagas_filtrado[df_vagas_filtrado['id'] == x]['nome'].iloc[0]} "
+                    f"{df_vagas_filtrado[df_vagas_filtrado['id'] == x]['sobrenome'].iloc[0]} - "
+                    f"{formatar_funcao_vaga(df_vagas_filtrado[df_vagas_filtrado['id'] == x]['formulario_id'].iloc[0])} - "
+                    f"R$ {df_vagas_filtrado[df_vagas_filtrado['id'] == x]['salario_oferecido'].iloc[0]}"
+                ),
+                key="select_vaga_rel"  # ✅ KEY ÚNICA
             )
         
-        with col_status2:
-            st.write("**Legenda dos Status:**")
-            st.caption("• **Enviado:** Candidato foi enviado ao cliente")
-            st.caption("• **Em Análise:** Cliente está analisando o candidato")
-            st.caption("• **Entrevista Agendada:** Entrevista marcada")
-            st.caption("• **Aprovado:** Cliente aprovou o candidato")
-            st.caption("• **Contratado:** Candidato foi contratado")
+        st.markdown("---")
         
-        # CAMPOS ESPECIAIS PARA ENTREVISTA
-        data_entrevista_inicial = None
+        # ===== SEÇÃO 3: DETALHES =====
+        st.markdown("#### 📋 Detalhes do Relacionamento")
+        
+        col_status, col_obs = st.columns([1, 2])
+        
+        with col_status:
+            status_inicial = st.selectbox(
+                "Status inicial:",
+                ["enviado", "em_analise", "entrevista_agendada", "aprovado"],
+                key="status_inicial_rel"  # ✅ KEY ÚNICA
+            )
+        
+        with col_obs:
+            observacao = st.text_area(
+                "Observação inicial:",
+                placeholder="Ex: Candidato enviado via WhatsApp às 14h30",
+                height=100,
+                key="observacao_inicial_rel"  # ✅ KEY ÚNICA
+            )
+        
+        # Campo especial para entrevista
+        data_entrevista = None
         if status_inicial == "entrevista_agendada":
-            st.markdown("---")
-            st.write("**📅 Dados da Entrevista (obrigatório para status 'entrevista_agendada'):**")
+            st.markdown("**📅 Dados da Entrevista:**")
+            col_data, col_hora = st.columns(2)
             
-            col_data_inicial, col_hora_inicial = st.columns(2)
-            
-            with col_data_inicial:
-                data_ent_inicial = st.date_input(
-                    "Data da entrevista:",
+            with col_data:
+                data_ent = st.date_input(
+                    "Data:",
                     value=datetime.now().date(),
-                    key="data_entrevista_inicial"
+                    key="data_entrevista_rel"  # ✅ KEY ÚNICA
                 )
             
-            with col_hora_inicial:
-                hora_ent_inicial = st.time_input(
-                    "Hora da entrevista:",
+            with col_hora:
+                hora_ent = st.time_input(
+                    "Hora:",
                     value=datetime.now().replace(second=0, microsecond=0).time(),
-                    key="hora_entrevista_inicial"
+                    key="hora_entrevista_rel"  # ✅ KEY ÚNICA
                 )
             
-            data_entrevista_inicial = datetime.combine(data_ent_inicial, hora_ent_inicial)
-            st.success(f"✅ Entrevista será criada para: **{data_entrevista_inicial.strftime('%d/%m/%Y às %H:%M')}**")
+            data_entrevista = datetime.combine(data_ent, hora_ent)
+            st.success(f"✅ Entrevista: {data_entrevista.strftime('%d/%m/%Y às %H:%M')}")
         
-        observacao_inicial = st.text_area(
-            "📝 Observação inicial:",
-            placeholder="Ex: Candidato enviado via WhatsApp às 14h30. Cliente solicitou entrevista presencial.",
-            height=80
+        # ===== ✅ BOTÃO DE SUBMIT (CORRIGIDO) =====
+        submitted = st.form_submit_button(
+            "🔗 Criar Relacionamento",
+            type="primary",
+            use_container_width=True
         )
         
-        # VALIDAÇÃO E SUBMISSÃO
-        if st.form_submit_button("🔗 Criar Relacionamento", type="primary"):
-            if candidato_selecionado is None:
+        if submitted:
+            if not candidato_id:
                 st.error("❌ Selecione um candidato válido!")
-            elif vaga_selecionada is None:
+                return False
+            
+            if not vaga_id:
                 st.error("❌ Selecione uma vaga válida!")
-            elif status_inicial == "entrevista_agendada" and not data_entrevista_inicial:
-                st.error("❌ Para criar relacionamento com status 'entrevista_agendada', é obrigatório definir data e hora!")
+                return False
+            
+            if status_inicial == "entrevista_agendada" and not data_entrevista:
+                st.error("❌ Defina data e hora da entrevista!")
+                return False
+            
+            # Criar relacionamento
+            with st.spinner("🔄 Criando relacionamento..."):
+                sucesso, mensagem = relacionar_candidato_vaga_com_status(
+                    candidato_id=candidato_id,
+                    vaga_id=vaga_id,
+                    observacao=observacao,
+                    status_inicial=status_inicial,
+                    data_entrevista=data_entrevista
+                )
+                
+                if sucesso:
+                    st.success(mensagem)
+                    st.balloons()
+                    return True
+                else:
+                    st.error(mensagem)
+                    return False
+    
+    return False
+
+def exibir_card_relacionamento(rel, idx):
+    """
+    Exibe card individual de um relacionamento
+    
+    Args:
+        rel: Dict com dados do relacionamento
+        idx: Índice para keys únicas
+    """
+    # Calcular datas
+    data_envio = pd.to_datetime(rel.get('data_envio'))
+    hoje = pd.Timestamp.now(tz='UTC')
+    
+    # Normalizar timezone
+    if data_envio.tz is None:
+        data_envio = data_envio.tz_localize(None)
+        hoje = hoje.tz_localize(None)
+    else:
+        hoje = hoje.tz_convert(data_envio.tz)
+    
+    dias_passados = (hoje - data_envio).days
+    dias_restantes = 90 - dias_passados
+    status_atual = rel.get('status_processo', 'enviado')
+    
+    # Container do card
+    with st.container():
+        # ===== HEADER =====
+        col_status, col_prazo = st.columns([2, 1])
+        
+        with col_status:
+            status_icons = {
+                'enviado': '📤',
+                'em_analise': '🔍',
+                'entrevista_agendada': '📅',
+                'aprovado': '✅',
+                'contratado': '🎉',
+                'rejeitado': '❌',
+                'cancelado': 'ℹ️'
+            }
+            icon = status_icons.get(status_atual, '📋')
+            st.markdown(f"### {icon} {status_atual.upper().replace('_', ' ')}")
+        
+        with col_prazo:
+            if dias_restantes <= 0:
+                st.error(f"🚨 Vencido há {abs(dias_restantes)} dias")
+            elif dias_restantes <= 15:
+                st.error(f"⚠️ {dias_restantes} dias restantes")
+            elif dias_restantes <= 30:
+                st.warning(f"⏳ {dias_restantes} dias restantes")
             else:
-                with st.spinner("🔄 Validando e criando relacionamento..."):
-                    sucesso, mensagem = relacionar_candidato_vaga_com_status(candidato_selecionado, vaga_selecionada, observacao_inicial, status_inicial, data_entrevista_inicial)
+                st.success(f"✅ {dias_restantes} dias restantes")
+        
+        # ===== INFORMAÇÕES =====
+        col_pessoas, col_datas = st.columns(2)
+        
+        with col_pessoas:
+            st.markdown("**👥 Pessoas**")
+            st.write(f"👤 {rel.get('nome_completo', 'N/A')}")
+            st.write(f"🏷️ {formatar_funcao(rel.get('tipo_candidato', ''))}")
+            st.write(f"🏠 {rel.get('nome_proprietario', 'N/A')}")
+            st.write(f"🎯 {formatar_funcao_vaga(rel.get('tipo_vaga', ''))}")
+        
+        with col_datas:
+            st.markdown("**📅 Cronologia**")
+            st.write(f"📤 {data_envio.strftime('%d/%m/%Y %H:%M')}")
+            st.write(f"⏱️ {dias_passados} dias ativo")
+            
+            # Barra de progresso
+            progresso = max(0, min(100, dias_restantes / 90 * 100))
+            st.progress(progresso / 100)
+            st.caption(f"{progresso:.0f}% do prazo")
+        
+        # ===== OBSERVAÇÕES =====
+        if rel.get('observacoes'):
+            with st.expander("💬 Histórico", expanded=False):
+                for linha in rel.get('observacoes').split('\n'):
+                    if linha.strip():
+                        st.caption(linha.strip())
+        
+        # ===== PAINEL DE CONTROLE =====
+        exibir_painel_controle_relacionamento(rel, idx)
+        
+        st.markdown("---")
+        
+def exibir_painel_controle_relacionamento(rel, idx):
+    """
+    Exibe painel de ações para um relacionamento
+    
+    Args:
+        rel: Dict com dados do relacionamento
+        idx: Índice para keys únicas
+    """
+    with st.expander("⚙️ Ações", expanded=False):
+        
+        tab1, tab2, tab3 = st.tabs(["📝 Observação", "📋 Status", "🏁 Finalizar"])
+        
+        # ===== TAB 1: OBSERVAÇÃO =====
+        with tab1:
+            nova_obs = st.text_area(
+                "Nova observação:",
+                height=80,
+                key=f"obs_{rel.get('id')}_{idx}"
+            )
+            
+            if st.button("💾 Adicionar", key=f"add_obs_{idx}"):
+                if nova_obs.strip():
+                    obs_atual = rel.get('observacoes', '')
+                    obs_completa = f"{obs_atual}\n\n{nova_obs.strip()}" if obs_atual else nova_obs.strip()
                     
+                    if atualizar_relacionamento(rel.get('id'), nova_observacao=obs_completa):
+                        st.success("✅ Observação adicionada!")
+                        st.cache_data.clear()
+                        st.rerun()
+                else:
+                    st.error("❌ Digite uma observação")
+        
+        # ===== TAB 2: STATUS =====
+        with tab2:
+            novo_status = st.selectbox(
+                "Alterar status para:",
+                ["enviado", "em_analise", "entrevista_agendada", "aprovado", "rejeitado", "contratado"],
+                key=f"status_{idx}"
+            )
+            
+            if st.button("🔄 Atualizar", key=f"update_status_{idx}"):
+                if atualizar_relacionamento(rel.get('id'), novo_status=novo_status):
+                    st.success("✅ Status atualizado!")
+                    st.cache_data.clear()
+                    st.rerun()
+        
+        # ===== TAB 3: FINALIZAR =====
+        with tab3:
+            resultado = st.selectbox(
+                "Resultado final:",
+                ["contratado", "rejeitado", "cancelado"],
+                key=f"resultado_{idx}"
+            )
+            
+            motivo = st.text_area(
+                "Motivo:",
+                height=60,
+                key=f"motivo_{idx}"
+            )
+            
+            if st.button("🏁 Finalizar", key=f"finalizar_{idx}"):
+                if motivo.strip():
+                    sucesso, msg = finalizar_relacionamento(rel.get('id'), resultado, motivo)
                     if sucesso:
-                        st.success(mensagem)
+                        st.success(msg)
+                        st.cache_data.clear()
                         st.rerun()
                     else:
-                        st.error(mensagem)
+                        st.error(msg)
+                else:
+                    st.error("❌ Informe o motivo")
+                    
+def exibir_estatisticas_relacionamentos(df_relacionamentos):
+    """
+    Exibe métricas dos relacionamentos
+    
+    Args:
+        df_relacionamentos: DataFrame com relacionamentos
+    """
+    st.subheader("📈 Estatísticas")
+    
+    if df_relacionamentos.empty:
+        st.info("📊 Nenhum relacionamento para exibir estatísticas")
+        return
+    
+    # Calcular métricas
+    df_temp = df_relacionamentos.copy()
+    df_temp['data_envio'] = pd.to_datetime(df_temp['data_envio'], errors='coerce')
+    hoje = pd.Timestamp.now(tz='UTC').tz_localize(None)
+    df_temp['data_envio'] = df_temp['data_envio'].dt.tz_localize(None)
+    df_temp['dias_passados'] = (hoje - df_temp['data_envio']).dt.days
+    
+    # Métricas
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("📊 Total", len(df_relacionamentos))
+    
+    with col2:
+        criticos = len(df_temp[df_temp['dias_passados'] >= 75])
+        st.metric("🚨 Críticos", criticos)
+    
+    with col3:
+        vencidos = len(df_temp[df_temp['dias_passados'] >= 90])
+        st.metric("⏰ Vencidos", vencidos)
+    
+    with col4:
+        ativos = len(df_temp[df_temp['dias_passados'] < 90])
+        st.metric("✅ Ativos", ativos)
+        
+def gerenciar_relacionamentos():
+    """
+    Gestão de relacionamentos candidato-vaga
+    FUNÇÃO ORQUESTRADORA - Apenas coordena os módulos
+    """
+    st.header("🔗 Relacionar Candidatos com Vagas")
+    
+    # 1. CARREGAR DADOS
+    df_candidatos, df_vagas, df_relacionamentos, total = carregar_dados_relacionamentos()
+    
+    # 2. FORMULÁRIO DE CRIAÇÃO
+    criou_novo = criar_formulario_novo_relacionamento(df_candidatos, df_vagas)
+    
+    if criou_novo:
+        st.cache_data.clear()
+        st.rerun()
     
     st.markdown("---")
     
-    # MOSTRAR RELACIONAMENTOS EXISTENTES
+    # 3. RELACIONAMENTOS EXISTENTES
     st.subheader("📊 Relacionamentos Existentes")
     
-    df_relacionamentos = carregar_relacionamentos()
+    if df_relacionamentos.empty:
+        st.info("ℹ️ Nenhum relacionamento cadastrado ainda")
+        return
     
-    if not df_relacionamentos.empty:
+    # 4. ESTATÍSTICAS
+    exibir_estatisticas_relacionamentos(df_relacionamentos)
     
-        pagina_atual, offset = exibir_paginacao(
-        total_registros=total_relacionamentos,
+    st.markdown("---")
+    
+    # 5. PAGINAÇÃO
+    pagina_atual, offset = exibir_paginacao(
+        total_registros=total,
         registros_por_pagina=100,
         key_prefix="relacionamentos"
     )
-        
-        # Se mudou página, recarregar
+    
     if offset > 0:
         df_relacionamentos = carregar_relacionamentos(limite=100, offset=offset)
-        
-        # INTERFACE MELHORADA COM STREAMLIT NATIVO
-        for rel in df_relacionamentos.to_dict('records'):  # ✅ RÁPIDO
-            data_envio = pd.to_datetime(rel.get('data_envio'))
-            data_criacao = pd.to_datetime(rel.get('created_at', rel.get('data_envio')))
-            # rel.get('data_envio') is already used above, so no need to reference it here
-            
-            # Normalizar timezone
-            if data_envio.tz is not None:
-                hoje = pd.Timestamp.now(tz='UTC').tz_convert(data_envio.tz)
-            else:
-                hoje = pd.Timestamp.now().tz_localize(None)
-                data_envio = data_envio.tz_localize(None) if data_envio.tz is not None else data_envio
-                data_criacao = data_criacao.tz_localize(None) if data_criacao.tz is not None else data_criacao
-            
-            dias_passados = (hoje - data_envio).days
-            tres_meses = data_envio + pd.Timedelta(days=90)
-            dias_restantes = (tres_meses - hoje).days
-            
-            status_atual = rel.get('status_processo', 'enviado')
-            
-            # CONTAINER PRINCIPAL
-            with st.container():
-                # HEADER COM STATUS
-                col_status, col_prazo = st.columns([2, 1])
-                
-                with col_status:
-                    if status_atual == 'enviado':
-                        st.info("📤 **CANDIDATO ENVIADO**")
-                    elif status_atual == 'em_analise':
-                        st.warning("🔍 **EM ANÁLISE PELO CLIENTE**")
-                    elif status_atual == 'entrevista_agendada':
-                        st.success("📅 **ENTREVISTA AGENDADA**")
-                    elif status_atual == 'aprovado':
-                        st.success("✅ **CANDIDATO APROVADO**")
-                    elif status_atual == 'contratado':
-                        st.success("🎉 **CANDIDATO CONTRATADO**")
-                    elif status_atual == 'rejeitado':
-                        st.error("❌ **CANDIDATO REJEITADO**")
-                    elif status_atual == 'cancelado':
-                        st.error("ℹ️ **PROCESSO CANCELADO**")
-                
-                with col_prazo:
-                    if dias_restantes <= 0:
-                        st.error(f"🚨 Vencido há {abs(dias_restantes)} dias")
-                    elif dias_restantes <= 15:
-                        st.error(f"⚠️ {dias_restantes} dias restantes (CRÍTICO)")
-                    elif dias_restantes <= 30:
-                        st.warning(f"⏳ {dias_restantes} dias restantes")
-                    else:
-                        st.success(f"✅ {dias_restantes} dias restantes")
-                
-                # DESTAQUE PARA ENTREVISTA AGENDADA
-                if status_atual == 'entrevista_agendada' and rel.get('data_entrevista'):
-                    data_entrevista = pd.to_datetime(rel.get('data_entrevista'))
-                    if data_entrevista.tz is not None:
-                        data_entrevista = data_entrevista.tz_convert(hoje.tz if hoje.tz else 'UTC')
-                    else:
-                        data_entrevista = data_entrevista.tz_localize(None)
-                    
-                    dias_ate_entrevista = (data_entrevista - hoje).days
-                    
-                    if dias_ate_entrevista == 0:
-                        st.error(f"🚨 **ENTREVISTA É HOJE às {data_entrevista.strftime('%H:%M')}!**")
-                    elif dias_ate_entrevista == 1:
-                        st.warning(f"⚠️ **ENTREVISTA É AMANHÃ às {data_entrevista.strftime('%H:%M')}!**")
-                    elif dias_ate_entrevista > 0:
-                        st.info(f"📅 **Entrevista em {dias_ate_entrevista} dias:** {data_entrevista.strftime('%d/%m/%Y às %H:%M')}")
-                    else:
-                        st.error(f"⚠️ **Entrevista atrasada há {abs(dias_ate_entrevista)} dias!**")
-                
-                # INFORMAÇÕES ORGANIZADAS
-                col_pessoas, col_datas, col_prazo_detalhado = st.columns([2, 2, 1])
-                
-                with col_pessoas:
-                    st.markdown("**👥 PESSOAS ENVOLVIDAS**")
-                    st.write(f"👤 **Candidato:** {rel.get('nome_completo', 'N/A')}")
-                    st.write(f"🏷️ **Função:** {formatar_funcao(rel.get('tipo_candidato', ''))}")
-                    st.write(f"🏠 **Proprietário:** {rel.get('nome_proprietario', 'N/A')}")
-                    st.write(f"🎯 **Vaga:** {formatar_funcao_vaga(rel.get('tipo_vaga', ''))}")
-                
-                with col_datas:
-                    st.markdown("**📅 CRONOLOGIA DETALHADA**")
-                    st.write(f"📅 **Relacionamento criado:** {data_criacao.strftime('%d/%m/%Y às %H:%M')}")
-                    st.write(f"📤 **Candidato enviado:** {data_envio.strftime('%d/%m/%Y às %H:%M')}")
-                    st.write(f"⏱️ **Tempo ativo:** {dias_passados} dias")
-                    
-                    if rel.get('updated_at'):
-                        ultima_atualizacao = pd.to_datetime(rel.get('updated_at'))
-                        if ultima_atualizacao.tz is not None:
-                            ultima_atualizacao = ultima_atualizacao.tz_convert(hoje.tz if hoje.tz else 'UTC')
-                        else:
-                            ultima_atualizacao = ultima_atualizacao.tz_localize(None)
-                        st.write(f"🔄 **Última modificação:** {ultima_atualizacao.strftime('%d/%m/%Y às %H:%M')}")
-                
-                with col_prazo_detalhado:
-                    st.markdown("**⏰ PRAZO 90 DIAS**")
-                    if dias_restantes <= 0:
-                        st.error(f"🚨 **Vencido**\n{abs(dias_restantes)} dias")
-                    elif dias_restantes <= 15:
-                        st.error(f"⚠️ **Crítico**\n{dias_restantes} dias")
-                    elif dias_restantes <= 30:
-                        st.warning(f"⏳ **Atenção**\n{dias_restantes} dias")
-                    else:
-                        st.success(f"✅ **Normal**\n{dias_restantes} dias")
-                    
-                    # BARRA DE PROGRESSO
-                    progresso = max(0, min(100, (90 - dias_passados) / 90 * 100))
-                    st.progress(progresso / 100)
-                    st.caption(f"{progresso:.0f}% do prazo restante")
-                
-                # OBSERVAÇÕES (SE EXISTIREM)
-                if rel.get('observacoes') and rel.get('observacoes').strip():
-                    with st.expander("💬 Ver Histórico Completo", expanded=False):
-                        # Dividir e colorir observações por tipo
-                        observacoes_linhas = rel.get('observacoes').split('\n')
-                        for linha in observacoes_linhas:
-                            linha = linha.strip()
-                            if linha:
-                                if '[SISTEMA -' in linha:
-                                    st.info(f"🤖 {linha}")
-                                elif 'TROCA DE CANDIDATO' in linha or 'Candidato alterado' in linha:
-                                    st.warning(f"🔄 {linha}")
-                                elif 'Status alterado' in linha:
-                                    st.info(f"📋 {linha}")
-                                elif 'Entrevista agendada' in linha:
-                                    st.success(f"📅 {linha}")
-                                else:
-                                    st.write(f"💬 {linha}")
-                
-                # PAINEL DE CONTROLE
-                with st.expander("⚙️ Painel de Controle", expanded=False):
-                    tab_obs, tab_status, tab_troca, tab_finalizar, tab_excluir = st.tabs(
-                        ["📝 Observações", "🔄 Alterar Status", "🔀 Trocar Candidato", "🏁 Finalizar", "🗑️ Excluir"]
-                    )
-                    
-                    # ABA FINALIZAR
-                    with tab_finalizar:
-                        st.warning("**Use esta opção quando o processo for concluído (contratação, rejeição, etc.)**")
-                        
-                        resultado_final = st.selectbox(
-                            "Resultado do processo:",
-                            ["contratado", "rejeitado", "cancelado", "desistiu", "outro"],
-                            key=f"resultado_{rel.get('id')}"
-                        )
-                        
-                        motivo_finalizacao = st.text_area(
-                            "Motivo/Observação final:",
-                            placeholder="Ex: Cliente contratou candidato. Início em 15/10/2025",
-                            key=f"motivo_fin_{rel.get('id')}"
-                        )
-                        
-                        if st.button("🏁 Finalizar Processo", key=f"finalizar_{rel.get('id')}", type="secondary"):
-                            if motivo_finalizacao.strip():
-                                sucesso, mensagem = finalizar_relacionamento(rel.get('id'), resultado_final, motivo_finalizacao)
-                                if sucesso:
-                                    st.success(mensagem)
-                                    st.cache_data.clear()
-                                    st.rerun()
-                                else:
-                                    st.error(mensagem)
-                            else:
-                                st.error("Informe o motivo da finalização")
-                    
-                    # ABA OBSERVAÇÕES
-                    with tab_obs:
-                        st.write("**Adicionar nova observação:**")
-                        nova_obs = st.text_area(
-                            "Observação:",
-                            placeholder="Ex: Cliente solicitou envio do currículo por email",
-                            height=80,
-                            key=f"obs_{rel.get('id')}"
-                        )
-                        
-                        if st.button("💾 Adicionar", key=f"add_obs_{rel.get('id')}", type="primary"):
-                            if nova_obs.strip():
-                                observacao_atual = rel.get('observacoes', '')
-                                if observacao_atual:
-                                    observacao_completa = f"{observacao_atual}\n\n{nova_obs.strip()}"
-                                else:
-                                    observacao_completa = nova_obs.strip()
-                                
-                                if atualizar_relacionamento(
-                                    rel.get('id'),
-                                    nova_observacao=observacao_completa
-                                ):
-                                    st.success("✅ Observação adicionada!")
-                                    st.cache_data.clear()
-                                    st.rerun()
-                            else:
-                                st.error("❌ Digite uma observação")
-                    
-                    # ABA STATUS
-                    with tab_status:
-                        col_atual, col_novo = st.columns(2)
-                        
-                        with col_atual:
-                            st.write("**Status Atual:**")
-                            st.write(f"📋 {status_atual.upper().replace('_', ' ')}")
-                        
-                        with col_novo:
-                            novo_status = st.selectbox(
-                                "Alterar para:",
-                                ["enviado", "em_analise", "entrevista_agendada", "aprovado", "rejeitado", "contratado", "cancelado"],
-                                key=f"status_{rel.get('id')}"
-                            )
-                        
-                        # CAMPO ESPECIAL PARA ENTREVISTA
-                        data_entrevista_nova = None
-                        if novo_status == "entrevista_agendada":
-                            st.markdown("---")
-                            st.write("**📅 Dados da Entrevista:**")
-                            
-                            col_data, col_hora = st.columns(2)
-                            with col_data:
-                                data_ent = st.date_input(
-                                    "Data:",
-                                    value=datetime.now().date(),
-                                    key=f"data_ent_{rel.get('id')}"
-                                )
-                            
-                            with col_hora:
-                                hora_ent = st.time_input(
-                                    "Hora:",
-                                    value=datetime.now().replace(second=0, microsecond=0).time(),
-                                    key=f"hora_ent_{rel.get('id')}"
-                                )
-                            
-                            data_entrevista_nova = datetime.combine(data_ent, hora_ent)
-                            st.info(f"✅ Entrevista será agendada para: **{data_entrevista_nova.strftime('%d/%m/%Y às %H:%M')}**")
-                        
-                        if st.button("🔄 Confirmar Alteração", key=f"update_status_{rel.get('id')}", type="primary"):
-                            if atualizar_relacionamento(
-                                rel.get('id'),
-                                novo_status=novo_status,
-                                data_entrevista=data_entrevista_nova
-                            ):
-                                st.success("✅ Status atualizado com histórico!")
-                                st.cache_data.clear()
-                                st.rerun()
-                    
-                    # ABA TROCA
-                    with tab_troca:
-                        st.warning("⚠️ **ATENÇÃO:** Trocar candidato **reinicia** a contagem de 90 dias!")
-                        
-                        candidato_atual = rel.get('nome_completo', 'N/A')
-                        st.info(f"**Candidato atual:** {candidato_atual}")
-                        
-                        if not df_candidatos.empty:
-                            novo_candidato_id = st.selectbox(
-                                "Novo candidato:",
-                                options=df_candidatos['id'].tolist(),
-                                format_func=lambda x: f"{df_candidatos[df_candidatos['id'] == x]['nome_completo'].iloc[0]} ({formatar_funcao(df_candidatos[df_candidatos['id'] == x]['formulario_id'].iloc[0])})",
-                                key=f"novo_cand_{rel.get('id')}"
-                            )
-                            
-                            motivo_troca = st.text_area(
-                                "Motivo da troca:",
-                                placeholder="Ex: Cliente rejeitou perfil. Solicitou candidato com mais experiência em cozinha.",
-                                key=f"motivo_troca_{rel.get('id')}"
-                            )
-                            
-                            if st.button("🔀 Confirmar Troca", key=f"trocar_{rel.get('id')}", type="secondary"):
-                                if motivo_troca.strip():
-                                    novo_candidato_nome = df_candidatos[df_candidatos['id'] == novo_candidato_id]['nome_completo'].iloc[0]
-                                    
-                                    # Adicionar motivo às observações junto com o histórico automático
-                                    observacao_atual = rel.get('observacoes', '')
-                                    observacao_com_motivo = f"{observacao_atual}\n\nMOTIVO DA TROCA: {motivo_troca.strip()}"
-                                    
-                                    if atualizar_relacionamento(
-                                        rel.get('id'),
-                                        novo_candidato_id=novo_candidato_id,
-                                        nova_observacao=observacao_com_motivo,
-                                        reiniciar_prazo=True
-                                    ):
-                                        st.success("✅ Candidato trocado! Prazo reiniciado para 90 dias.")
-                                        st.cache_data.clear()
-                                        st.rerun()
-                                else:
-                                    st.error("❌ Informe o motivo da troca")
-                        else:
-                            st.error("❌ Nenhum candidato disponível")
-                    
-                    # ABA EXCLUIR
-                    with tab_excluir:
-                        st.error("⚠️ **AÇÃO PERMANENTE E IRREVERSÍVEL!**")
-                        st.write("Use apenas se o relacionamento foi criado por engano.")
-                        
-                        motivo_exclusao = st.text_area(
-                            "Motivo da exclusão:",
-                            placeholder="Ex: Relacionamento duplicado criado por engano",
-                            key=f"motivo_excl_{rel.get('id')}"
-                        )
-                        
-                        confirmar = st.checkbox(
-                            "Confirmo que desejo excluir permanentemente",
-                            key=f"confirm_{rel.get('id')}"
-                        )
-                        
-                        if st.button("🗑️ EXCLUIR RELACIONAMENTO", key=f"excluir_{rel.get('id')}", type="secondary"):
-                            if confirmar and motivo_exclusao.strip():
-                                if excluir_relacionamento(rel.get('id')):
-                                    st.success("✅ Relacionamento excluído!")
-                                    st.cache_data.clear()
-                                    st.rerun()
-                            else:
-                                st.error("❌ Confirme a exclusão e informe o motivo")
-
-                st.markdown("---")
-            
-        # ESTATÍSTICAS DOS RELACIONAMENTOS
-        st.subheader("📈 Estatísticas dos Relacionamentos")
-        
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.metric("📊 Total", len(df_relacionamentos))
-        
-        with col2:
-            # ✅ VETORIZADO: 100x mais rápido
-            try:
-                # Converter datas uma vez só
-                df_temp = df_relacionamentos.copy()
-                df_temp['data_envio'] = pd.to_datetime(df_temp['data_envio'], errors='coerce')
-                
-                # Normalizar timezone
-                hoje_calc = pd.Timestamp.now(tz='UTC')
-                if df_temp['data_envio'].dt.tz is None:
-                    df_temp['data_envio'] = df_temp['data_envio'].dt.tz_localize(None)
-                    hoje_calc = hoje_calc.tz_localize(None)
-                
-                # Calcular dias (vetorizado)
-                df_temp['dias_passados'] = (hoje_calc - df_temp['data_envio']).dt.days
-                
-                # Contar críticos
-                criticos = len(df_temp[df_temp['dias_passados'] >= 75])
-            except:
-                criticos = 0
-            
-            st.metric("🚨 Críticos", criticos)
-        
-            with col3:
-                try:
-                    vencidos = len(df_temp[df_temp['dias_passados'] >= 90])
-                except:
-                    vencidos = 0
-                
-                st.metric("⏰ Vencidos", vencidos)
-        
-            with col4:
-                # ✅ REUTILIZA cálculo anterior (df_temp já existe)
-                try:
-                    ativos = len(df_temp[df_temp['dias_passados'] < 90])
-                except:
-                    ativos = 0
-                
-                st.metric("✅ Ativos", ativos)
-
-# =====================================
-# FUNÇÃO PRINCIPAL
-# =====================================
-
-def main():
-    """Função principal com sistema de abas"""
-    # CABEÇALHO
-    st.markdown(f"""
-    <div class="main-header">
-        <h1>🏠 R.O Recrutamento - Dashboard</h1>
-        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
-            Bem-vindo(a), {name}!
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
     
-    # SIDEBAR
-    st.sidebar.title("📊 Menu Principal")
-    
-    # ⭐ Exibir info do usuário na sidebar
-    exibir_info_usuario_sidebar(name, username, authenticator)
-    
-    # ✅ EXECUTAR EXPIRAÇÃO AUTOMÁTICA NO CARREGAMENTO
-    with st.spinner("🔄 Verificando relacionamentos antigos..."):
-        expirar_relacionamentos_antigos()
-    
-    # SISTEMA DE ABAS COM MÉTRICAS
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["👥 Candidatos", "💼 Vagas", "🔗 Relacionamentos", "📊 Métricas", "Backups"])
-    
-    with tab1:
-        gerenciar_candidatos()
-    
-    with tab2:
-        gerenciar_vagas()
-    
-    with tab3:
-        gerenciar_relacionamentos()
-    
-    with tab4:
-        gerenciar_metricas()
-        
-    with tab5:
-        gerenciar_backups()
-
-    # RODAPÉ
-    st.markdown("---")
-    st.markdown("""
-    <div style='text-align: center; color: #666; padding: 1rem;'>
-        <p><strong>R.O RECRUTAMENTO</strong> - Dashboard de Gestão</p>
-        <p>🔄 Última atualização: {}</p>
-    </div>
-    """.format(datetime.now().strftime('%d/%m/%Y às %H:%M')), unsafe_allow_html=True)
+    # 6. LISTA DE CARDS
+    for idx, rel in enumerate(df_relacionamentos.to_dict('records')):
+        exibir_card_relacionamento(rel, idx)
 
 def gerenciar_metricas():
     """Nova aba dedicada às métricas de negócio"""
@@ -2810,6 +3220,76 @@ def gerenciar_metricas():
         metricas = calcular_metricas_negocio(data_limite)
         exibir_dashboard_metricas(metricas, periodo_analise)
 
+# =====================================
+# FUNÇÃO PRINCIPAL
+# =====================================
+
+def main():
+    """
+    Função principal com sistema de abas
+    ✅ CORRIGIDO: Sidebar aparece sempre
+    """
+    # CABEÇALHO
+    st.markdown(f"""
+    <div class="main-header">
+        <h1>🏠 R.O Recrutamento - Dashboard</h1>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+            Bem-vindo(a), {name}!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ✅ SIDEBAR GLOBAL (SEMPRE APARECE)
+    with st.sidebar:
+        st.title("📊 Menu Principal")
+        
+        # ⭐ Exibir info do usuário
+        exibir_info_usuario_sidebar(name, username, authenticator)
+        
+        st.markdown("---")
+        
+        # Informações do sistema
+        st.caption("**Sistema:**")
+        st.caption("R.O Recrutamento v2.0")
+        st.caption(f"📅 {datetime.now().strftime('%d/%m/%Y')}")
+    
+    # ✅ EXECUTAR EXPIRAÇÃO AUTOMÁTICA
+    with st.spinner("🔄 Verificando relacionamentos antigos..."):
+        expirar_relacionamentos_antigos()
+    
+    # SISTEMA DE ABAS
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "👥 Candidatos", 
+        "💼 Vagas", 
+        "🔗 Relacionamentos", 
+        "📊 Métricas", 
+        "💾 Backups"
+    ])
+    
+    with tab1:
+        gerenciar_candidatos()
+    
+    with tab2:
+        gerenciar_vagas()
+    
+    with tab3:
+        gerenciar_relacionamentos()
+    
+    with tab4:
+        gerenciar_metricas()
+        
+    with tab5:
+        gerenciar_backups()
+
+    # RODAPÉ
+    st.markdown("---")
+    st.markdown("""
+    <div style='text-align: center; color: #666; padding: 1rem;'>
+        <p><strong>R.O RECRUTAMENTO</strong> - Dashboard de Gestão</p>
+        <p>🔄 Última atualização: {}</p>
+    </div>
+    """.format(datetime.now().strftime('%d/%m/%Y às %H:%M')), unsafe_allow_html=True)
+    
 # =====================================
 # EXECUTAR APLICAÇÃO
 # =====================================
