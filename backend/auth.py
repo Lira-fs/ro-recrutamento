@@ -236,6 +236,7 @@ def verificar_autenticacao():
 def exibir_info_usuario_sidebar(name, username, authenticator):
     """
     Exibe informações do usuário na sidebar com botão de logout
+    ✅ CORRIGIDO: Usa st.sidebar.elemento + Botão manual com key única
     
     Args:
         name: Nome do usuário
@@ -243,44 +244,43 @@ def exibir_info_usuario_sidebar(name, username, authenticator):
         authenticator: Objeto de autenticação
     """
     
-    with st.sidebar:
-        st.markdown("---")
-        
-        # Info do usuário
-        st.markdown(f"""
-        <div style="
-            background: linear-gradient(135deg, #a65e2e 0%, #d4a574 100%);
-            padding: 1rem;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-            margin-bottom: 1rem;
-        ">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
-            <div style="font-weight: bold; font-size: 1.1rem;">{name}</div>
-            <div style="font-size: 0.9rem; opacity: 0.9;">@{username}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Botão de logout - Compatível com versões diferentes
+    # ✅ Separador
+    st.sidebar.markdown("---")
+    
+    # ✅ Info do usuário (card)
+    st.sidebar.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #a65e2e 0%, #d4a574 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        margin-bottom: 1rem;
+    ">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+        <div style="font-weight: bold; font-size: 1.1rem;">{name}</div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">@{username}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ✅ Botão de logout manual (sempre funciona)
+    if st.sidebar.button('🚪 Sair', key=f'logout_{username}_sidebar', use_container_width=True):
+        # Limpar cookies do authenticator se possível
         try:
-            # Tentar API nova
-            authenticator.logout(button_name='🚪 Sair', location='sidebar')
-        except TypeError:
-            try:
-                # Tentar API antiga com parâmetros posicionais
-                authenticator.logout('🚪 Sair', 'sidebar')
-            except:
-                # Última tentativa - botão manual
-                if st.button('🚪 Sair', key='logout_manual'):
-                    # Limpar session state
-                    for key in ['name', 'username', 'authentication_status']:
-                        if key in st.session_state:
-                            del st.session_state[key]
-                    st.rerun()
+            authenticator.cookie_manager.delete(authenticator.cookie_name)
+        except:
+            pass
         
-        st.markdown("---")
-
+        # Limpar session state
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        
+        # Forçar reload completo
+        st.rerun()
+    
+    # ✅ Separador final
+    st.sidebar.markdown("---")
+    
 # ============================================
 # FUNÇÕES AUXILIARES
 # ============================================

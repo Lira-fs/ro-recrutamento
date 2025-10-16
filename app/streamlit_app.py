@@ -55,35 +55,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ============================================
-# ⭐ VERIFICAÇÃO DE AUTENTICAÇÃO (NOVO)
-# ============================================
+# verificar autenticação
 
-# CRÍTICO: Esta linha deve vir ANTES de qualquer outro código
+if 'authentication_status' not in st.session_state:
+    st.session_state['authentication_status'] = None
+
+
 name, username, authenticator = verificar_autenticacao()
+
 
 # Se chegou aqui, usuário está autenticado! ✅
 
-@st.cache_data(ttl=300)
-def carregar_dados_vagas_completo():
-    """
-    Carrega todas as vagas do sistema
-    
-    Returns:
-        DataFrame: Dados das vagas
-    """
-    try:
-        df_vagas = carregar_vagas()
-        return df_vagas
-        
-    except Exception as e:
-        log_erro(
-            mensagem_usuario="Erro ao carregar dados de vagas",
-            excecao=e,
-            contexto={}
-        )
-        return pd.DataFrame()
-    
 # =====================================
 # MÓDULO 1: CARREGAR DADOS DE VAGAS
 # =====================================
@@ -112,8 +94,6 @@ def carregar_dados_vagas_completo():
 # =====================================
 # MÓDULO 2: SIDEBAR COM FILTROS DE VAGAS
 # =====================================
-
-def criar_sidebar_filtros_vagas(df):
     """
     Cria sidebar com todos os filtros de vagas
     
@@ -2263,98 +2243,6 @@ def carregar_dados_candidatos_por_tipo(tipo_visualizacao):
         )
         return pd.DataFrame(), "📋 Candidatos"
     
-def criar_sidebar_filtros_candidatos(df):
-    """
-    Cria sidebar com todos os filtros de candidatos
-    
-    Args:
-        df (DataFrame): DataFrame com candidatos
-        
-    Returns:
-        dict: Dicionário com valores dos filtros selecionados
-    """
-    filtros = {}
-    
-    with st.sidebar:
-        st.header("🔍 Filtros de Candidatos")
-        
-        # Filtro de qualificação
-        filtros['tipo_visualizacao'] = st.selectbox(
-            "Visualizar:",
-            [
-                "Todos os candidatos",
-                "Candidatos qualificados", 
-                "Pendentes de qualificação"
-            ],
-            key="tipo_visualizacao_candidatos"
-        )
-        
-        st.markdown("---")
-        
-        # Filtro por nome
-        if 'nome_completo' in df.columns:
-            filtros['nome'] = st.text_input(
-                "🔎 Buscar por nome", 
-                "",
-                placeholder="Digite o nome...",
-                key="filtro_nome_candidato"
-            )
-        else:
-            filtros['nome'] = ""
-        
-        # Filtro por função
-        if 'formulario_id' in df.columns:
-            funcoes_unicas = ['Todas'] + sorted(
-                df['formulario_id'].dropna().unique().tolist()
-            )
-            filtros['funcao'] = st.selectbox(
-                "💼 Filtrar por função", 
-                funcoes_unicas,
-                key="filtro_funcao_candidato"
-            )
-        else:
-            filtros['funcao'] = "Todas"
-        
-        # Filtro por status de ficha
-        filtros['status_ficha'] = st.radio(
-            "📋 Status da ficha",
-            ["Todos", "Apenas pendentes", "Apenas com ficha gerada"],
-            key="filtro_status_ficha"
-        )
-        
-        st.markdown("---")
-        
-        # Filtros avançados (se houver dados)
-        if not df.empty:
-            with st.expander("🔧 Filtros Avançados", expanded=False):
-                
-                # Filtro por cidade
-                if 'cidade' in df.columns:
-                    cidades = ['Todas'] + sorted(
-                        df['cidade'].dropna().unique().tolist()
-                    )
-                    filtros['cidade'] = st.selectbox(
-                        "🏙️ Cidade:",
-                        cidades,
-                        key="filtro_cidade_candidato"
-                    )
-                else:
-                    filtros['cidade'] = "Todas"
-                
-                # Filtro por status do candidato
-                if 'status_candidato' in df.columns:
-                    status_opcoes = ['Todos'] + sorted(
-                        df['status_candidato'].dropna().unique().tolist()
-                    )
-                    filtros['status_candidato'] = st.selectbox(
-                        "📊 Status:",
-                        status_opcoes,
-                        key="filtro_status_candidato"
-                    )
-                else:
-                    filtros['status_candidato'] = "Todos"
-    
-    return filtros
 
 def aplicar_filtros_candidatos(df, filtros):
     """
@@ -3224,11 +3112,12 @@ def gerenciar_metricas():
 # FUNÇÃO PRINCIPAL
 # =====================================
 
+# =====================================
+# CORREÇÃO DEFINITIVA DA FUNÇÃO MAIN()
+# =====================================
+
 def main():
-    """
-    Função principal com sistema de abas
-    ✅ CORRIGIDO: Sidebar aparece sempre
-    """
+    
     # CABEÇALHO
     st.markdown(f"""
     <div class="main-header">
@@ -3239,25 +3128,17 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # ✅ SIDEBAR GLOBAL (SEMPRE APARECE)
-    with st.sidebar:
-        st.title("📊 Menu Principal")
-        
-        # ⭐ Exibir info do usuário
-        exibir_info_usuario_sidebar(name, username, authenticator)
-        
-        st.markdown("---")
-        
-        # Informações do sistema
-        st.caption("**Sistema:**")
-        st.caption("R.O Recrutamento v2.0")
-        st.caption(f"📅 {datetime.now().strftime('%d/%m/%Y')}")
+    # Info do usuário + Logout
+    exibir_info_usuario_sidebar(name, username, authenticator)
+    
+    # ⚠️ IMPORTANTE: Não adicionar mais nada aqui!
+    # Cada aba adiciona seus próprios filtros quando necessário
     
     # ✅ EXECUTAR EXPIRAÇÃO AUTOMÁTICA
     with st.spinner("🔄 Verificando relacionamentos antigos..."):
         expirar_relacionamentos_antigos()
     
-    # SISTEMA DE ABAS
+    # ✅ SISTEMA DE ABAS
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "👥 Candidatos", 
         "💼 Vagas", 
@@ -3266,20 +3147,23 @@ def main():
         "💾 Backups"
     ])
     
+    # ✅ CONTEÚDO DAS ABAS
+    # Cada aba adiciona seus filtros contextuais automaticamente
+    
     with tab1:
-        gerenciar_candidatos()
+        gerenciar_candidatos()  # ← Adiciona filtros de candidatos na sidebar
     
     with tab2:
-        gerenciar_vagas()
+        gerenciar_vagas()  # ← Adiciona filtros de vagas na sidebar
     
     with tab3:
-        gerenciar_relacionamentos()
+        gerenciar_relacionamentos()  # ← Sem filtros por enquanto
     
     with tab4:
-        gerenciar_metricas()
+        gerenciar_metricas()  # ← Sem filtros
         
     with tab5:
-        gerenciar_backups()
+        gerenciar_backups()  # ← Sem filtros
 
     # RODAPÉ
     st.markdown("---")
@@ -3289,7 +3173,177 @@ def main():
         <p>🔄 Última atualização: {}</p>
     </div>
     """.format(datetime.now().strftime('%d/%m/%Y às %H:%M')), unsafe_allow_html=True)
+
+
+    st.sidebar.title("📊 Menu Principal")
+    st.write("Teste no conteúdo principal")
+# =====================================
+# FUNÇÕES DE FILTROS - SEM "with st.sidebar"
+# =====================================
+
+def criar_sidebar_filtros_candidatos(df):
+    """
+    Adiciona filtros de candidatos à sidebar existente (não cria nova)
+    """
+    filtros = {}
     
+    # ✅ Separador visual
+    st.sidebar.subheader("🔍 Filtros de Candidatos")
+    
+    # Filtro: Tipo de visualização
+    filtros['tipo_visualizacao'] = st.sidebar.selectbox(
+        "Visualizar:",
+        ["Todos os candidatos", "Candidatos qualificados", "Pendentes de qualificação"],
+        key="tipo_visualizacao_candidatos"
+    )
+    
+    # Filtro: Busca por nome
+    if 'nome_completo' in df.columns:
+        filtros['nome'] = st.sidebar.text_input(
+            "🔎 Buscar por nome", 
+            "",
+            placeholder="Digite o nome...",
+            key="filtro_nome_candidato"
+        )
+    else:
+        filtros['nome'] = ""
+    
+    # Filtro: Função
+    if 'formulario_id' in df.columns:
+        funcoes_unicas = ['Todas'] + sorted(df['formulario_id'].dropna().unique().tolist())
+        filtros['funcao'] = st.sidebar.selectbox(
+            "💼 Filtrar por função", 
+            funcoes_unicas,
+            key="filtro_funcao_candidato"
+        )
+    else:
+        filtros['funcao'] = "Todas"
+    
+    # Filtro: Status da ficha
+    filtros['status_ficha'] = st.sidebar.radio(
+        "📋 Status da ficha",
+        ["Todos", "Apenas pendentes", "Apenas com ficha gerada"],
+        key="filtro_status_ficha"
+    )
+    
+    # Filtros avançados (dentro de expander)
+    if not df.empty:
+        with st.sidebar.expander("🔧 Filtros Avançados", expanded=False):
+            # Filtro: Cidade
+            if 'cidade' in df.columns:
+                cidades = ['Todas'] + sorted(df['cidade'].dropna().unique().tolist())
+                filtros['cidade'] = st.selectbox(
+                    "🏙️ Cidade:",
+                    cidades,
+                    key="filtro_cidade_candidato"
+                )
+            else:
+                filtros['cidade'] = "Todas"
+            
+            # Filtro: Status do candidato
+            if 'status_candidato' in df.columns:
+                status_opcoes = ['Todos'] + sorted(df['status_candidato'].dropna().unique().tolist())
+                filtros['status_candidato'] = st.selectbox(
+                    "📊 Status:",
+                    status_opcoes,
+                    key="filtro_status_candidato"
+                )
+            else:
+                filtros['status_candidato'] = "Todos"
+    
+    return filtros
+
+def criar_sidebar_filtros_vagas(df):
+    """
+    Adiciona filtros de vagas à sidebar existente (não cria nova)
+    
+    Args:
+        df (DataFrame): DataFrame com vagas
+        
+    Returns:
+        dict: Dicionário com valores dos filtros selecionados
+    """
+    filtros = {}
+    
+    # ✅ Separador visual
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("🔍 Filtros de Vagas")
+    
+    # Filtro: Status
+    filtros['status'] = st.sidebar.selectbox(
+        "📊 Status:",
+        ["Todas", "ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
+        key="filtro_status_vaga"
+    )
+    
+    # Filtro: Urgência
+    filtros['urgente'] = st.sidebar.checkbox(
+        "🚨 Apenas urgentes",
+        key="filtro_urgente"
+    )
+    
+    
+    # Filtros avançados (dentro de expander)
+    if not df.empty:
+        with st.sidebar.expander("🔧 Filtros Avançados", expanded=False):
+            
+            # Filtro: Cidade
+            if 'cidade' in df.columns:
+                cidades = ['Todas'] + sorted(df['cidade'].dropna().unique().tolist())
+                filtros['cidade'] = st.selectbox(
+                    "🏙️ Cidade:",
+                    cidades,
+                    key="filtro_cidade_vaga"
+                )
+            else:
+                filtros['cidade'] = "Todas"
+            
+            # Filtro: Tipo de vaga
+            if 'formulario_id' in df.columns:
+                tipos = ['Todas'] + sorted(df['formulario_id'].dropna().unique().tolist())
+                filtros['tipo'] = st.selectbox(
+                    "💼 Tipo de vaga:",
+                    tipos,
+                    format_func=lambda x: formatar_funcao_vaga(x) if x != 'Todas' else x,
+                    key="filtro_tipo_vaga"
+                )
+            else:
+                filtros['tipo'] = "Todas"
+            
+            # Filtro: Faixa salarial
+            if 'salario_oferecido' in df.columns:
+                salarios = pd.to_numeric(df['salario_oferecido'], errors='coerce').dropna()
+                if not salarios.empty:
+                    salario_min_val = int(salarios.min())
+                    salario_max_val = int(salarios.max())
+                    
+                    if salario_max_val > salario_min_val:
+                        filtros['salario_min'], filtros['salario_max'] = st.slider(
+                            "💰 Faixa salarial:",
+                            min_value=salario_min_val,
+                            max_value=salario_max_val,
+                            value=(salario_min_val, salario_max_val),
+                            step=100,
+                            key="filtro_salario_vaga"
+                        )
+                    else:
+                        filtros['salario_min'] = salario_min_val
+                        filtros['salario_max'] = salario_max_val
+                else:
+                    filtros['salario_min'] = 0
+                    filtros['salario_max'] = 0
+            else:
+                filtros['salario_min'] = 0
+                filtros['salario_max'] = 0
+            
+            # Busca global
+            filtros['busca'] = st.text_input(
+                "🔎 Busca geral:",
+                placeholder="Nome do proprietário, cidade...",
+                key="busca_global_vaga"
+            )
+    
+    return filtros
 # =====================================
 # EXECUTAR APLICAÇÃO
 # =====================================
