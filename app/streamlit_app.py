@@ -43,6 +43,32 @@ from encryption import (
     decrypt_lista_vagas
 )
 
+# 6. imports clean_cache
+
+from clean_cache import (
+    invalidar_cache_candidatos,
+    invalidar_cache_vagas,
+    invalidar_cache_relacionamentos,
+    invalidar_cache_apos_relacionamento,
+    invalidar_cache_completo,
+    cache_apos_criar_candidato,
+    cache_apos_editar_candidato,
+    cache_apos_criar_vaga,
+    cache_apos_editar_vaga,
+    cache_apos_criar_relacionamento,
+    cache_apos_excluir_relacionamento,
+    cache_apos_gerar_pdf,
+    limpar_session_state_antigo,
+)
+
+# 7. import lazy_loading
+
+from lazy_loading import (
+    expander_com_lazy_loading,
+    expander_lazy_simples,
+    criar_funcao_cached,
+)
+
 
 # ============================================
 # CONFIGURAÇÃO DA PÁGINA (APENAS UMA VEZ!)
@@ -70,7 +96,7 @@ name, username, authenticator = verificar_autenticacao()
 # MÓDULO 1: CARREGAR DADOS DE VAGAS
 # =====================================
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_dados_vagas_completo():
     """
     Carrega todas as vagas do sistema
@@ -291,20 +317,13 @@ def exibir_metricas_vagas(df):
         st.metric("🔥 Urgentes", vagas_urgentes)
         
 def exibir_card_vaga(vaga, idx):
-    """
-    Exibe card individual de uma vaga com todas as informações e ações
-    
-    Args:
-        vaga (dict): Dados da vaga
-        idx (int): Índice para keys únicas
-    """
+    """Versão com lazy loading completo"""
     vaga_id = vaga.get('id')
     
-    # Obter status formatado
+    # Título do expander (sempre visível)
     status_atual = vaga.get('status_detalhado', vaga.get('status', 'ativa'))
     status_display, status_color = formatar_status_vaga(status_atual)
     
-    # Título do expander
     titulo_expander = (
         f"{formatar_funcao_vaga(vaga.get('formulario_id', ''))} | "
         f"{vaga.get('nome', '')} {vaga.get('sobrenome', '')} | "
@@ -313,57 +332,48 @@ def exibir_card_vaga(vaga, idx):
         f"{status_display}"
     )
     
+    # ✅ LAZY LOADING NO CARD
     with st.expander(titulo_expander, expanded=False):
-        
-        col1, col2 = st.columns([2, 1])
-        
-        # ===== COLUNA 1: INFORMAÇÕES DA VAGA =====
-        with col1:
-            st.write(f"**📧 Email:** {vaga.get('email', 'Não informado')}")
-            st.write(f"**📞 Telefone:** {vaga.get('telefone_principal', 'Não informado')}")
-            st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
-            st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
-            st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
+        with st.container():  # ← Lazy loading simples
             
-            # Data de cadastro
-            if vaga.get('created_at'):
-                data_cadastro = pd.to_datetime(vaga['created_at']).strftime('%d/%m/%Y às %H:%M')
-                st.write(f"**📅 Cadastrada em:** {data_cadastro}")
-        
-        # ===== COLUNA 2: CONTROLES =====
-        with col2:
-            st.subheader("🎛️ Controles")
+            col1, col2 = st.columns([2, 1])
             
-            # Selectbox de status
-            novo_status = st.selectbox(
-                "Alterar status:",
-                ["ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
-                index=["ativa", "em_andamento", "preenchida", "pausada", "cancelada"].index(status_atual),
-                key=f"status_{vaga_id}_{idx}"
-            )
+            with col1:
+                st.write(f"**📧 Email:** {vaga.get('email', 'Não informado')}")
+                st.write(f"**📞 Telefone:** {vaga.get('telefone_principal', 'Não informado')}")
+                st.write(f"**🏠 Endereço:** {vaga.get('rua_numero', 'Não informado')}")
+                st.write(f"**⏰ Urgência:** {vaga.get('inicio_urgente', 'Não informado')}")
+                st.write(f"**📄 Regime:** {vaga.get('regime_trabalho', 'Não informado')}")
+                
+                if vaga.get('created_at'):
+                    data_cadastro = pd.to_datetime(vaga['created_at']).strftime('%d/%m/%Y às %H:%M')
+                    st.write(f"**📅 Cadastrada em:** {data_cadastro}")
             
-            # Botão atualizar status
-            if st.button(f"💾 Atualizar Status", key=f"update_status_{vaga_id}_{idx}"):
-                if atualizar_status_vaga(vaga_id, novo_status):
-                    st.success("✅ Status atualizado!")
-                    # Adicionar observação automática
-                    obs_status = f"Status alterado para: {novo_status}"
-                    adicionar_observacao_vaga(vaga_id, obs_status, 'status_change')
-                    st.cache_data.clear()
-                    st.rerun()
-                else:
-                    st.error("❌ Erro ao atualizar")
+            with col2:
+                st.subheader("🎛️ Controles")
+                
+                novo_status = st.selectbox(
+                    "Alterar status:",
+                    ["ativa", "em_andamento", "preenchida", "pausada", "cancelada"],
+                    index=["ativa", "em_andamento", "preenchida", "pausada", "cancelada"].index(status_atual),
+                    key=f"status_{vaga_id}_{idx}"
+                )
+                
+                if st.button(f"💾 Atualizar Status", key=f"update_status_{vaga_id}_{idx}"):
+                    if atualizar_status_vaga(vaga_id, novo_status):
+                        st.success("✅ Status atualizado!")
+                        obs_status = f"Status alterado para: {novo_status}"
+                        adicionar_observacao_vaga(vaga_id, obs_status, 'status_change')
+                        invalidar_cache_vagas()
+                        st.rerun()
+                    else:
+                        st.error("❌ Erro ao atualizar")
+                
+                st.markdown("---")
+                exibir_botao_gerar_pdf_vaga(vaga, idx)
             
             st.markdown("---")
-            
-            # Botão gerar PDF
-            exibir_botao_gerar_pdf_vaga(vaga, idx)
-        
-        st.markdown("---")
-        
-        # ===== SEÇÃO DE OBSERVAÇÕES =====
-        exibir_secao_observacoes_vaga(vaga, idx)
-
+            exibir_secao_observacoes_vaga(vaga, idx)
 
 # =====================================
 # MÓDULO 5A: BOTÃO GERAR PDF DE VAGA
@@ -396,6 +406,7 @@ def exibir_botao_gerar_pdf_vaga(vaga, idx):
                 )
                 
                 st.success("✅ PDF gerado! Clique acima para baixar.")
+                cache_apos_gerar_pdf()
                 
         except Exception as e:
             log_erro(
@@ -433,29 +444,31 @@ def exibir_secao_observacoes_vaga(vaga, idx):
             if nova_obs.strip():
                 if adicionar_observacao_vaga(vaga_id, nova_obs):
                     st.success("✅ Observação adicionada!")
-                    st.cache_data.clear()
+                    cache_apos_adicionar_observacao_vaga()
                     st.rerun()
                 else:
                     st.error("❌ Erro ao adicionar observação")
             else:
                 st.warning("⚠️ Digite uma observação válida")
     
-    # ===== EXIBIR OBSERVAÇÕES EXISTENTES =====
-    observacoes = carregar_observacoes_vaga(vaga_id)
-    
-    if observacoes:
-        st.write("**📚 Histórico de Observações:**")
-        for obs in observacoes:
-            data_obs = pd.to_datetime(obs['data_criacao']).strftime('%d/%m/%Y às %H:%M')
-            tipo_icon = {
-                'geral': '📝',
-                'candidato_enviado': '👤',
-                'status_change': '🔄'
-            }.get(obs.get('tipo_observacao', 'geral'), '📝')
+    # ✅ EXIBIR OBSERVAÇÕES EXISTENTES COM LAZY LOADING
+    with st.expander("📚 Histórico de Observações", expanded=False):
+        # Versão SIMPLES com st.container()
+        with st.container():
+            observacoes = carregar_observacoes_vaga(vaga_id)
             
-            st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
-    else:
-        st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
+            if observacoes:
+                for obs in observacoes:
+                    data_obs = pd.to_datetime(obs['data_criacao']).strftime('%d/%m/%Y às %H:%M')
+                    tipo_icon = {
+                        'geral': '📝',
+                        'candidato_enviado': '👤',
+                        'status_change': '🔄'
+                    }.get(obs.get('tipo_observacao', 'geral'), '📝')
+                    
+                    st.write(f"{tipo_icon} **{data_obs}** - {obs['observacao']}")
+            else:
+                st.info("ℹ️ Nenhuma observação registrada para esta vaga.")
         
 def gerenciar_vagas():
     """
@@ -547,7 +560,7 @@ st.markdown("""
 # FUNÇÕES DE CANDIDATOS (PRESERVADAS 100%)
 # =====================================
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_candidatos(
     limite=100, 
     offset=0, 
@@ -743,7 +756,7 @@ def qualificar_candidato_simples(candidato_id, nota, observacoes, instrutor):
         st.error(f"Erro técnico: {str(e)}")
         return False, None
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_candidatos_qualificados(limite=100, offset=0, retornar_contagem=False):
     """Carrega candidatos qualificados usando dados combinados otimizados"""
     try:
@@ -811,7 +824,7 @@ def carregar_candidatos_qualificados(limite=100, offset=0, retornar_contagem=Fal
             return pd.DataFrame(), 0
         return pd.DataFrame()
     
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_candidatos_pendentes(limite=100, offset=0, retornar_contagem=False):
     """Carrega candidatos pendentes usando LEFT JOIN no banco"""
     try:
@@ -1538,7 +1551,7 @@ def finalizar_relacionamento(relacionamento_id, resultado_final, motivo=""):
     except Exception as e:
         return False, f"Erro técnico: {str(e)}"
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_vagas(
     limite=100,
     offset=0,
@@ -1840,7 +1853,7 @@ def relacionar_candidato_vaga_com_status(candidato_id, vaga_id, observacao="", s
     
     return False, "❌ Erro ao criar relacionamento. Contate o administrador."
     
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_relacionamentos(limite=100, offset=0, filtros=None, retornar_contagem=False):
     """Carrega relacionamentos com paginação e filtros"""
     try:
@@ -2006,6 +2019,7 @@ def gerenciar_backups():
                         st.info(f"🆔 File ID: `{file_id}`")
                         st.balloons()
                         
+                        criar_backup_automatico()
                         # Atualizar lista
                         st.rerun()
                     else:
@@ -2517,7 +2531,7 @@ def exibir_formulario_qualificacao(candidato, idx):
                         import time
                         time.sleep(2)
                         
-                        st.cache_data.clear()
+                        cache_apos_gerar_pdf()
                         st.info("🔄 Recarregando página...")
                         st.rerun()
                     else:
@@ -2583,7 +2597,7 @@ def gerenciar_candidatos():
     for idx, candidato in enumerate(df_filtrado.to_dict('records')):
         exibir_card_candidato(candidato, idx)
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def carregar_dados_relacionamentos():
     """
     Carrega todos os dados necessários para gestão de relacionamentos
@@ -2913,12 +2927,14 @@ def exibir_card_relacionamento(rel, idx):
             st.progress(progresso / 100)
             st.caption(f"{progresso:.0f}% do prazo")
         
-        # ===== OBSERVAÇÕES =====
+        # ===== OBSERVAÇÕES COM LAZY LOADING SIMPLES =====
         if rel.get('observacoes'):
             with st.expander("💬 Histórico", expanded=False):
-                for linha in rel.get('observacoes').split('\n'):
-                    if linha.strip():
-                        st.caption(linha.strip())
+                # Container lazy - só renderiza quando expander é aberto
+                with st.container():
+                    for linha in rel.get('observacoes').split('\n'):
+                        if linha.strip():
+                            st.caption(linha.strip())
         
         # ===== PAINEL DE CONTROLE =====
         exibir_painel_controle_relacionamento(rel, idx)
@@ -2933,10 +2949,97 @@ def exibir_painel_controle_relacionamento(rel, idx):
         rel: Dict com dados do relacionamento
         idx: Índice para keys únicas
     """
+    # Expander de ações com lazy loading
+    key_acoes = f"acoes_loaded_{rel.get('id')}_{idx}"
+
+    if key_acoes not in st.session_state:
+        st.session_state[key_acoes] = False
+
     with st.expander("⚙️ Ações", expanded=False):
-        
-        tab1, tab2, tab3 = st.tabs(["📝 Observação", "📋 Status", "🏁 Finalizar"])
-        
+        # ✅ CORREÇÃO: Criar tabs SEMPRE, lazy loading SÓ no conteúdo
+        if not st.session_state[key_acoes]:
+            # Primeira vez: apenas marcar como visto
+            st.session_state[key_acoes] = True
+            st.info("💡 Clique novamente para carregar ações...")
+            # Não renderiza nada, usuário precisa fechar e abrir de novo
+        else:
+            # ✅ Agora sim renderiza as tabs
+            tab1, tab2, tab3 = st.tabs(["📝 Observação", "📋 Status", "🏁 Finalizar"])
+            
+            # ===== TAB 1: OBSERVAÇÃO =====
+            with tab1:
+                nova_obs = st.text_area(
+                    "Nova observação:",
+                    height=80,
+                    key=f"obs_{rel.get('id')}_{idx}"
+                )
+                
+                if st.button("💾 Adicionar", key=f"add_obs_{idx}"):
+                    if nova_obs.strip():
+                        obs_atual = rel.get('observacoes', '')
+                        obs_completa = f"{obs_atual}\n\n{nova_obs.strip()}" if obs_atual else nova_obs.strip()
+                        
+                        if atualizar_relacionamento(rel.get('id'), nova_observacao=obs_completa):
+                            st.success("✅ Observação adicionada!")
+                            cache_apos_editar_relacionamento()
+                            st.rerun()
+                    else:
+                        st.error("❌ Digite uma observação")
+            
+            # ===== TAB 2: STATUS =====
+            with tab2:
+                novo_status = st.selectbox(
+                    "Alterar status para:",
+                    ["enviado", "em_analise", "entrevista_agendada", "aprovado", "rejeitado", "contratado"],
+                    key=f"status_{idx}"
+                )
+                
+                if st.button("🔄 Atualizar", key=f"update_status_{idx}"):
+                    if atualizar_relacionamento(rel.get('id'), novo_status=novo_status):
+                        st.success("✅ Status atualizado!")
+                        cache_apos_editar_relacionamento()
+                        st.rerun()
+            
+            # ===== TAB 3: FINALIZAR =====
+            with tab3:
+                resultado = st.selectbox(
+                    "Resultado final:",
+                    ["contratado", "rejeitado", "cancelado"],
+                    key=f"resultado_{idx}"
+                )
+                
+                motivo = st.text_area(
+                    "Motivo:",
+                    height=60,
+                    key=f"motivo_{idx}"
+                )
+                
+                if st.button("🏁 Finalizar", key=f"finalizar_{idx}"):
+                    if motivo.strip():
+                        sucesso, msg = finalizar_relacionamento(rel.get('id'), resultado, motivo)
+                        if sucesso:
+                            st.success(msg)
+                            cache_apos_excluir_relacionamento()
+                            st.rerun()
+                        else:
+                            st.error(msg)
+                    else:
+                        st.error("❌ Informe o motivo")
+
+    # Expander de ações com lazy loading
+    key_acoes = f"acoes_loaded_{rel.get('id')}_{idx}"
+
+    if key_acoes not in st.session_state:
+        st.session_state[key_acoes] = False
+
+    with st.expander("⚙️ Ações", expanded=False):
+        # Só renderiza tabs se expander já foi aberto
+        if not st.session_state[key_acoes]:
+            st.info("💡 Clique para ver ações disponíveis...")
+            st.session_state[key_acoes] = True
+        else:
+            tab1, tab2, tab3 = st.tabs(["📝 Observação", "📋 Status", "🏁 Finalizar"])
+            
         # ===== TAB 1: OBSERVAÇÃO =====
         with tab1:
             nova_obs = st.text_area(
@@ -2952,7 +3055,7 @@ def exibir_painel_controle_relacionamento(rel, idx):
                     
                     if atualizar_relacionamento(rel.get('id'), nova_observacao=obs_completa):
                         st.success("✅ Observação adicionada!")
-                        st.cache_data.clear()
+                        cache_apos_editar_relacionamento()
                         st.rerun()
                 else:
                     st.error("❌ Digite uma observação")
@@ -2968,7 +3071,7 @@ def exibir_painel_controle_relacionamento(rel, idx):
             if st.button("🔄 Atualizar", key=f"update_status_{idx}"):
                 if atualizar_relacionamento(rel.get('id'), novo_status=novo_status):
                     st.success("✅ Status atualizado!")
-                    st.cache_data.clear()
+                    cache_apos_editar_relacionamento()
                     st.rerun()
         
         # ===== TAB 3: FINALIZAR =====
@@ -2990,7 +3093,7 @@ def exibir_painel_controle_relacionamento(rel, idx):
                     sucesso, msg = finalizar_relacionamento(rel.get('id'), resultado, motivo)
                     if sucesso:
                         st.success(msg)
-                        st.cache_data.clear()
+                        cache_apos_excluir_relacionamento()
                         st.rerun()
                     else:
                         st.error(msg)
@@ -3049,7 +3152,7 @@ def gerenciar_relacionamentos():
     criou_novo = criar_formulario_novo_relacionamento(df_candidatos, df_vagas)
     
     if criou_novo:
-        st.cache_data.clear()
+        cache_apos_criar_relacionamento()
         st.rerun()
     
     st.markdown("---")
@@ -3134,6 +3237,9 @@ def main():
     # ⚠️ IMPORTANTE: Não adicionar mais nada aqui!
     # Cada aba adiciona seus próprios filtros quando necessário
     
+    #limpeza de session state 
+    limpar_session_state_antigo()
+    
     # ✅ EXECUTAR EXPIRAÇÃO AUTOMÁTICA
     with st.spinner("🔄 Verificando relacionamentos antigos..."):
         expirar_relacionamentos_antigos()
@@ -3176,7 +3282,6 @@ def main():
 
 
     st.sidebar.title("📊 Menu Principal")
-    st.write("Teste no conteúdo principal")
 # =====================================
 # FUNÇÕES DE FILTROS - SEM "with st.sidebar"
 # =====================================
@@ -3226,19 +3331,29 @@ def criar_sidebar_filtros_candidatos(df):
         key="filtro_status_ficha"
     )
     
-    # Filtros avançados (dentro de expander)
+    # Filtros avançados com lazy loading
     if not df.empty:
+        key_filtros_avanc = "filtros_avancados_candidatos_loaded"
+        
+        if key_filtros_avanc not in st.session_state:
+            st.session_state[key_filtros_avanc] = False
+        
         with st.sidebar.expander("🔧 Filtros Avançados", expanded=False):
-            # Filtro: Cidade
-            if 'cidade' in df.columns:
-                cidades = ['Todas'] + sorted(df['cidade'].dropna().unique().tolist())
-                filtros['cidade'] = st.selectbox(
-                    "🏙️ Cidade:",
-                    cidades,
-                    key="filtro_cidade_candidato"
-                )
+            # Só processa filtros se expander foi aberto
+            if not st.session_state[key_filtros_avanc]:
+                st.info("💡 Expandir para ver filtros...")
+                st.session_state[key_filtros_avanc] = True
             else:
-                filtros['cidade'] = "Todas"
+                # Filtro: Cidade
+                if 'cidade' in df.columns:
+                    cidades = ['Todas'] + sorted(df['cidade'].dropna().unique().tolist())
+                    filtros['cidade'] = st.selectbox(
+                        "🏙️ Cidade:",
+                        cidades,
+                        key="filtro_cidade_candidato"
+                    )
+                else:
+                    filtros['cidade'] = "Todas"
             
             # Filtro: Status do candidato
             if 'status_candidato' in df.columns:
@@ -3285,18 +3400,17 @@ def criar_sidebar_filtros_vagas(df):
     
     # Filtros avançados (dentro de expander)
     if not df.empty:
-        with st.sidebar.expander("🔧 Filtros Avançados", expanded=False):
-            
-            # Filtro: Cidade
-            if 'cidade' in df.columns:
-                cidades = ['Todas'] + sorted(df['cidade'].dropna().unique().tolist())
-                filtros['cidade'] = st.selectbox(
-                    "🏙️ Cidade:",
-                    cidades,
-                    key="filtro_cidade_vaga"
-                )
-            else:
-                filtros['cidade'] = "Todas"
+        key_filtros_avanc_vagas = "filtros_avancados_vagas_loaded"
+    
+    if key_filtros_avanc_vagas not in st.session_state:
+        st.session_state[key_filtros_avanc_vagas] = False
+    
+    with st.sidebar.expander("🔧 Filtros Avançados", expanded=False):
+        if not st.session_state[key_filtros_avanc_vagas]:
+            st.info("💡 Expandir para ver filtros...")
+            st.session_state[key_filtros_avanc_vagas] = True
+        else:
+            # ... filtros avançados ...
             
             # Filtro: Tipo de vaga
             if 'formulario_id' in df.columns:
