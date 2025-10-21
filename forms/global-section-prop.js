@@ -4,7 +4,7 @@
    =================================== */
 
 const ownerFormSections = {
-    /*'aceitar-termos': `
+    'aceitar-termos': `
         <section class="form-section treinamento-section">
             <h2 class="section-title">
                 <i class="fas fa-handshake"></i>
@@ -119,7 +119,7 @@ const ownerFormSections = {
                 </div>
             </div>
         </div>
-    `,*/
+    `,
     
     'dados-proprietario': `
         <section class="form-section">

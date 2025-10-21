@@ -130,8 +130,65 @@
                 <!-- OBSERVAÇÕES ADICIONAIS -->
                 <div id="observacoes-adicionais-container"></div>
 
-                <!-- TREINAMENTO PERSONALIZADO -->
-                <div id="treinamento-personalizado-container"></div>
+
+                <section class="form-section">
+            <h2 class="section-title">
+                <i class="fas fa-graduation-cap"></i>
+                Treinamento Personalizado
+            </h2>
+            
+            <div class="treinamento-info">
+                <div class="info-box">
+                    <i class="fas fa-star"></i>
+                    <div>
+                        <h3>Treinamento Personalizado R.O</h3>
+                        <p>Oferecemos treinamento personalizado para profissionais de acordo com suas necessidades específicas e rotina da sua residência.</p>
+                        
+                        <div style="margin-top: 15px;">
+                            <button type="button" class="btn-info-treinamento" onclick="toggleInfoTreinamento()">
+                                <i class="fas fa-info-circle"></i>
+                                Saber mais sobre o treinamento personalizado
+                            </button>
+                        </div>
+                        
+                        <div class="info-treinamento" style="display: none; margin-top: 15px; padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px;">
+                            <h4>O que inclui o treinamento personalizado:</h4>
+                            <ul style="margin: 10px 0; padding-left: 20px; color: var(--text-light);">
+                                <li>Análise da rotina específica da sua residência</li>
+                                <li>Treinamento adaptado às suas necessidades</li>
+                                <li>Protocolos personalizados de atendimento</li>
+                                <li>Orientações sobre equipamentos específicos</li>
+                                <li>Padrões de qualidade customizados</li>
+                                <li>Acompanhamento durante período de adaptação</li>
+                            </ul>
+                            <p><strong>Investimento:</strong> Consulte valores conforme complexidade</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Interesse no treinamento personalizado</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="interesseTreinamento" value="tenho-interesse" required>
+                            <span>Tenho interesse</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="interesseTreinamento" value="nao-tenho-interesse" required>
+                            <span>Não tenho interesse</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="interesseTreinamento" value="quero-conversar" required>
+                            <span>Quero conversar sobre</span>
+                        </label>
+                    </div><br>
+                    <p> <strong>*Obs:</strong> <i>no treinamento personalizada para cozinheira, <strong>nós não ensinamos a como cozinhar,</strong> nós ensinamos boas práticas de organização no trabalho, vestimenta, repsponsabilidade, limpeza e boas maneiras de como se comportar em ambientes de alto padrão</i></p>
+                </div>
+            </div>
+        </section>
+                
 
                 <!-- Submit Button -->
                 <div class="form-submit">
@@ -182,7 +239,7 @@
     <script src="../global-section-prop.js"></script>
     <script src="../../components/components.js"></script>
     <script>
-        
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Carregando formulário de vaga - Cozinheira(o)');
     

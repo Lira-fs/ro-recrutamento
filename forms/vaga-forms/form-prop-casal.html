@@ -147,6 +147,12 @@
                    </label>
                </div>
            </div>
+
+           <div class="form-group full-width">
+               <label for="perfilDesejadoEle">O que espera do seu futuro administrador de residência? </label>
+               <textarea id="perfilDesejadoEle" name="perfilDesejadoEle" rows="4" placeholder="Descreva as atividades que ele deverá realizar na residência durante a jornada de trabalho"></textarea>
+           </div>
+
        </div>
    </div>
 
@@ -194,24 +200,11 @@
                        <span>Não necessário</span>
                    </label>
                </div>
-           </div>
+           </div><br>
 
-           <div class="form-group">
-               <label>Limpeza geral da casa?</label>
-               <div class="radio-group">
-                   <label class="radio-label">
-                       <input type="radio" name="elaLimpezaGeral" value="sim" required>
-                       <span>Sim, necessário</span>
-                   </label>
-                   <label class="radio-label">
-                       <input type="radio" name="elaLimpezaGeral" value="desejavel" required>
-                       <span>Desejável</span>
-                   </label>
-                   <label class="radio-label">
-                       <input type="radio" name="elaLimpezaGeral" value="nao" required>
-                       <span>Não necessário</span>
-                   </label>
-               </div>
+           <div class="form-group full-width">
+               <label for="perfilDesejadoEla">O que espera do sua futura candidata? </label>
+               <textarea id="perfilDesejadoEla" name="perfilDesejadoEla" rows="4" placeholder="Descreva as atividades que ela deverá realizar na residência durante a jornada de trabalho"></textarea>
            </div>
        </div>
    </div>
@@ -326,13 +319,9 @@
 
     <!-- JavaScript -->
      <script type="module" src="../../components/supabase-config.js"></script>
-    <script src="../global-section-prop.js"></script>
+    <!-- <script src="../global-section-prop.js"></script> -->
     <script src="../../components/components.js"></script>
     <script>
-       // ===================================
-// SCRIPT PARA FORM-PROP-CASAL.HTML
-// Substituir todo o <script> existente no HTML
-// ===================================
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Carregando formulário de vaga - Casal de Caseiros');
