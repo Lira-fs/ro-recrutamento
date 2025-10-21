@@ -18,166 +18,6 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Estilos específicos para novos campos -->
-    <style>
-        /* Estilos para campos específicos do casal */
-        .casal-subtitle {
-            color: var(--bronze-light);
-            font-size: 1.3rem;
-            margin-bottom: var(--spacing-lg);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            padding-bottom: var(--spacing-sm);
-            border-bottom: 1px solid var(--cor-borda);
-        }
-
-        .casal-subtitle i {
-            color: var(--bronze-light);
-            font-size: 1.2rem;
-        }
-
-        .habilidades-extras {
-            background: rgba(0, 0, 0, 0.2);
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius-sm);
-            margin-top: var(--spacing-lg);
-            border: 1px solid var(--cor-borda);
-        }
-
-        .habilidades-extras h4 {
-            color: var(--bronze-light);
-            margin-bottom: var(--spacing-md);
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-
-        .habilidades-extras h4 i {
-            color: var(--bronze-light);
-        }
-
-        .preferencia-field {
-            margin-top: var(--spacing-sm);
-            padding: var(--spacing-md);
-            background: rgba(231, 76, 60, 0.1);
-            border-radius: var(--border-radius-sm);
-            border-left: 3px solid #e74c3c;
-        }
-
-        .preferencia-field label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .preferencia-field input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-        }
-
-        .checkbox-grid-small {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--spacing-xs);
-        }
-
-        .pets-details {
-            display: none;
-            margin-top: var(--spacing-md);
-            padding: var(--spacing-md);
-            background: rgba(166, 94, 46, 0.1);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--bronze-light);
-        }
-
-        .pets-details.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .jardim-details, .piscina-details {
-            display: none;
-            margin-top: var(--spacing-sm);
-        }
-
-        .jardim-details.show, .piscina-details.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .coqueteis-nivel {
-            display: none;
-            margin-top: var(--spacing-md);
-            padding: var(--spacing-md);
-            background: rgba(166, 94, 46, 0.1);
-            border-radius: var(--border-radius-sm);
-        }
-
-        .coqueteis-nivel.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .trabalhou-juntos-tempo {
-            display: none;
-            margin-top: var(--spacing-md);
-            padding: var(--spacing-md);
-            background: rgba(166, 94, 46, 0.1);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--bronze-light);
-        }
-
-        .trabalhou-juntos-tempo.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .habilidades-cozinha {
-            display: none;
-            margin-top: var(--spacing-md);
-        }
-
-        .habilidades-cozinha.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        /* Responsividade para novos campos */
-        @media (min-width: 768px) {
-            .checkbox-grid-small {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .checkbox-grid-small {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 767px) {
-            .casal-subtitle {
-                font-size: 1.1rem;
-                flex-direction: column;
-                text-align: center;
-                gap: var(--spacing-xs);
-            }
-
-            .habilidades-extras {
-                padding: var(--spacing-md);
-            }
-
-            .habilidades-extras h4 {
-                font-size: 1rem;
-                flex-direction: column;
-                text-align: center;
-                gap: var(--spacing-xs);
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -254,24 +94,8 @@
                                     </label>
                                 </div>
                             </div>
-                            
-                            <div class="cnh-details-ele">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label for="categoriaCnhEle">Categoria</label>
-                                        <select id="categoriaCnhEle" name="categoriaCnhEle">
-                                            <option value="">Selecione</option>
-                                            <option value="A">A</option>
-                                            <option value="B">B</option>
-                                            <option value="C">C</option>
-                                            <option value="D">D</option>
-                                            <option value="E">E</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                    </div> <br><br>
 
                     <!-- Dados Pessoais - ELA -->
                     <div class="casal-section">
@@ -327,25 +151,8 @@
                                     </label>
                                 </div>
                             </div>
-                            
-                            <div class="cnh-details-ela">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label for="categoriaCnhEla">Categoria</label>
-                                        <select id="categoriaCnhEla" name="categoriaCnhEla">
-                                            <option value="">Selecione</option>
-                                            <option value="A">A</option>
-                                            <option value="B">B</option>
-                                            <option value="C">C</option>
-                                            <option value="D">D</option>
-                                            <option value="E">E</option>
-                                        </select>
-                                    </div>
-                            
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                    </div><br><br>
 
                     <!-- Informações Gerais do Casal -->
                     <div class="casal-section">
@@ -425,13 +232,6 @@
                                     </label>
                                 </div>
                             </div>
-                            
-                            <div class="veiculo-details">
-                                <div class="form-group">
-                                    <label for="tipoVeiculo">Tipo de veículo</label>
-                                    <input type="text" id="tipoVeiculo" name="tipoVeiculo" placeholder="Ex: Carro, Moto...">
-                                </div>
-                            </div>
                         </div>
 
                         <!-- NOVA SEÇÃO: DISPONIBILIDADE PARA MORAR -->
@@ -480,6 +280,10 @@
                 <!-- Seção de Referências - Agora Obrigatória -->
             <section class="form-section">
                 <div class="referencias-section">
+                <h2 class="section-title">
+                    <i class="fas fa-briefcase"></i>
+                    Referências profissionais
+                 </h2>
                     <div class="info-box aviso-referencias">
                         <i class="fas fa-exclamation-triangle"></i>
                         <div>
@@ -674,11 +478,78 @@
                     <i class="fas fa-male"></i>
                     Conte sobre o último emprego - Ele
                 </h3>
-                
-                <div class="form-group full-width">
-                    <label for="ultimoEmpregoEle">Descreva brevemente seu último emprego</label>
-                    <textarea id="ultimoEmpregoEle" name="ultimoEmpregoEle" rows="5" placeholder="Ex: Trabalhei por 3 anos como caseiro numa chácara em Itatiba. Fazia manutenção geral da propriedade, cuidava do jardim, piscina e segurança. Trabalhava de segunda a sábado das 7h às 17h. A propriedade tinha casa principal, casa de caseiro, área de lazer com piscina e churrasqueira. Minhas principais responsabilidades eram manter tudo funcionando e em ordem..."></textarea>
-                </div>
+                <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="tempoExperiencia">Tempo total de experiência<span class="required-asterisk">*</span></label>
+                            <select id="tempoExperiencia" name="tempoExperiencia" required>
+                                <option value="">Selecione</option>
+                                <option value="1-2-anos">1-2 anos</option>
+                                <option value="2-3-anos">2-3 anos</option>
+                                <option value="3-5-anos">3-5 anos</option>
+                                <option value="5-10-anos">5-10 anos</option>
+                                <option value="mais-10-anos">Mais de 10 anos</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Experiência em residência de alto padrão?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                    <div class="alto-padrao-details">
+                            <div class="form-group">
+                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
+                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
+                            </div>
+                        </div>
+                    </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoEmpresa">Nome da empresa/família <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoEmpresa" name="ultimoEmpregoEmpresa" placeholder="Nome da empresa ou família" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoCargo">Cargo/função exercida <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoCargo" name="ultimoEmpregoCargo" placeholder="Ex: Arrumadeira, Diarista, etc." required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoTempo">Tempo de trabalho <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoTempo" name="ultimoEmpregoTempo" placeholder="Ex: 2 anos e 3 meses" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoSalario">Salário (aproximado)</label>
+                                    <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
+                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoAprendizados">O que mais aprendeu nesta experiência?</label>
+                                <textarea id="ultimoEmpregoAprendizados" name="ultimoEmpregoAprendizados" rows="3" placeholder="Conte o que mais aprendeu ou desenvolveu nesta experiência profissional..."></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoDificuldades">Quais foram as principais dificuldades encontradas?</label>
+                                <textarea id="ultimoEmpregoDificuldades" name="ultimoEmpregoDificuldades" rows="2" placeholder="Descreva as principais dificuldades que enfrentou e como as superou..."></textarea>
+                            </div>
+
             </div>
 
             <!-- EXPERIÊNCIA PROFISSIONAL - ELA -->
@@ -687,11 +558,78 @@
                     <i class="fas fa-female"></i>
                     Conte sobre o último emprego - Ela
                 </h3>
-                
-                <div class="form-group full-width">
-                    <label for="ultimoEmpregoEla">Descreva brevemente seu último emprego</label>
-                    <textarea id="ultimoEmpregoEla" name="ultimoEmpregoEla" rows="5" placeholder="Ex: Trabalhei por 2 anos como cozinheira numa família em Alphaville. Preparava refeições diárias para 4 pessoas, organizava cardápios semanais, fazia compras e cuidava da limpeza da cozinha. Trabalhava de segunda a sexta das 8h às 16h. Cozinhava pratos variados, desde comida caseira até receitas mais elaboradas para jantares especiais..."></textarea>
-                </div>
+
+                <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="tempoExperiencia">Tempo total de experiência<span class="required-asterisk">*</span></label>
+                            <select id="tempoExperiencia" name="tempoExperiencia" required>
+                                <option value="">Selecione</option>
+                                <option value="1-2-anos">1-2 anos</option>
+                                <option value="2-3-anos">2-3 anos</option>
+                                <option value="3-5-anos">3-5 anos</option>
+                                <option value="5-10-anos">5-10 anos</option>
+                                <option value="mais-10-anos">Mais de 10 anos</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Experiência em residência de alto padrão?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                    <div class="alto-padrao-details">
+                            <div class="form-group">
+                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
+                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
+                            </div>
+                        </div>
+                    </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoEmpresa">Nome da empresa/família <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoEmpresa" name="ultimoEmpregoEmpresa" placeholder="Nome da empresa ou família" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoCargo">Cargo/função exercida <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoCargo" name="ultimoEmpregoCargo" placeholder="Ex: Arrumadeira, Diarista, etc." required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoTempo">Tempo de trabalho <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoTempo" name="ultimoEmpregoTempo" placeholder="Ex: 2 anos e 3 meses" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoSalario">Salário (aproximado)</label>
+                                    <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
+                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoAprendizados">O que mais aprendeu nesta experiência?</label>
+                                <textarea id="ultimoEmpregoAprendizados" name="ultimoEmpregoAprendizados" rows="3" placeholder="Conte o que mais aprendeu ou desenvolveu nesta experiência profissional..."></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoDificuldades">Quais foram as principais dificuldades encontradas?</label>
+                                <textarea id="ultimoEmpregoDificuldades" name="ultimoEmpregoDificuldades" rows="2" placeholder="Descreva as principais dificuldades que enfrentou e como as superou..."></textarea>
+                            </div>
             </div>
         </section>
 
@@ -721,24 +659,12 @@
                                     <span>Hidráulica</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="competenciasEle" value="jardinagem">
-                                    <span>Jardinagem</span>
-                                </label>
-                                <label class="checkbox-label">
                                     <input type="checkbox" name="competenciasEle" value="manutencao-geral">
                                     <span>Manutenção geral</span>
                                 </label>
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="competenciasEle" value="piscina">
-                                    <span>Piscina</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" name="competenciasEle" value="seguranca-patrimonial">
-                                    <span>Segurança patrimonial</span>
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" name="competenciasEle" value="automacao-residencial">
-                                    <span>Automação residencial</span>
+                                    <input type="checkbox" name="competenciasEle" value="limpeza-area-externa">
+                                    <span>Limpeza áreas externas</span>
                                 </label>
                             </div>
                         </div>
@@ -767,7 +693,7 @@
 
 
                             <div class="form-group">
-                                <label>Sabe assar pizza?</label>
+                                <label>Sabe fazer pizza?</label>
                                 <div class="radio-group">
                                     <label class="radio-label">
                                         <input type="radio" name="sabeAssarPizza" value="nao" required>
@@ -803,7 +729,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Sabe fazer serviços de barman?</label>
+                                <label>Sabe fazer serviços de bar? <i>(caipirinhas, drinks...)</i></label>
                                 <div class="radio-group">
                                     <label class="radio-label">
                                         <input type="radio" name="servicosBarman" value="nao" required>
@@ -858,13 +784,6 @@
                                 </div>
                             </div>
 
-                            <div class="jardim-details">
-                                <div class="preferencia-field">
-                                    <label for="detalhesJardim">Especifique sua experiência com jardim</label>
-                                    <input type="text" id="detalhesJardim" name="detalhesJardim" placeholder="Ex: poda, plantio, irrigação...">
-                                </div>
-                            </div>
-
                             <div class="form-group">
                                 <label>Sabe cuidar de piscina?</label>
                                 <div class="radio-group">
@@ -881,21 +800,11 @@
                                         <span>Prefiro não me comprometer</span>
                                     </label>
                                 </div>
-                            </div>
-
-                            <div class="piscina-details">
-                                <div class="preferencia-field">
-                                    <label for="detalhesPiscina">Especifique sua experiência com piscina</label>
-                                    <input type="text" id="detalhesPiscina" name="detalhesPiscina" placeholder="Ex: limpeza, tratamento químico, manutenção...">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label for="outrosConhecimentosEle">Outros conhecimentos (Ele)</label>
+                                <label for="outrosConhecimentosEle">Outros conhecimentos (Ele)</label>
                             <input type="text" id="outrosConhecimentosEle" name="outrosConhecimentosEle" placeholder="Especifique outros conhecimentos...">
+                            </div>
                         </div>
-                    </div>
+                    </div><br><br>
 
                     <!-- Competências - ELA -->
                     <div class="casal-section">
@@ -962,11 +871,11 @@
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="habilidadesCozinha" value="culinaria-internacional">
-                                        <span>Culinária internacional</span>
+                                        <span>Culinária internacional <i>(italiana, francesa, árabe...)</i></span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="habilidadesCozinha" value="massas-caseiras">
-                                        <span>Massas caseiras</span>
+                                        <input type="checkbox" name="habilidadesCozinha" value="massas-frescas">
+                                        <span>Massas Frescas</span>
                                     </label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="habilidadesCozinha" value="paes-caseiros">
@@ -977,8 +886,8 @@
                                         <span>Pratos vegetarianos/veganos</span>
                                     </label>
                                     <label class="checkbox-label">
-                                        <input type="checkbox" name="habilidadesCozinha" value="comida-fitness">
-                                        <span>Comida fitness/diet</span>
+                                        <input type="checkbox" name="habilidadesCozinha" value="tortas-salgadas">
+                                        <span>Tortas salgadas</span>
                                     </label>
                                 </div>
                             </div>
@@ -1110,24 +1019,6 @@
                     </div>
                 </section>
 
-                <!-- SEÇÃO ESPECÍFICA - OBJETIVO E DISPONIBILIDADE -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-target"></i>
-                        Objetivo e Motivação
-                    </h2>
-                    
-                    <div class="form-group full-width">
-                        <label for="porqueJuntos">Por que desejam atuar juntos nesta função?</label>
-                        <textarea id="porqueJuntos" name="porqueJuntos" rows="4" placeholder="Descreva o que os motiva a trabalhar juntos como caseiros..."></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="diferencialCasal">O que consideram ser os diferenciais de vocês como casal?</label>
-                        <textarea id="diferencialCasal" name="diferencialCasal" rows="4" placeholder="Descreva os principais diferenciais e qualidades do casal..."></textarea>
-                    </div>
-                </section>
-
                 <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES COMPLEMENTARES -->
                 <section class="form-section">
                     <h2 class="section-title">
@@ -1178,12 +1069,12 @@
                                 <span>Não</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="consumemAlcool" value="socialmente" required>
-                                <span>Socialmente</span>
+                                <input type="radio" name="consumemAlcool" value="sim" required>
+                                <span>Sim</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="consumemAlcool" value="frequentemente" required>
-                                <span>Frequentemente</span>
+                                <input type="radio" name="consumemAlcool" value="socialmente" required>
+                                <span>Socialmente</span>
                             </label>
                         </div>
                     </div>
@@ -1191,6 +1082,24 @@
                     <div class="form-group full-width">
                         <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
                         <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para a candidatura do casal..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - OBJETIVO E DISPONIBILIDADE -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-bullseye"></i>
+                        Objetivo e Motivação
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="porqueJuntos">Por que desejam atuar juntos nesta função?</label>
+                        <textarea id="porqueJuntos" name="porqueJuntos" rows="4" placeholder="Descreva o que os motiva a trabalhar juntos como caseiros..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="diferencialCasal">O que consideram ser os diferenciais de vocês como casal?</label>
+                        <textarea id="diferencialCasal" name="diferencialCasal" rows="4" placeholder="Descreva os principais diferenciais e qualidades do casal..."></textarea>
                     </div>
                 </section>
 
@@ -1288,8 +1197,6 @@ function initializeCasalSpecificFields() {
     };
 
     // ✅ CONFIGURAR CAMPOS CONDICIONAIS DO CASAL
-    setupConditionalRadio('possuiCnhEle', 'cnh-details-ele');
-    setupConditionalRadio('possuiCnhEla', 'cnh-details-ela');
     setupConditionalRadio('temFilhos', 'filhos-details');
     setupConditionalRadio('veiculoProprio', 'veiculo-details');
     setupConditionalRadio('morarResidencia', 'pets-details');
