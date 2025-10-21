@@ -86,223 +86,8 @@
                 <div id="treinamento-obrigatorio-container"></div>
                 <div id="dados-pessoais-container"></div>
                 <div id="contato-container"></div>
-
-                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL ARRUMADEIRA -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Experiência Profissional - Arrumadeira
-                    </h2>
-                    
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="tempoExperiencia">Tempo total de experiência como arrumadeira <span class="required-asterisk">*</span></label>
-                            <select id="tempoExperiencia" name="tempoExperiencia" required>
-                                <option value="">Selecione</option>
-                                <option value="1-2-anos">1-2 anos</option>
-                                <option value="2-3-anos">2-3 anos</option>
-                                <option value="3-5-anos">3-5 anos</option>
-                                <option value="5-10-anos">5-10 anos</option>
-                                <option value="mais-10-anos">Mais de 10 anos</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Experiência em residência de alto padrão?</label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
-                                    <span>Não</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
-                                    <span>Sim</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="alto-padrao-details">
-                            <div class="form-group">
-                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
-                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Tipos de residência onde já trabalhou (marque todos que se aplicam):</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tiposResidencia" value="nenhuma">
-                                <span>Nenhuma antes</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tiposResidencia" value="apartamentos">
-                                <span>Apartamentos</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tiposResidencia" value="casas-campo">
-                                <span>Casas de campo (veraneio)</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tiposResidencia" value="mansoes">
-                                <span>Mansões (residentes)</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tiposResidencia" value="outros">
-                                <span>Outros</span>
-                            </label>
-                        </div>
-                        
-                        <div class="outros-residencia">
-                            <div class="form-group">
-                                <label for="outrosResidenciaEspecificar">Especificar outros tipos</label>
-                                <input type="text" id="outrosResidenciaEspecificar" name="outrosResidenciaEspecificar">
-                            </div>
-                        </div>
-                    </div>
-
-                     <!-- Seção de Referências - Agora Obrigatória -->
-                    <div class="referencias-section">
-                        <div class="info-box aviso-referencias">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h4>Referências Profissionais Obrigatórias</h4>
-                                <p>Referências do último lugar que trabalhou (até um ano) são primordiais para seleções. A primeira referência é <strong>obrigatória</strong>.</p>
-                                <p style="font-style: italic;">O intuito é manter a trânsparência e oferecer um bom histórico para a vaga futura! <br><br>(se nunca trabalhou na função antes, pode enviar do antigo trabalho, sem nenhum problema)</p>
-                            </div>
-                        </div>
-
-                        <!-- Referência 1 - OBRIGATÓRIA -->
-                        <div class="referencia-card referencia-obrigatoria">
-                            <h4>Referência 1 <span class="required-asterisk">*</span></h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref1Nome">Nome <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ref1Nome" name="ref1Nome" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Telefone">Telefone <span class="required-asterisk">*</span></label>
-                                    <input type="tel" id="ref1Telefone" name="ref1Telefone" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Inicio">Período - Início <span class="required-asterisk">*</span></label>
-                                    <input type="month" id="ref1Inicio" name="ref1Inicio" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Fim">Período - Fim <span class="required-asterisk">*</span></label>
-                                    <input type="month" id="ref1Fim" name="ref1Fim" required>
-                                </div>
-                                
-                                <!-- CAMPO ESPECÍFICO POR FUNÇÃO - manter os existentes como ref1TipoCozinha, ref1IdadesCriancas etc -->
-                                
-                                <div class="form-group">
-                                    <label for="ref1Relacao">Relação <span class="required-asterisk">*</span></label>
-                                    <select id="ref1Relacao" name="ref1Relacao" required>
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref1-outro">
-                                    <label for="ref1OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
-                                </div>
-                                
-                                <!-- NOVO CAMPO: Motivo da saída -->
-                                <div class="form-group full-width">
-                                    <label for="ref1MotivoSaida">Motivo da saída <span class="required-asterisk">*</span></label>
-                                    <textarea id="ref1MotivoSaida" name="ref1MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..." required></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Referência 2 - OPCIONAL mas deve parecer obrigatória -->
-                        <div class="referencia-card referencia-opcional">
-                            <h4>Referência 2</h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref2Nome">Nome</label>
-                                    <input type="text" id="ref2Nome" name="ref2Nome">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Telefone">Telefone</label>
-                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Inicio">Período - Início</label>
-                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Fim">Período - Fim</label>
-                                    <input type="month" id="ref2Fim" name="ref2Fim">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Relacao">Relação</label>
-                                    <select id="ref2Relacao" name="ref2Relacao">
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref2-outro">
-                                    <label for="ref2OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="ref2MotivoSaida">Motivo da saída</label>
-                                    <textarea id="ref2MotivoSaida" name="ref2MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NOVA SEÇÃO: Conte sobre seu último emprego -->
-
-                        <h2 class="section-title">
-                            <i class="fas fa-briefcase"></i>
-                            Experiência Profissional - Arrumadeira
-                        </h2>
-                            
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoEmpresa">Nome da empresa/família <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoEmpresa" name="ultimoEmpregoEmpresa" placeholder="Nome da empresa ou família" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoCargo">Cargo/função exercida <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoCargo" name="ultimoEmpregoCargo" placeholder="Ex: Arrumadeira, Diarista, etc." required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoTempo">Tempo de trabalho <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoTempo" name="ultimoEmpregoTempo" placeholder="Ex: 2 anos e 3 meses" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoSalario">Salário (aproximado)</label>
-                                    <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
-                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoAprendizados">O que mais aprendeu nesta experiência?</label>
-                                <textarea id="ultimoEmpregoAprendizados" name="ultimoEmpregoAprendizados" rows="3" placeholder="Conte o que mais aprendeu ou desenvolveu nesta experiência profissional..."></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoDificuldades">Quais foram as principais dificuldades encontradas?</label>
-                                <textarea id="ultimoEmpregoDificuldades" name="ultimoEmpregoDificuldades" rows="2" placeholder="Descreva as principais dificuldades que enfrentou e como as superou..."></textarea>
-                            </div>
-                </section>
+                <div id="experiencia-container"></div>
+                <div id="referencias-container"></div>
 
                 <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS TÉCNICAS ARRUMADEIRA -->
                 <section class="form-section">
@@ -312,37 +97,6 @@
                     </h2>
                     
                     <div class="form-group full-width">
-                        <label>Conhecimento em equipamentos de limpeza específicos (marque todos que se aplicam):</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="enceradeira">
-                                <span>Enceradeira</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="extratora-carpetes">
-                                <span>Extratora de carpetes</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="aspirador-profissional">
-                                <span>Aspirador de pó profissional</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="lavadora-alta-pressao">
-                                <span>Lavadora de alta pressão</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="vaporizador">
-                                <span>Vaporizador</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="lustrador-pisos">
-                                <span>Lustrador de pisos</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipamentosLimpeza" value="outros">
-                                <span>Outros</span>
-                            </label>
-                        </div>
                         
                         <div class="outros-equipamentos">
                             <div class="form-group">
@@ -385,172 +139,11 @@
                     <div class="form-group full-width">
                         <label for="habilidadePassar">Habilidade em passar roupas delicadas e de alta costura</label>
                         <select id="habilidadePassar" name="habilidadePassar">
+                            <option value="nao">Não tenho conhecimento</option>
                             <option value="basico">Básico (roupas simples)</option>
                             <option value="intermediario">Intermediário (camisas, vestidos)</option>
                             <option value="avancado">Avançado (peças delicadas, alta costura)</option>
                         </select>
-                    </div>
-                </section>
-
-                <!-- SEÇÃO ESPECÍFICA - ESPECIALIDADES EM ORGANIZAÇÃO -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-layer-group"></i>
-                        Especialidades em Organização
-                    </h2>
-                    
-                    <div class="form-group full-width">
-                        <label>Técnicas de organização que domina (marque todos que se aplicam):</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="marie-kondo">
-                                <span>Método Marie Kondo</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="organizacao-categorias">
-                                <span>Organização por categorias</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="sistemas-padrao-logica">
-                                <span>Sistemas padrão e lógica</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="rotulagem-profissional">
-                                <span>Rotulagem profissional</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="organizacao-sazonal">
-                                <span>Organização sazonal</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="personal-organizer">
-                                <span>Personal Organizer</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="tecnicasOrganizacao" value="outros">
-                                <span>Outros</span>
-                            </label>
-                        </div>
-                        
-                        <div class="outros-tecnicas">
-                            <div class="form-group">
-                                <label for="outrosTecnicasEspecificar">Especificar outras técnicas</label>
-                                <input type="text" id="outrosTecnicasEspecificar" name="outrosTecnicasEspecificar">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="experienciaEventos">Experiência em organização de eventos em casa <i>(festas, comemorações, casamentos...)</i></label>
-                        <select id="experienciaEventos" name="experienciaEventos">
-                            <option value="nao">Não tenho experiência</option>
-                            <option value="preparacao-pre">Preparação pré-evento</option>
-                            <option value="limpeza-pos">Limpeza pós-evento</option>
-                            <option value="ambas">Ambas</option>
-                        </select>
-                    </div>
-                </section>
-
-                <!-- SEÇÃO ESPECÍFICA - PRODUTOS E TÉCNICAS DE LIMPEZA -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-spray-can"></i>
-                        Produtos e Técnicas de Limpeza
-                    </h2>
-                    
-                    <div class="form-group full-width">
-                        <label>Conhecimento em produtos de limpeza específicos (marque todos que se aplicam):</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="produtos-madeira">
-                                <span>Produtos para madeira</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="produtos-marmore">
-                                <span>Produtos para mármore</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="produtos-prata">
-                                <span>Produtos para prata</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="produtos-cristal">
-                                <span>Produtos para cristal</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="produtos-ecologicos">
-                                <span>Produtos ecológicos</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="produtos-importados">
-                                <span>Produtos importados</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="produtosLimpeza" value="outros">
-                                <span>Outros</span>
-                            </label>
-                        </div>
-                        
-                        <div class="outros-produtos">
-                            <div class="form-group">
-                                <label for="outrosProdutosEspecificar">Especificar outros produtos</label>
-                                <input type="text" id="outrosProdutosEspecificar" name="outrosProdutosEspecificar">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Tem alergia a algum produto de limpeza?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="alergiaLimpeza" value="nao" required>
-                                <span>Não</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="alergiaLimpeza" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="alergia-details">
-                        <div class="form-group">
-                            <label for="especificarAlergia">Especifique a alergia</label>
-                            <input type="text" id="especificarAlergia" name="especificarAlergia">
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Métodos de limpeza que domina (marque todos que se aplicam):</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="metodosLimpeza" value="limpeza-seco">
-                                <span>Limpeza a seco</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="metodosLimpeza" value="limpeza-vapor">
-                                <span>Limpeza a vapor</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="metodosLimpeza" value="enceramento">
-                                <span>Enceramento</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="metodosLimpeza" value="cristalizacao-pisos">
-                                <span>Cristalização de pisos</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="metodosLimpeza" value="outros">
-                                <span>Outros</span>
-                            </label>
-                        </div>
-                        
-                        <div class="outros-metodos">
-                            <div class="form-group">
-                                <label for="outrosMetodosEspecificar">Especificar outros métodos</label>
-                                <input type="text" id="outrosMetodosEspecificar" name="outrosMetodosEspecificar">
-                            </div>
-                        </div>
                     </div>
                 </section>
 
@@ -581,8 +174,8 @@
                                 <span>Hotelaria</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="certificacoes" value="manipulacao-quimicos">
-                                <span>Manipulação de produtos químicos</span>
+                                <input type="checkbox" name="certificacoes" value="manipulacao-limpeza">
+                                <span>Manipulação de produtos limpeza</span>
                             </label>
                             <label class="checkbox-label">
                                 <input type="checkbox" name="certificacoes" value="primeiros-socorros">
@@ -672,11 +265,6 @@
                             </label>
                         </div>
                     </div>
-
-                    <div class="form-group full-width">
-                        <label for="lidaObjetosValor">Como lida com objetos de valor ou frágeis?</label>
-                        <textarea id="lidaObjetosValor" name="lidaObjetosValor" rows="3" placeholder="Descreva sua experiência e cuidados com objetos de valor..."></textarea>
-                    </div>
                 </section>
 
                 <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES DE SAÚDE -->
@@ -741,27 +329,6 @@
                             <input type="text" id="especificarProblemas" name="especificarProblemas">
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Possui veículo próprio?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="veiculoProprio" value="nao" required>
-                                <span>Não</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="veiculoProprio" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="veiculo-details">
-                        <div class="form-group">
-                            <label for="tipoVeiculo">Tipo de veículo</label>
-                            <input type="text" id="tipoVeiculo" name="tipoVeiculo" placeholder="Ex: Carro, Moto">
-                        </div>
-                    </div>
                 </section>
 
                 <!-- SEÇÃO ESPECÍFICA - PERGUNTAS ABERTAS -->
@@ -780,19 +347,12 @@
                         <label for="organizaRotina">Como organiza sua rotina de trabalho para ser mais eficiente?</label>
                         <textarea id="organizaRotina" name="organizaRotina" rows="4" placeholder="Descreva como você organiza e planeja seu trabalho..."></textarea>
                     </div>
-                </section>
 
-                <!-- SEÇÃO ADICIONAIS -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-plus-circle"></i>
-                        Informações Complementares
-                    </h2>
-                    
                     <div class="form-group full-width">
                         <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
                         <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
                     </div>
+
                 </section>
 
                 <!-- Botão de Envio -->
@@ -812,14 +372,14 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
-    <!-- SCRIPTS - ORDEM CORRETA -->
     <script type="module" src="../../components/supabase-config.js"></script>
     <script src="../../components/components.js"></script>
+    
     <script src="../global-section.js"></script>
-    <!-- ✅ SCRIPT ARRUMADEIRA SIMPLIFICADO - SUBSTITUIR A ÚLTIMA TAG <script> -->
-<script type="module">
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Inicializando formulário Arrumadeira (usando global-section.js)...');
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Inicializando formulário Arrumadeira (usando global-section.js)...');
     
     // ✅ USAR FUNÇÃO GLOBAL para carregar todas as seções padrão
     carregarTodasSecoesPadrao();

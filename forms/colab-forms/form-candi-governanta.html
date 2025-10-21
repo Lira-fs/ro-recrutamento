@@ -72,49 +72,13 @@
                 <div id="treinamento-obrigatorio-container"></div>
                 <div id="dados-pessoais-container"></div>
                 <div id="contato-container"></div>
-
-                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL GOVERNANTA -->
+                <div id="experiencia-container"></div>
                 <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Experiência Profissional - Governanta
-                    </h2>
-                    
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="tempoExperiencia">Tempo total de experiência como governanta <span class="required-asterisk">*</span></label>
-                            <select id="tempoExperiencia" name="tempoExperiencia" required>
-                                <option value="">Selecione</option>
-                                <option value="1-2-anos">1-2 anos</option>
-                                <option value="2-3-anos">2-3 anos</option>
-                                <option value="3-5-anos">3-5 anos</option>
-                                <option value="5-10-anos">5-10 anos</option>
-                                <option value="mais-10-anos">Mais de 10 anos</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Já atuou em residências de alto padrão?</label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
-                                    <span>Não</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
-                                    <span>Sim</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="alto-padrao-details">
-                            <div class="form-group">
-                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
-                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 3 anos">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
+                    <div class="form-group">
+                        <h2 class="section-title">
+                        <i class="fas fa-person"></i>
+                        Mais um pouco sobre seu trabalho
+                        </h2>
                             <label>Já coordenou equipes domésticas?</label>
                             <div class="radio-group">
                                 <label class="radio-label">
@@ -136,7 +100,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Responsável por rotina da casa e lista de compras?</label>
+                            <label>Ja foi responsável por rotina da casa?</label>
                             <div class="radio-group">
                                 <label class="radio-label">
                                     <input type="radio" name="responRotinaCompras" value="nao" required>
@@ -147,8 +111,7 @@
                                     <span>Sim</span>
                                 </label>
                             </div>
-                        </div>
-                    </div>
+                        </div><br>
 
                     <div class="form-group full-width">
                         <label>Tipos de residência onde trabalhou (marque todos que se aplicam):</label>
@@ -186,148 +149,10 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Seção de Referências - Agora Obrigatória -->
-                    <div class="referencias-section">
-                        <div class="info-box aviso-referencias">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h4>Referências Profissionais Obrigatórias</h4>
-                                <p>Referências do último lugar que trabalhou (até um ano) são primordiais para seleções. A primeira referência é <strong>obrigatória</strong>.</p>
-                                <p style="font-style: italic;">O intuito é manter a trânsparência e oferecer um bom histórico para a vaga futura! <br><br>(se nunca trabalhou na função antes, pode enviar do antigo trabalho, sem nenhum problema)</p>
-                            </div>
-                        </div>
-
-                        <!-- Referência 1 - OBRIGATÓRIA -->
-                        <div class="referencia-card referencia-obrigatoria">
-                            <h4>Referência 1 <span class="required-asterisk">*</span></h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref1Nome">Nome <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ref1Nome" name="ref1Nome" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Telefone">Telefone <span class="required-asterisk">*</span></label>
-                                    <input type="tel" id="ref1Telefone" name="ref1Telefone" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Inicio">Período - Início <span class="required-asterisk">*</span></label>
-                                    <input type="month" id="ref1Inicio" name="ref1Inicio" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Fim">Período - Fim <span class="required-asterisk">*</span></label>
-                                    <input type="month" id="ref1Fim" name="ref1Fim" required>
-                                </div>
-                                
-                                <!-- CAMPO ESPECÍFICO POR FUNÇÃO - manter os existentes como ref1TipoCozinha, ref1IdadesCriancas etc -->
-                                
-                                <div class="form-group">
-                                    <label for="ref1Relacao">Relação <span class="required-asterisk">*</span></label>
-                                    <select id="ref1Relacao" name="ref1Relacao" required>
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref1-outro">
-                                    <label for="ref1OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
-                                </div>
-                                
-                                <!-- NOVO CAMPO: Motivo da saída -->
-                                <div class="form-group full-width">
-                                    <label for="ref1MotivoSaida">Motivo da saída <span class="required-asterisk">*</span></label>
-                                    <textarea id="ref1MotivoSaida" name="ref1MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..." required></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Referência 2 - OPCIONAL mas deve parecer obrigatória -->
-                        <div class="referencia-card referencia-opcional">
-                            <h4>Referência 2</h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref2Nome">Nome</label>
-                                    <input type="text" id="ref2Nome" name="ref2Nome">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Telefone">Telefone</label>
-                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Inicio">Período - Início</label>
-                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Fim">Período - Fim</label>
-                                    <input type="month" id="ref2Fim" name="ref2Fim">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Relacao">Relação</label>
-                                    <select id="ref2Relacao" name="ref2Relacao">
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref2-outro">
-                                    <label for="ref2OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="ref2MotivoSaida">Motivo da saída</label>
-                                    <textarea id="ref2MotivoSaida" name="ref2MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NOVA SEÇÃO: Conte sobre seu último emprego -->
-
-                        <h2 class="section-title">
-                            <i class="fas fa-briefcase"></i>
-                            Experiência Profissional
-                        </h2>
-                            
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoEmpresa">Nome da empresa/família <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoEmpresa" name="ultimoEmpregoEmpresa" placeholder="Nome da empresa ou família" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoCargo">Cargo/função exercida <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoCargo" name="ultimoEmpregoCargo" placeholder="Ex: Arrumadeira, Diarista, etc." required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoTempo">Tempo de trabalho <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoTempo" name="ultimoEmpregoTempo" placeholder="Ex: 2 anos e 3 meses" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoSalario">Salário (aproximado)</label>
-                                    <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
-                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoAprendizados">O que mais aprendeu nesta experiência?</label>
-                                <textarea id="ultimoEmpregoAprendizados" name="ultimoEmpregoAprendizados" rows="3" placeholder="Conte o que mais aprendeu ou desenvolveu nesta experiência profissional..."></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoDificuldades">Quais foram as principais dificuldades encontradas?</label>
-                                <textarea id="ultimoEmpregoDificuldades" name="ultimoEmpregoDificuldades" rows="2" placeholder="Descreva as principais dificuldades que enfrentou e como as superou..."></textarea>
-                            </div>
                 </section>
+                
+                <div id="referencias-container"></div>
+                
                 
                 <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS TÉCNICAS GOVERNANTA -->
                 <section class="form-section">
@@ -436,10 +261,6 @@
                                 <span>Primeiros Socorros</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="certificacoes" value="seguranca-residencial">
-                                <span>Segurança residencial</span>
-                            </label>
-                            <label class="checkbox-label">
                                 <input type="checkbox" name="certificacoes" value="gestao-pessoas">
                                 <span>Gestão de Pessoas</span>
                             </label>
@@ -468,10 +289,10 @@
                     <div class="form-group full-width">
                         <label for="organizaEquipe">Como você organiza a equipe e lida com conflitos?</label>
                         <textarea id="organizaEquipe" name="organizaEquipe" rows="4" placeholder="Descreva sua abordagem para organizar equipes e resolver conflitos..."></textarea>
-                    </div>
+                    </div><br>
 
                     <div class="form-group">
-                        <label>Já participou da organização de eventos sociais?</label>
+                        <label>Já participou da organização de eventos sociais? <i>(residênciais ou corporativos)</i></label>
                         <div class="radio-group">
                             <label class="radio-label">
                                 <input type="radio" name="participouEventos" value="nao" required>
@@ -498,29 +319,11 @@
                 <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
                 <div id="pretensoes-condicoes-container"></div>
 
-                <!-- SEÇÃO ESPECÍFICA - EXPECTATIVAS E DIFERENCIAIS -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-star"></i>
-                        Expectativas e Diferenciais
-                    </h2>
-                    
-                    <div class="form-group full-width">
-                        <label for="porquePessoaCerta">Por que você acredita ser a pessoa certa para essa função?</label>
-                        <textarea id="porquePessoaCerta" name="porquePessoaCerta" rows="4" placeholder="Descreva por que você é a candidata ideal para a função de governanta..."></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="diferencialGovernanta">O que considera ser seu diferencial como governanta?</label>
-                        <textarea id="diferencialGovernanta" name="diferencialGovernanta" rows="4" placeholder="Descreva seus principais diferenciais profissionais..."></textarea>
-                    </div>
-                </section>
-
                 <!-- SEÇÃO ESPECÍFICA - SAÚDE E BEM-ESTAR -->
                 <section class="form-section">
                     <h2 class="section-title">
-                        <i class="fas fa-heartbeat"></i>
-                        Saúde e Bem-estar
+                        <i class="fas fa-info-circle"></i>
+                        Informações Complementares:
                     </h2>
                     
                     <div class="form-group">
@@ -559,29 +362,44 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Tem alergia a produtos de limpeza?</label>
+                        <label>Consome bebidas alcoólicas?</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="alergiaLimpeza" value="nao" required>
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
                                 <span>Não</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="alergiaLimpeza" value="sim" required>
-                                <span>Sim</span>
+                                <input type="radio" name="fuma" value="socialmente" required>
+                                <span>Socialmente</span>
                             </label>
-                        </div>
-                    </div>
-
-                    <div class="alergia-details">
-                        <div class="form-group">
-                            <label for="especificarAlergia">Especifique a alergia</label>
-                            <input type="text" id="especificarAlergia" name="especificarAlergia">
                         </div>
                     </div>
 
                     <div class="form-group full-width">
                         <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
                         <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - EXPECTATIVAS E DIFERENCIAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-star"></i>
+                        Expectativas e Diferenciais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="porquePessoaCerta">Por que você acredita ser a pessoa certa para essa função?</label>
+                        <textarea id="porquePessoaCerta" name="porquePessoaCerta" rows="4" placeholder="Descreva por que você é a candidata ideal para a função de governanta..."></textarea>
+                    </div><br>
+
+                    <div class="form-group full-width">
+                        <label for="diferencialGovernanta">O que considera ser seu diferencial como governanta?</label>
+                        <textarea id="diferencialGovernanta" name="diferencialGovernanta" rows="4" placeholder="Descreva seus principais diferenciais profissionais..."></textarea>
                     </div>
                 </section>
 
@@ -606,7 +424,7 @@
     <script type="module" src="../../components/supabase-config.js"></script>
     <script src="../../components/components.js"></script>
     <script src="../global-section.js"></script>
-    <!-- ✅ SCRIPT GOVERNANTA SIMPLIFICADO - SUBSTITUIR A ÚLTIMA TAG <script> -->
+
 <script type="module">
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando formulário Governanta (usando global-section.js)...');

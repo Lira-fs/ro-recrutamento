@@ -78,191 +78,7 @@
                 <div id="treinamento-obrigatorio-container"></div>
                 <div id="dados-pessoais-container"></div>
                 <div id="contato-container"></div>
-
-                <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA PROFISSIONAL BABÁ -->
-                <section class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Experiência Profissional - Babá
-                    </h2>
-                    
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="tempoExperiencia">Tempo total de experiência como babá <span class="required-asterisk">*</span></label>
-                            <select id="tempoExperiencia" name="tempoExperiencia" required>
-                                <option value="">Selecione</option>
-                                <option value="1-2-anos">1-2 anos</option>
-                                <option value="2-3-anos">2-3 anos</option>
-                                <option value="3-5-anos">3-5 anos</option>
-                                <option value="5-10-anos">5-10 anos</option>
-                                <option value="mais-10-anos">Mais de 10 anos</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Experiência em residência de alto padrão?</label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
-                                    <span>Não</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
-                                    <span>Sim</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="alto-padrao-details">
-                            <div class="form-group">
-                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
-                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Referências - Agora Obrigatória -->
-                    <div class="referencias-section">
-                        <div class="info-box aviso-referencias">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div>
-                                <h4>Referências Profissionais Obrigatórias</h4>
-                                <p>Referências do último lugar que trabalhou (até um ano) são primordiais para seleções. A primeira referência é <strong>obrigatória</strong>.</p>
-                                <p style="font-style: italic;">O intuito é manter a trânsparência e oferecer um bom histórico para a vaga futura! <br><br>(se nunca trabalhou na função antes, pode enviar do antigo trabalho, sem nenhum problema)</p>
-                            </div>
-                        </div>
-
-                        <!-- Referência 1 - OBRIGATÓRIA -->
-                        <div class="referencia-card referencia-obrigatoria">
-                            <h4>Referência 1 <span class="required-asterisk">*</span></h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref1Nome">Nome <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ref1Nome" name="ref1Nome" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Telefone">Telefone <span class="required-asterisk">*</span></label>
-                                    <input type="tel" id="ref1Telefone" name="ref1Telefone" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Inicio">Período - Início <span class="required-asterisk">*</span></label>
-                                    <input type="month" id="ref1Inicio" name="ref1Inicio" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref1Fim">Período - Fim <span class="required-asterisk">*</span></label>
-                                    <input type="month" id="ref1Fim" name="ref1Fim" required>
-                                </div>
-                                
-                                <!-- CAMPO ESPECÍFICO POR FUNÇÃO - manter os existentes como ref1TipoCozinha, ref1IdadesCriancas etc -->
-                                
-                                <div class="form-group">
-                                    <label for="ref1Relacao">Relação <span class="required-asterisk">*</span></label>
-                                    <select id="ref1Relacao" name="ref1Relacao" required>
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref1-outro">
-                                    <label for="ref1OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
-                                </div>
-                                
-                                <!-- NOVO CAMPO: Motivo da saída -->
-                                <div class="form-group full-width">
-                                    <label for="ref1MotivoSaida">Motivo da saída <span class="required-asterisk">*</span></label>
-                                    <textarea id="ref1MotivoSaida" name="ref1MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..." required></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Referência 2 - OPCIONAL mas deve parecer obrigatória -->
-                        <div class="referencia-card referencia-opcional">
-                            <h4>Referência 2</h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ref2Nome">Nome</label>
-                                    <input type="text" id="ref2Nome" name="ref2Nome">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Telefone">Telefone</label>
-                                    <input type="tel" id="ref2Telefone" name="ref2Telefone">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Inicio">Período - Início</label>
-                                    <input type="month" id="ref2Inicio" name="ref2Inicio">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Fim">Período - Fim</label>
-                                    <input type="month" id="ref2Fim" name="ref2Fim">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ref2Relacao">Relação</label>
-                                    <select id="ref2Relacao" name="ref2Relacao">
-                                        <option value="">Selecione</option>
-                                        <option value="ex-patrao">Ex-patrão</option>
-                                        <option value="supervisor">Supervisor</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
-                                </div>
-                                <div class="form-group ref2-outro">
-                                    <label for="ref2OutroEspecificar">Especificar relação</label>
-                                    <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="ref2MotivoSaida">Motivo da saída</label>
-                                    <textarea id="ref2MotivoSaida" name="ref2MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NOVA SEÇÃO: Conte sobre seu último emprego -->
-
-                        <h2 class="section-title">
-                            <i class="fas fa-briefcase"></i>
-                            Experiência Profissional - Babá
-                        </h2>
-                            
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoEmpresa">Nome da empresa/família <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoEmpresa" name="ultimoEmpregoEmpresa" placeholder="Nome da empresa ou família" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoCargo">Cargo/função exercida <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoCargo" name="ultimoEmpregoCargo" placeholder="Ex: Arrumadeira, Diarista, etc." required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoTempo">Tempo de trabalho <span class="required-asterisk">*</span></label>
-                                    <input type="text" id="ultimoEmpregoTempo" name="ultimoEmpregoTempo" placeholder="Ex: 2 anos e 3 meses" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ultimoEmpregoSalario">Salário (aproximado)</label>
-                                    <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
-                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoAprendizados">O que mais aprendeu nesta experiência?</label>
-                                <textarea id="ultimoEmpregoAprendizados" name="ultimoEmpregoAprendizados" rows="3" placeholder="Conte o que mais aprendeu ou desenvolveu nesta experiência profissional..."></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="ultimoEmpregoDificuldades">Quais foram as principais dificuldades encontradas?</label>
-                                <textarea id="ultimoEmpregoDificuldades" name="ultimoEmpregoDificuldades" rows="2" placeholder="Descreva as principais dificuldades que enfrentou e como as superou..."></textarea>
-                            </div>
-
-                </section>
+                <div id="experiencia-container"></div>
 
                 <!-- SEÇÃO ESPECÍFICA - EXPERIÊNCIA POR FAIXA ETÁRIA -->
                 <section class="form-section">
@@ -325,6 +141,10 @@
                     </div>
                 </section>
 
+                <!--SESSÃO DE REFERENCIAS-->
+
+                <div id="referencias-container"></div>
+
                 <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS ESPECÍFICAS -->
                 <section class="form-section">
                     <h2 class="section-title">
@@ -341,7 +161,7 @@
                             <option value="intermediario">Intermediário (alguns cursos)</option>
                             <option value="avancado">Avançado (formação específica)</option>
                         </select>
-                    </div>
+                    </div><br>
 
                     <div class="form-group full-width">
                         <label for="atividadesLudicas">Capacidade de planejar atividades lúdicas e educativas</label>
@@ -351,7 +171,7 @@
                             <option value="intermediario">Intermediário (atividades variadas por idade)</option>
                             <option value="avancado">Avançado (planejamento pedagógico)</option>
                         </select>
-                    </div>
+                    </div><br>
 
                     <div class="form-group full-width">
                         <label>Experiência com crianças com necessidades especiais (marque todos que se aplicam):</label>
@@ -380,7 +200,7 @@
                                 <input type="checkbox" name="necessidadesEspeciais" value="outros">
                                 <span>Outros</span>
                             </label>
-                        </div>
+                        </div><br>
                         
                         <div class="outros-necessidades">
                             <div class="form-group">
@@ -398,7 +218,7 @@
                             <option value="intermediario">Intermediário (refeições balanceadas)</option>
                             <option value="avancado">Avançado (dietas especiais, restrições alimentares)</option>
                         </select>
-                    </div>
+                    </div><br>
 
                     <div class="form-group full-width">
                         <label>Conhecimento em restrições alimentares (marque todos que tem experiência):</label>
@@ -451,10 +271,6 @@
                             <label class="radio-label">
                                 <input type="radio" name="primeirosSocorros" value="sim" required>
                                 <span>Sim</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="primeirosSocorros" value="interesse" required>
-                                <span>Não, mas tenho interesse em fazer</span>
                             </label>
                             <label class="radio-label">
                                 <input type="radio" name="primeirosSocorros" value="nao" required>
@@ -523,20 +339,6 @@
                     </h2>
 
                     <div class="form-group">
-                        <label>Disponibilidade para dormir no trabalho quando necessário</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="dormirTrabalho" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="dormirTrabalho" value="nao" required>
-                                <span>Não</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
                         <label>Disponibilidade para morar no local de trabalho</label>
                         <div class="radio-group">
                             <label class="radio-label">
@@ -553,6 +355,43 @@
                             </label>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label>Disponibilidade para viagens?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="viagens" value="sim" required>
+                                <span>Sim (nacionais/internacionais)</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="viagens" value="apenas-nacionais" required>
+                                <span>Apenas nacionais</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="viagens" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Possui passaporte internacional válido?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="passaporte" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="passaporte" value="pode-providenciar" required>
+                                <span>Não, mas posso providenciar</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="passaporte" value="nao-interesse" required>
+                                <span>Não tenho interesse</span>
+                            </label>
+                        </div>
+                    </div>
+
                 </section>
 
                 <!-- SEÇÃO ESPECÍFICA - ATIVIDADES E METODOLOGIAS -->
@@ -752,27 +591,6 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Possui veículo próprio?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="veiculoProprio" value="nao" required>
-                                <span>Não</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="veiculoProprio" value="sim" required>
-                                <span>Sim</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="veiculo-details">
-                        <div class="form-group">
-                            <label for="tipoVeiculo">Tipo de veículo</label>
-                            <input type="text" id="tipoVeiculo" name="tipoVeiculo" placeholder="Ex: Carro, Moto">
-                        </div>
-                    </div>
-
                     <div class="form-group full-width">
                         <label for="situacoesEmergencia">Como lida com situações de emergência envolvendo crianças?</label>
                         <textarea id="situacoesEmergencia" name="situacoesEmergencia" rows="4" placeholder="Descreva como você lidaria com situações de emergência..."></textarea>
@@ -819,24 +637,11 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
-    <!-- SCRIPTS - ORDEM CORRETA -->
      <script src="../../components/supabase-config.js"></script>
+
     <script src="../../components/components.js"></script>
+
     <script src="../global-section.js"></script>
-    <!-- ✅ SCRIPTS LIMPOS - SUBSTITUIR TODA A PARTE DE BAIXO -->
-
-<!-- SCRIPTS - ORDEM CORRETA -->
-<script src="../../components/components.js"></script>
-<script src="../global-section.js"></script>
-
-<!-- ✅ CONFIGURAÇÃO SUPABASE -->
-<script type="module" src="../../components/supabase-config.js"></script>
-
-    <!-- ✅ SCRIPTS CORRIGIDOS - SUBSTITUIR PARTE DE BAIXO -->
-
-<!-- SCRIPTS - ORDEM CORRETA -->
-<script src="../../components/components.js"></script>
-<script src="../global-section.js"></script>
 
 <!-- ✅ CONFIGURAÇÃO SUPABASE - INLINE PARA GARANTIR CARREGAMENTO -->
 <script type="module">
@@ -849,6 +654,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFormSection('contato', 'contato-container');
     loadFormSection('pretensoes-condicoes', 'pretensoes-condicoes-container');
     loadFormSection('disponibilidade', 'disponibilidade-container');
+    loadFormSection('experiencias', 'experiencia-container');
+    loadFormSection('referencias', 'referencias-container')
     
     // Aguardar seções carregarem
     setTimeout(() => {
@@ -991,7 +798,6 @@ function initializeFormSubmission() {
     console.log('✅ Sistema de envio configurado');
 }
 
-// ===== FUNÇÃO PARA COLETAR DADOS ESTRUTURADOS - CORRIGIDA =====
 function coletarDadosBaba(form) {
     const formData = new FormData(form);
     

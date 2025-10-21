@@ -76,6 +76,79 @@ const secoes = {
                     <input type="text" id="nacionalidade" name="nacionalidade" value="Brasileira" required>
                 </div>
             </div>
+
+            <!-- CNH e Filhos -->
+            <div class="form-subsection">
+                <div class="form-group">
+                    <label>Possui CNH?</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="possuiCnh" value="nao" required>
+                            <span>Não</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="possuiCnh" value="sim" required>
+                            <span>Sim</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="cnh-details">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="categoriaCnh">Categoria</label>
+                            <select id="categoriaCnh" name="categoriaCnh">
+                                <option value="">Selecione</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="AB">AB</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                        <label>Possui veículo próprio?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="veiculoProprio" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="veiculoProprio" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+            </div>
+
+            <div class="form-subsection">
+                <div class="form-group">
+                    <label>Tem filhos?</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="temFilhos" value="nao" required>
+                            <span>Não</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="temFilhos" value="sim" required>
+                            <span>Sim</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filhos-details">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="quantosFilhos">Quantos filhos?</label>
+                            <input type="number" id="quantosFilhos" name="quantosFilhos" min="1" max="10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idadesFilhos">Idades dos filhos</label>
+                            <input type="text" id="idadesFilhos" name="idadesFilhos" placeholder="Ex: 5, 8, 12 anos">
+                        </div>
+                    </div>
+                
         </section>
     `,
     
@@ -122,64 +195,7 @@ const secoes = {
                 </div>
             </div>
 
-            <!-- CNH e Filhos -->
-            <div class="form-subsection">
-                <div class="form-group">
-                    <label>Possui CNH?</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="possuiCnh" value="nao" required>
-                            <span>Não</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="possuiCnh" value="sim" required>
-                            <span>Sim</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="cnh-details">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="categoriaCnh">Categoria</label>
-                            <select id="categoriaCnh" name="categoriaCnh">
-                                <option value="">Selecione</option>
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="AB">AB</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-subsection">
-                <div class="form-group">
-                    <label>Tem filhos?</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="temFilhos" value="nao" required>
-                            <span>Não</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="temFilhos" value="sim" required>
-                            <span>Sim</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="filhos-details">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="quantosFilhos">Quantos filhos?</label>
-                            <input type="number" id="quantosFilhos" name="quantosFilhos" min="1" max="10">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="idadesFilhos">Idades dos filhos</label>
-                            <input type="text" id="idadesFilhos" name="idadesFilhos" placeholder="Ex: 5, 8, 12 anos">
-                        </div>
-                    </div>
+            
                 </div>
             </div>
         </section>
@@ -270,7 +286,7 @@ const secoes = {
         <section class="form-section">
             <h2 class="section-title">
                 <i class="fas fa-dollar-sign"></i>
-                Pretensões e Condições
+                Pretensão Salarial
             </h2>
             
             <div class="form-grid">
@@ -383,44 +399,194 @@ const secoes = {
                         </label>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Disponibilidade para viagens?</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="viagens" value="sim" required>
-                            <span>Sim (nacionais/internacionais)</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="viagens" value="apenas-nacionais" required>
-                            <span>Apenas nacionais</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="viagens" value="nao" required>
-                            <span>Não</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Possui passaporte internacional válido?</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="passaporte" value="sim" required>
-                            <span>Sim</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="passaporte" value="pode-providenciar" required>
-                            <span>Não, mas posso providenciar</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="passaporte" value="nao-interesse" required>
-                            <span>Não tenho interesse</span>
-                        </label>
-                    </div>
-                </div>
             </div>
         </section>
+    `,
+
+    'referencias':`
+    <section class="form-section">
+        <div class="referencias-section">
+            <h2 class="section-title">
+                <i class="fas fa-briefcase"></i>
+                Referências profissionais
+            </h2>
+
+            <div class="info-box aviso-referencias">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                            <h4>Referências Profissionais Obrigatórias</h4>
+                            <p>Referências do último lugar que trabalhou (até um ano) são primordiais para seleções. A primeira referência é <strong>obrigatória</strong>.</p>
+                            <p style="font-style: italic;">O intuito é manter a trânsparência e oferecer um bom histórico para a vaga futura! <br><br>(se nunca trabalhou na função antes, pode enviar do antigo trabalho, sem nenhum problema)</p>
+                        </div>
+                    </div>
+
+                    <!-- Referência 1 - OBRIGATÓRIA -->
+                    <div class="referencia-card referencia-obrigatoria">
+                        <h4>Referência 1 <span class="required-asterisk">*</span></h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="ref1Nome">Nome <span class="required-asterisk">*</span></label>
+                                <input type="text" id="ref1Nome" name="ref1Nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ref1Telefone">Telefone <span class="required-asterisk">*</span></label>
+                                <input type="tel" id="ref1Telefone" name="ref1Telefone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ref1Inicio">Período - Início <span class="required-asterisk">*</span></label>
+                                <input type="month" id="ref1Inicio" name="ref1Inicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ref1Fim">Período - Fim <span class="required-asterisk">*</span></label>
+                                <input type="month" id="ref1Fim" name="ref1Fim" required>
+                            </div>
+
+                            <!-- CAMPO ESPECÍFICO POR FUNÇÃO - manter os existentes como ref1TipoCozinha, ref1IdadesCriancas etc -->
+
+                            <div class="form-group">
+                                <label for="ref1Relacao">Relação <span class="required-asterisk">*</span></label>
+                                <select id="ref1Relacao" name="ref1Relacao" required>
+                                    <option value="">Selecione</option>
+                                    <option value="ex-patrao">Ex-patrão</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group ref1-outro">
+                                <label for="ref1OutroEspecificar">Especificar relação</label>
+                                <input type="text" id="ref1OutroEspecificar" name="ref1OutroEspecificar">
+                            </div>
+
+                            <!-- NOVO CAMPO: Motivo da saída -->
+                            <div class="form-group full-width">
+                                <label for="ref1MotivoSaida">Motivo da saída <span class="required-asterisk">*</span></label>
+                                <textarea id="ref1MotivoSaida" name="ref1MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referência 2 - OPCIONAL mas deve parecer obrigatória -->
+                    <div class="referencia-card referencia-opcional">
+                        <h4>Referência 2</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="ref2Nome">Nome</label>
+                                <input type="text" id="ref2Nome" name="ref2Nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="ref2Telefone">Telefone</label>
+                                <input type="tel" id="ref2Telefone" name="ref2Telefone">
+                            </div>
+                            <div class="form-group">
+                                <label for="ref2Inicio">Período - Início</label>
+                                <input type="month" id="ref2Inicio" name="ref2Inicio">
+                            </div>
+                            <div class="form-group">
+                                <label for="ref2Fim">Período - Fim</label>
+                                <input type="month" id="ref2Fim" name="ref2Fim">
+                            </div>
+                            <div class="form-group">
+                                <label for="ref2Relacao">Relação</label>
+                                <select id="ref2Relacao" name="ref2Relacao">
+                                    <option value="">Selecione</option>
+                                    <option value="ex-patrao">Ex-patrão</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group ref2-outro">
+                                <label for="ref2OutroEspecificar">Especificar relação</label>
+                                <input type="text" id="ref2OutroEspecificar" name="ref2OutroEspecificar">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="ref2MotivoSaida">Motivo da saída</label>
+                                <textarea id="ref2MotivoSaida" name="ref2MotivoSaida" rows="2" placeholder="Explique brevemente o motivo da saída..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </section>
+    `,
+
+    'experiencias': `
+    <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Experiência Profissional - {ROTEAR}
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="tempoExperiencia">Tempo total de experiência como copeiro <span class="required-asterisk">*</span></label>
+                            <select id="tempoExperiencia" name="tempoExperiencia" required>
+                                <option value="">Selecione</option>
+                                <option value="1-2-anos">1-2 anos</option>
+                                <option value="2-3-anos">2-3 anos</option>
+                                <option value="3-5-anos">3-5 anos</option>
+                                <option value="5-10-anos">5-10 anos</option>
+                                <option value="mais-10-anos">Mais de 10 anos</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Experiência em residência de alto padrão?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="experienciaAltoPadrao" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                    <div class="alto-padrao-details">
+                            <div class="form-group">
+                                <label for="tempoAltoPadrao">Tempo de experiência em residências de alto padrão</label>
+                                <input type="text" id="tempoAltoPadrao" name="tempoAltoPadrao" placeholder="Ex: 2 anos">
+                            </div>
+                        </div>
+                    </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoEmpresa">Nome da empresa/família <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoEmpresa" name="ultimoEmpregoEmpresa" placeholder="Nome da empresa ou família" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoCargo">Cargo/função exercida <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoCargo" name="ultimoEmpregoCargo" placeholder="Ex: Arrumadeira, Diarista, etc." required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoTempo">Tempo de trabalho <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="ultimoEmpregoTempo" name="ultimoEmpregoTempo" placeholder="Ex: 2 anos e 3 meses" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ultimoEmpregoSalario">Salário (aproximado)</label>
+                                    <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
+                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoAprendizados">O que mais aprendeu nesta experiência?</label>
+                                <textarea id="ultimoEmpregoAprendizados" name="ultimoEmpregoAprendizados" rows="3" placeholder="Conte o que mais aprendeu ou desenvolveu nesta experiência profissional..."></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="ultimoEmpregoDificuldades">Quais foram as principais dificuldades encontradas?</label>
+                                <textarea id="ultimoEmpregoDificuldades" name="ultimoEmpregoDificuldades" rows="2" placeholder="Descreva as principais dificuldades que enfrentou e como as superou..."></textarea>
+                            </div>
+                </section>
     `
 };
 
@@ -470,7 +636,9 @@ function carregarTodasSecoesPadrao() {
         { nome: 'treinamento-obrigatorio', container: 'treinamento-obrigatorio-container' },
         { nome: 'contato', container: 'contato-container' },
         { nome: 'pretensoes-condicoes', container: 'pretensoes-condicoes-container' },
-        { nome: 'disponibilidade', container: 'disponibilidade-container' }
+        { nome: 'disponibilidade', container: 'disponibilidade-container' },
+        {nome: 'referencias', container: 'referencias-container' },
+        {nome: 'experiencias', container:'experiencia-container'}
     ];
     
     totalSecoes = secoesParaCarregar.length;
@@ -729,126 +897,132 @@ function configurarCamposCondicionaisDisponibilidade() {
 /**
  * Configura treinamento obrigatório - VERSÃO CORRIGIDA
  */
-function configurarTreinamentoObrigatorio() {
-    const aceitaTreinamento = document.querySelectorAll('input[name="aceitaTreinamento"]');
-    const turnoSelection = document.querySelector('.turno-selection');
-    const rejectionMessage = document.querySelector('.rejection-message');
-    const turnoSelect = document.getElementById('turnoTreinamento');
+
+
+//DESCOMENTAR ANTES DE SUBIR
+// function configurarTreinamentoObrigatorio() {
+//     const aceitaTreinamento = document.querySelectorAll('input[name="aceitaTreinamento"]');
+//     const turnoSelection = document.querySelector('.turno-selection');
+//     const rejectionMessage = document.querySelector('.rejection-message');
+//     const turnoSelect = document.getElementById('turnoTreinamento');
     
-    if (!aceitaTreinamento.length) {
-        console.warn('⚠️ Campos de treinamento não encontrados');
-        return;
-    }
+//     if (!aceitaTreinamento.length) {
+//         console.warn('⚠️ Campos de treinamento não encontrados');
+//         return;
+//     }
     
-    console.log('🎓 Configurando treinamento obrigatório...');
+//     console.log('🎓 Configurando treinamento obrigatório...');
     
-    // ✅ INICIALIZAR ESTADO - garantir que elementos existam e estejam ocultos
-    if (turnoSelection) {
-        turnoSelection.style.display = 'none';
-        turnoSelection.classList.remove('show');
-    }
-    if (rejectionMessage) {
-        rejectionMessage.style.display = 'none'; // OCULTAR INICIALMENTE
-        rejectionMessage.classList.remove('show');
-    }
+//     // ✅ INICIALIZAR ESTADO - garantir que elementos existam e estejam ocultos
+//     if (turnoSelection) {
+//         turnoSelection.style.display = 'none';
+//         turnoSelection.classList.remove('show');
+//     }
+//     if (rejectionMessage) {
+//         rejectionMessage.style.display = 'none'; // OCULTAR INICIALMENTE
+//         rejectionMessage.classList.remove('show');
+//     }
     
-    // ✅ BLOQUEAR FORMULÁRIO INICIALMENTE
-    bloquearOutrasSecoes();
+//     // ✅ BLOQUEAR FORMULÁRIO INICIALMENTE
+//     bloquearOutrasSecoes();
     
-    aceitaTreinamento.forEach(radio => {
-        radio.addEventListener('change', function() {
-            console.log(`🔄 Treinamento mudou para: ${this.value}`);
+//     aceitaTreinamento.forEach(radio => {
+//         radio.addEventListener('change', function() {
+//             console.log(`🔄 Treinamento mudou para: ${this.value}`);
             
-            if (this.value === 'sim') {
-                // ✅ ACEITO O TREINAMENTO
-                console.log('✅ Treinamento aceito, mostrando seleção de turno...');
+//             if (this.value === 'sim') {
+//                 // ✅ ACEITO O TREINAMENTO
+//                 console.log('✅ Treinamento aceito, mostrando seleção de turno...');
                 
-                // Mostrar seleção de turno
-                if (turnoSelection) {
-                    turnoSelection.style.display = 'block';
-                    turnoSelection.classList.add('show');
-                    console.log('📅 Seleção de turno exibida');
-                }
+//                 // Mostrar seleção de turno
+//                 if (turnoSelection) {
+//                     turnoSelection.style.display = 'block';
+//                     turnoSelection.classList.add('show');
+//                     console.log('📅 Seleção de turno exibida');
+//                 }
                 
-                // Ocultar mensagem de recusa
-                if (rejectionMessage) {
-                    rejectionMessage.style.display = 'none';
-                    rejectionMessage.classList.remove('show');
-                }
+//                 // Ocultar mensagem de recusa
+//                 if (rejectionMessage) {
+//                     rejectionMessage.style.display = 'none';
+//                     rejectionMessage.classList.remove('show');
+//                 }
                 
-                // Tornar turno obrigatório
-                if (turnoSelect) {
-                    turnoSelect.required = true;
-                    console.log('⚡ Campo turno marcado como obrigatório');
-                }
+//                 // Tornar turno obrigatório
+//                 if (turnoSelect) {
+//                     turnoSelect.required = true;
+//                     console.log('⚡ Campo turno marcado como obrigatório');
+//                 }
                 
-                // SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
-                if (turnoSelect && turnoSelect.value) {
-                    console.log('🚀 Turno já selecionado, liberando formulário...');
-                    desbloquearOutrasSecoes();
-                } else {
-                    console.log('⏳ Aguardando seleção de turno...');
-                    // Manter bloqueado até selecionar turno
-                    bloquearOutrasSecoes();
-                }
+//                 // SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
+//                 if (turnoSelect && turnoSelect.value) {
+//                     console.log('🚀 Turno já selecionado, liberando formulário...');
+//                     desbloquearOutrasSecoes();
+//                 } else {
+//                     console.log('⏳ Aguardando seleção de turno...');
+//                     // Manter bloqueado até selecionar turno
+//                     bloquearOutrasSecoes();
+//                 }
                 
-            } else {
-                // ❌ NÃO ACEITO O TREINAMENTO
-                console.log('❌ Treinamento rejeitado');
+//             } else {
+//                 // ❌ NÃO ACEITO O TREINAMENTO
+//                 console.log('❌ Treinamento rejeitado');
                 
-                // Ocultar seleção de turno
-                if (turnoSelection) {
-                    turnoSelection.style.display = 'none';
-                    turnoSelection.classList.remove('show');
-                }
+//                 // Ocultar seleção de turno
+//                 if (turnoSelection) {
+//                     turnoSelection.style.display = 'none';
+//                     turnoSelection.classList.remove('show');
+//                 }
                 
-                // MOSTRAR mensagem de recusa
-                if (rejectionMessage) {
-                    rejectionMessage.style.display = 'block'; // MOSTRAR AGORA
-                    rejectionMessage.classList.add('show');
-                    console.log('⚠️ Mensagem de rejeição exibida');
-                }
+//                 // MOSTRAR mensagem de recusa
+//                 if (rejectionMessage) {
+//                     rejectionMessage.style.display = 'block'; // MOSTRAR AGORA
+//                     rejectionMessage.classList.add('show');
+//                     console.log('⚠️ Mensagem de rejeição exibida');
+//                 }
                 
-                // Remover obrigatoriedade do turno
-                if (turnoSelect) {
-                    turnoSelect.required = false;
-                    turnoSelect.value = '';
-                }
+//                 // Remover obrigatoriedade do turno
+//                 if (turnoSelect) {
+//                     turnoSelect.required = false;
+//                     turnoSelect.value = '';
+//                 }
                 
-                // Manter bloqueado
-                bloquearOutrasSecoes();
-            }
-        });
-    });
+//                 // Manter bloqueado
+//                 bloquearOutrasSecoes();
+//             }
+//         });
+//     });
     
-    // ✅ EVENTO PARA SELEÇÃO DE TURNO
-    if (turnoSelect) {
-        turnoSelect.addEventListener('change', function() {
-            console.log(`🕐 Turno selecionado: ${this.value}`);
+//     // ✅ EVENTO PARA SELEÇÃO DE TURNO
+//     if (turnoSelect) {
+//         turnoSelect.addEventListener('change', function() {
+//             console.log(`🕐 Turno selecionado: ${this.value}`);
             
-            const treinamentoAceito = isTreinamentoAceito();
-            console.log(`🎓 Treinamento aceito: ${treinamentoAceito}`);
+//             const treinamentoAceito = isTreinamentoAceito();
+//             console.log(`🎓 Treinamento aceito: ${treinamentoAceito}`);
             
-            if (this.value && treinamentoAceito) {
-                console.log('🎉 CONDIÇÕES ATENDIDAS: Liberando formulário!');
-                desbloquearOutrasSecoes();
-            } else if (!this.value && treinamentoAceito) {
-                console.log('⚠️ Turno removido, bloqueando formulário...');
-                bloquearOutrasSecoes();
-            }
-        });
+//             if (this.value && treinamentoAceito) {
+//                 console.log('🎉 CONDIÇÕES ATENDIDAS: Liberando formulário!');
+//                 desbloquearOutrasSecoes();
+//             } else if (!this.value && treinamentoAceito) {
+//                 console.log('⚠️ Turno removido, bloqueando formulário...');
+//                 bloquearOutrasSecoes();
+//             }
+//         });
         
-        // ✅ VERIFICAR ESTADO INICIAL DO TURNO
-        const estadoInicial = turnoSelect.value;
-        if (estadoInicial) {
-            console.log(`📄 Estado inicial do turno: ${estadoInicial}`);
-        }
-    }
+//         // ✅ VERIFICAR ESTADO INICIAL DO TURNO
+//         const estadoInicial = turnoSelect.value;
+//         if (estadoInicial) {
+//             console.log(`📄 Estado inicial do turno: ${estadoInicial}`);
+//         }
+//     }
     
-    console.log('✅ Treinamento obrigatório configurado com sucesso');
-}
+//     console.log('✅ Treinamento obrigatório configurado com sucesso');
+// }
+
 
 // Função para toggle do "Saiba Mais" do treinamento
+
+
 function toggleInfoTreinamento() {
     const infoDiv = document.getElementById('infoDetalhadaTreinamento');
     const botao = document.querySelector('.btn-saiba-mais');
