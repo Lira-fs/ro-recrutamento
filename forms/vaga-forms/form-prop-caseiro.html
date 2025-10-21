@@ -107,7 +107,7 @@
        </div>
 
        <div class="form-group">
-           <label>Saber assar churrasco?</label>
+           <label>Saber fazer churrasco?</label>
            <div class="radio-group">
                <label class="radio-label">
                    <input type="radio" name="saberChurrasco" value="sim" required>
@@ -119,6 +119,24 @@
                </label>
                <label class="radio-label">
                    <input type="radio" name="saberChurrasco" value="nao" required>
+                   <span>Não necessário</span>
+               </label>
+           </div>
+       </div>
+
+       <div class="form-group">
+           <label>Saber fazer pizza?</label>
+           <div class="radio-group">
+               <label class="radio-label">
+                   <input type="radio" name="saberPizza" value="sim" required>
+                   <span>Sim, necessário</span>
+               </label>
+               <label class="radio-label">
+                   <input type="radio" name="saberPizza" value="desejavel" required>
+                   <span>Desejável</span>
+               </label>
+               <label class="radio-label">
+                   <input type="radio" name="saberPizza" value="nao" required>
                    <span>Não necessário</span>
                </label>
            </div>
@@ -209,10 +227,6 @@
     <script src="../global-section-prop.js"></script>
     <script src="../../components/components.js"></script>
     <script>
-        // ===================================
-// SCRIPT PARA FORM-PROP-CASEIRO.HTML
-// Substituir todo o <script> existente no HTML
-// ===================================
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Carregando formulário de vaga - Caseiro');

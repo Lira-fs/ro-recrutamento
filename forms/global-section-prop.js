@@ -4,7 +4,7 @@
    =================================== */
 
 const ownerFormSections = {
-    'aceitar-termos': `
+    /*'aceitar-termos': `
         <section class="form-section treinamento-section">
             <h2 class="section-title">
                 <i class="fas fa-handshake"></i>
@@ -119,7 +119,7 @@ const ownerFormSections = {
                 </div>
             </div>
         </div>
-    `,
+    `,*/
     
     'dados-proprietario': `
         <section class="form-section">
@@ -191,10 +191,6 @@ const ownerFormSections = {
                             <input type="radio" name="tipoResidencia" value="casa-verao" required>
                             <span>Casa de veraneio</span>
                         </label>
-                        <label class="radio-label">
-                            <input type="radio" name="tipoResidencia" value="ambas" required>
-                            <span>Ambas</span>
-                        </label>
                     </div>
                 </div>
                 
@@ -214,6 +210,7 @@ const ownerFormSections = {
                                 <input type="radio" name="frequenciaVeraneio" value="2-ou-menos" required>
                                 <span>2 fins de semana ou menos por mês</span>
                             </label>
+                            <p>Obs: essa informação é para selecionarmos o candidato ideal para você!</p>
                         </div>
                     </div>
                 </div>
@@ -334,7 +331,7 @@ const ownerFormSections = {
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="horarioTrabalho">Horário previsto de trabalho (dias úteis)</label>
+                    <label for="horarioTrabalho">Horário previsto de trabalho (dias úteis | seg - sex)</label>
                     <input type="text" id="horarioTrabalho" name="horarioTrabalho" placeholder="Ex: 7h às 16h, 8h às 17h" required>
                 </div>
 
@@ -381,7 +378,12 @@ const ownerFormSections = {
                 
                 <div class="form-group full-width">
                     <label for="restricoesVaga">Alguma restrição para a vaga?</label>
-                    <textarea id="restricoesVaga" name="restricoesVaga" rows="3" placeholder="Ex: idade mínima, formação acadêmica mínima, experiência específica, etc..."></textarea>
+                    <textarea id="restricoesVaga" name="restricoesVaga" rows="3" placeholder="Ex: O que te deixaria desconfortável no candidato(a), situações, atitudes que você não gostaria de ver no dia a dia da casa, etc..."></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="obrigacoesPrincipais"> Quais serão as principais obrigações desse colaborador (a)?</label>
+                    <textarea id="obrigacoesPrincipais" name="obrigacoesPrincipais" rows="3" placeholder="Ex: Cuidar de cômodos especifícos, cuidar das manutenções, atender fins de semana, etc..."></textarea>
                 </div>
             </div>
         </section>
@@ -666,6 +668,7 @@ const ownerFormSections = {
                             <input type="checkbox" name="horarioContato" value="noite">
                             <span>Noite (18h às 22h)</span>
                         </label>
+                        <p><i>(Pode marcar mais de um.)</i></p>
                     </div>
                 </div>
             </div>

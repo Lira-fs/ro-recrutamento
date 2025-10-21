@@ -1076,6 +1076,164 @@ textarea {
    box-shadow: 0 8px 25px rgba(166, 94, 46, 0.6);
 }
 
+/* STILOS ESPECIFICOS PARA FORM CASAL*/
+
+.casal-subtitle {
+            color: var(--bronze-light);
+            font-size: 1.3rem;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--cor-borda);
+        }
+
+.casal-subtitle i {
+    color: var(--bronze-light);
+    font-size: 1.2rem;
+}
+
+.habilidades-extras {
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    margin-top: var(--spacing-lg);
+    border: 1px solid var(--cor-borda);
+}
+
+.habilidades-extras h4 {
+    color: var(--bronze-light);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.habilidades-extras h4 i {
+    color: var(--bronze-light);
+}
+
+.preferencia-field {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: var(--border-radius-sm);
+    border-left: 3px solid #e74c3c;
+}
+
+.preferencia-field label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.preferencia-field input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.checkbox-grid-small {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+}
+
+.pets-details {
+    display: none;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(166, 94, 46, 0.1);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--bronze-light);
+}
+
+.pets-details.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.jardim-details, .piscina-details {
+    display: none;
+    margin-top: var(--spacing-sm);
+}
+
+.jardim-details.show, .piscina-details.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.coqueteis-nivel {
+    display: none;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(166, 94, 46, 0.1);
+    border-radius: var(--border-radius-sm);
+}
+
+.coqueteis-nivel.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.trabalhou-juntos-tempo {
+    display: none;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(166, 94, 46, 0.1);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--bronze-light);
+}
+
+.trabalhou-juntos-tempo.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.habilidades-cozinha {
+    display: none;
+    margin-top: var(--spacing-md);
+}
+
+.habilidades-cozinha.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+/* Responsividade para novos campos */
+@media (min-width: 768px) {
+    .checkbox-grid-small {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .checkbox-grid-small {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .casal-subtitle {
+        font-size: 1.1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-xs);
+    }
+
+    .habilidades-extras {
+        padding: var(--spacing-md);
+    }
+
+    .habilidades-extras h4 {
+        font-size: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-xs);
+    }
+}
+
 /* Animações */
 @keyframes fadeIn {
    from { opacity: 0; }
