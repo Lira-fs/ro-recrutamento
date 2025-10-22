@@ -640,63 +640,43 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
-     <script src="../../components/supabase-config.js"></script>
-
     <script src="../../components/components.js"></script>
-
     <script src="../global-section.js"></script>
     <script src="../config-titulos.js"></script>
+    <script type="module" src="../../components/supabase-config.js"></script>
 
-<!-- ✅ CONFIGURAÇÃO SUPABASE - INLINE PARA GARANTIR CARREGAMENTO -->
 <script type="module">
 
-    
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+    // Aplicar títulos dinâmicos
     aplicarTitulosDinamicos();
+    
+    // Carregar seções universais
     carregarTodasSecoesPadrao();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Inicializando formulário Babá...');
-    
-    // Carregar seções universais
-    loadFormSection('dados-pessoais', 'dados-pessoais-container');
-    loadFormSection('treinamento-obrigatorio', 'treinamento-obrigatorio-container');
-    loadFormSection('contato', 'contato-container');
-    loadFormSection('pretensoes-condicoes', 'pretensoes-condicoes-container');
-    loadFormSection('disponibilidade', 'disponibilidade-container');
-    loadFormSection('experiencias', 'experiencia-container');
-    loadFormSection('referencias', 'referencias-container')
-    
-    // Aguardar seções carregarem
-    setTimeout(() => {
-        initializeBabaSpecificFields();
-        initializeFormSubmission();
-    }, 1000);
-});
-
 // ===== FUNÇÃO PARA INICIALIZAR CAMPOS ESPECÍFICOS =====
-function initializeBabaSpecificFields() {
-    console.log('🔧 Inicializando campos específicos da babá...');
-    
-    // Campos condicionais - checkboxes "outros"
-    const setupConditionalCheckbox = (groupName, targetClass) => {
-        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
-        const targetDiv = document.querySelector(`.${targetClass}`);
+    function initializeBabaSpecificFields() {
+        console.log('🔧 Inicializando campos específicos da babá...');
         
-        if (targetDiv) {
-            checkboxes.forEach(checkbox => {
-                if (checkbox.value === 'outros') {
-                    checkbox.addEventListener('change', function() {
-                        if (this.checked) {
-                            targetDiv.classList.add('show');
-                        } else {
-                            targetDiv.classList.remove('show');
-                        }
-                    });
-                }
-            });
-        }
+        // Campos condicionais - checkboxes "outros"
+        const setupConditionalCheckbox = (groupName, targetClass) => {
+            const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+            const targetDiv = document.querySelector(`.${targetClass}`);
+            
+            if (targetDiv) {
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.value === 'outros') {
+                        checkbox.addEventListener('change', function() {
+                            if (this.checked) {
+                                targetDiv.classList.add('show');
+                            } else {
+                                targetDiv.classList.remove('show');
+                            }
+                        });
+                    }
+                });
+            }
     };
 
     // Campos condicionais - radio buttons

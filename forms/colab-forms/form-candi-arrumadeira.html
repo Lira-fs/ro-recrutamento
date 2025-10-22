@@ -387,45 +387,31 @@
     <script type="module">
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Aplicar títulos dinâmicos
             aplicarTitulosDinamicos();
+            
+            // Carregar seções universais
             carregarTodasSecoesPadrao();
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Inicializando formulário Arrumadeira (usando global-section.js)...');
-
-        document.getElementById('titulo-dinamico').textContent = window.TITULO_FUNCAO;
-    
-    // ✅ USAR FUNÇÃO GLOBAL para carregar todas as seções padrão
-    carregarTodasSecoesPadrao();
-    
-    // ✅ Aguardar seções carregarem e inicializar campos específicos
-    setTimeout(() => {
-        initializeArrumadeiraSpecificFields();
-        console.log('✅ Arrumadeira: Campos específicos inicializados');
-        console.log('ℹ️ O envio será gerenciado automaticamente pelo global-section.js');
-    }, 1000);
-});
-
-// ===== APENAS OS CAMPOS ESPECÍFICOS DA ARRUMADEIRA =====
-function initializeArrumadeiraSpecificFields() {
-    console.log('🔧 Configurando campos específicos da arrumadeira...');
-    
-    // ✅ FUNÇÃO REUTILIZÁVEL PARA CHECKBOXES "OUTROS"
-    const setupConditionalCheckbox = (groupName, targetClass, triggerValue = 'outros') => {
-        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
-        const targetDiv = document.querySelector(`.${targetClass}`);
-        
-        if (targetDiv) {
-            checkboxes.forEach(checkbox => {
-                if (checkbox.value === triggerValue) {
-                    checkbox.addEventListener('change', function() {
-                        targetDiv.classList.toggle('show', this.checked);
+        function initializeArrumadeiraSpecificFields() {
+            console.log('🔧 Configurando campos específicos da arrumadeira...');
+            
+            // ✅ FUNÇÃO REUTILIZÁVEL PARA CHECKBOXES "OUTROS"
+            const setupConditionalCheckbox = (groupName, targetClass, triggerValue = 'outros') => {
+                const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+                const targetDiv = document.querySelector(`.${targetClass}`);
+                
+                if (targetDiv) {
+                    checkboxes.forEach(checkbox => {
+                        if (checkbox.value === triggerValue) {
+                            checkbox.addEventListener('change', function() {
+                                targetDiv.classList.toggle('show', this.checked);
+                            });
+                        }
                     });
                 }
-            });
-        }
-    };
+            };
 
     // ✅ FUNÇÃO REUTILIZÁVEL PARA RADIO BUTTONS
     const setupConditionalRadio = (radioName, targetClass, showValue = 'sim') => {

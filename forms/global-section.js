@@ -896,128 +896,128 @@ function configurarCamposCondicionaisDisponibilidade() {
 }
 
 
-//DESCOMENTAR ANTES DE SUBIR
-// function configurarTreinamentoObrigatorio() {
-//     const aceitaTreinamento = document.querySelectorAll('input[name="aceitaTreinamento"]');
-//     const turnoSelection = document.querySelector('.turno-selection');
-//     const rejectionMessage = document.querySelector('.rejection-message');
-//     const turnoSelect = document.getElementById('turnoTreinamento');
+
+ function configurarTreinamentoObrigatorio() {
+     const aceitaTreinamento = document.querySelectorAll('input[name="aceitaTreinamento"]');
+     const turnoSelection = document.querySelector('.turno-selection');
+     const rejectionMessage = document.querySelector('.rejection-message');
+     const turnoSelect = document.getElementById('turnoTreinamento');
     
-//     if (!aceitaTreinamento.length) {
-//         console.warn('⚠️ Campos de treinamento não encontrados');
-//         return;
-//     }
+     if (!aceitaTreinamento.length) {
+         console.warn('⚠️ Campos de treinamento não encontrados');
+         return;
+     }
     
-//     console.log('🎓 Configurando treinamento obrigatório...');
+     console.log('🎓 Configurando treinamento obrigatório...');
     
-//     // ✅ INICIALIZAR ESTADO - garantir que elementos existam e estejam ocultos
-//     if (turnoSelection) {
-//         turnoSelection.style.display = 'none';
-//         turnoSelection.classList.remove('show');
-//     }
-//     if (rejectionMessage) {
-//         rejectionMessage.style.display = 'none'; // OCULTAR INICIALMENTE
-//         rejectionMessage.classList.remove('show');
-//     }
+     // ✅ INICIALIZAR ESTADO - garantir que elementos existam e estejam ocultos
+     if (turnoSelection) {
+         turnoSelection.style.display = 'none';
+         turnoSelection.classList.remove('show');
+     }
+     if (rejectionMessage) {
+         rejectionMessage.style.display = 'none'; // OCULTAR INICIALMENTE
+         rejectionMessage.classList.remove('show');
+     }
     
-//     // ✅ BLOQUEAR FORMULÁRIO INICIALMENTE
-//     bloquearOutrasSecoes();
+     // ✅ BLOQUEAR FORMULÁRIO INICIALMENTE
+     bloquearOutrasSecoes();
     
-//     aceitaTreinamento.forEach(radio => {
-//         radio.addEventListener('change', function() {
-//             console.log(`🔄 Treinamento mudou para: ${this.value}`);
+     aceitaTreinamento.forEach(radio => {
+         radio.addEventListener('change', function() {
+             console.log(`🔄 Treinamento mudou para: ${this.value}`);
             
-//             if (this.value === 'sim') {
-//                 // ✅ ACEITO O TREINAMENTO
-//                 console.log('✅ Treinamento aceito, mostrando seleção de turno...');
+             if (this.value === 'sim') {
+                 // ✅ ACEITO O TREINAMENTO
+                 console.log('✅ Treinamento aceito, mostrando seleção de turno...');
                 
-//                 // Mostrar seleção de turno
-//                 if (turnoSelection) {
-//                     turnoSelection.style.display = 'block';
-//                     turnoSelection.classList.add('show');
-//                     console.log('📅 Seleção de turno exibida');
-//                 }
+                 // Mostrar seleção de turno
+                 if (turnoSelection) {
+                     turnoSelection.style.display = 'block';
+                     turnoSelection.classList.add('show');
+                     console.log('📅 Seleção de turno exibida');
+                 }
                 
-//                 // Ocultar mensagem de recusa
-//                 if (rejectionMessage) {
-//                     rejectionMessage.style.display = 'none';
-//                     rejectionMessage.classList.remove('show');
-//                 }
+                 // Ocultar mensagem de recusa
+                 if (rejectionMessage) {
+                     rejectionMessage.style.display = 'none';
+                     rejectionMessage.classList.remove('show');
+                 }
                 
-//                 // Tornar turno obrigatório
-//                 if (turnoSelect) {
-//                     turnoSelect.required = true;
-//                     console.log('⚡ Campo turno marcado como obrigatório');
-//                 }
+                 // Tornar turno obrigatório
+                 if (turnoSelect) {
+                     turnoSelect.required = true;
+                     console.log('⚡ Campo turno marcado como obrigatório');
+                 }
                 
-//                 // SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
-//                 if (turnoSelect && turnoSelect.value) {
-//                     console.log('🚀 Turno já selecionado, liberando formulário...');
-//                     desbloquearOutrasSecoes();
-//                 } else {
-//                     console.log('⏳ Aguardando seleção de turno...');
-//                     // Manter bloqueado até selecionar turno
-//                     bloquearOutrasSecoes();
-//                 }
+                 // SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
+                 if (turnoSelect && turnoSelect.value) {
+                     console.log('🚀 Turno já selecionado, liberando formulário...');
+                     desbloquearOutrasSecoes();
+                 } else {
+                     console.log('⏳ Aguardando seleção de turno...');
+                     // Manter bloqueado até selecionar turno
+                     bloquearOutrasSecoes();
+                 }
                 
-//             } else {
-//                 // ❌ NÃO ACEITO O TREINAMENTO
-//                 console.log('❌ Treinamento rejeitado');
+             } else {
+                 // ❌ NÃO ACEITO O TREINAMENTO
+                 console.log('❌ Treinamento rejeitado');
                 
-//                 // Ocultar seleção de turno
-//                 if (turnoSelection) {
-//                     turnoSelection.style.display = 'none';
-//                     turnoSelection.classList.remove('show');
-//                 }
+                 // Ocultar seleção de turno
+                 if (turnoSelection) {
+                     turnoSelection.style.display = 'none';
+                     turnoSelection.classList.remove('show');
+                 }
                 
-//                 // MOSTRAR mensagem de recusa
-//                 if (rejectionMessage) {
-//                     rejectionMessage.style.display = 'block'; // MOSTRAR AGORA
-//                     rejectionMessage.classList.add('show');
-//                     console.log('⚠️ Mensagem de rejeição exibida');
-//                 }
+                 // MOSTRAR mensagem de recusa
+                 if (rejectionMessage) {
+                     rejectionMessage.style.display = 'block'; // MOSTRAR AGORA
+                     rejectionMessage.classList.add('show');
+                     console.log('⚠️ Mensagem de rejeição exibida');
+                 }
                 
-//                 // Remover obrigatoriedade do turno
-//                 if (turnoSelect) {
-//                     turnoSelect.required = false;
-//                     turnoSelect.value = '';
-//                 }
+                 // Remover obrigatoriedade do turno
+                 if (turnoSelect) {
+                     turnoSelect.required = false;
+                     turnoSelect.value = '';
+                 }
                 
-//                 // Manter bloqueado
-//                 bloquearOutrasSecoes();
-//             }
-//         });
-//     });
+                 // Manter bloqueado
+                 bloquearOutrasSecoes();
+             }
+         });
+     });
     
-//     // ✅ EVENTO PARA SELEÇÃO DE TURNO
-//     if (turnoSelect) {
-//         turnoSelect.addEventListener('change', function() {
-//             console.log(`🕐 Turno selecionado: ${this.value}`);
+     // ✅ EVENTO PARA SELEÇÃO DE TURNO
+     if (turnoSelect) {
+         turnoSelect.addEventListener('change', function() {
+             console.log(`🕐 Turno selecionado: ${this.value}`);
+           
+             const treinamentoAceito = isTreinamentoAceito();
+             console.log(`🎓 Treinamento aceito: ${treinamentoAceito}`);
             
-//             const treinamentoAceito = isTreinamentoAceito();
-//             console.log(`🎓 Treinamento aceito: ${treinamentoAceito}`);
-            
-//             if (this.value && treinamentoAceito) {
-//                 console.log('🎉 CONDIÇÕES ATENDIDAS: Liberando formulário!');
-//                 desbloquearOutrasSecoes();
-//             } else if (!this.value && treinamentoAceito) {
-//                 console.log('⚠️ Turno removido, bloqueando formulário...');
-//                 bloquearOutrasSecoes();
-//             }
-//         });
+             if (this.value && treinamentoAceito) {
+                 console.log('🎉 CONDIÇÕES ATENDIDAS: Liberando formulário!');
+                 desbloquearOutrasSecoes();
+             } else if (!this.value && treinamentoAceito) {
+                 console.log('⚠️ Turno removido, bloqueando formulário...');
+                 bloquearOutrasSecoes();
+             }
+         });
         
-//         // ✅ VERIFICAR ESTADO INICIAL DO TURNO
-//         const estadoInicial = turnoSelect.value;
-//         if (estadoInicial) {
-//             console.log(`📄 Estado inicial do turno: ${estadoInicial}`);
-//         }
-//     }
+         // ✅ VERIFICAR ESTADO INICIAL DO TURNO
+         const estadoInicial = turnoSelect.value;
+         if (estadoInicial) {
+             console.log(`📄 Estado inicial do turno: ${estadoInicial}`);
+         }
+     }
     
-//     console.log('✅ Treinamento obrigatório configurado com sucesso');
-// }
+     console.log('✅ Treinamento obrigatório configurado com sucesso');
+ }
 
 
-// Função para toggle do "Saiba Mais" do treinamento
+ //Função para toggle do "Saiba Mais" do treinamento
 
 
 function toggleInfoTreinamento() {
@@ -1382,73 +1382,286 @@ function coletarDadosFormulario(form) {
     return dados;
 }
 
+
 /**
- * Estrutura dados para Supabase
+ * Estrutura dados para Supabase (HÍBRIDO - Colunas + JSONB)
  */
 function estruturarDadosSupabase(formData) {
-    // Dados universais
-    const dadosUniversais = {
-        formulario_id: formData.formulario_id,
-        nome_completo: formData.nomeCompleto || null,
+    console.log('🗂️ Estruturando dados híbridos...');
+    
+    const formularioId = formData.formulario_id;
+    
+    // CASAL tem estrutura especial
+    if (formularioId === 'candi-casal') {
+        return estruturarDadosCasal(formData);
+    }
+    
+    // OUTROS FORMULÁRIOS (padrão)
+    return {
+        // ===== COLUNAS FIXAS =====
+        formulario_id: formularioId,
+        nome_completo: formData.nomeCompleto,
         data_nascimento: formData.dataNascimento || null,
-        cpf: formData.cpf || null,
-        rg: formData.rg || null,
-        estado_civil: formData.estadoCivil || null,
-        nacionalidade: formData.nacionalidade || 'Brasileira',
-        telefone: formData.telefone || null,
-        whatsapp: formData.whatsapp || null,
-        email: formData.email || null,
-        endereco: formData.endereco || null,
-        cep: formData.cep || null,
-        cidade: extrairCidadeEndereco(formData.endereco),
+        cpf: formData.cpf,
+        rg: formData.rg,
+        estado_civil: formData.estadoCivil,
+        telefone: formData.telefone,
+        whatsapp: formData.whatsapp,
+        email: formData.email,
+        endereco: formData.endereco,
+        rua_numero: formData.ruaNumero || null,
+        complemento: formData.complemento || null,
+        bairro: formData.bairro || null,
+        cep: formData.cep,
+        cidade: formData.cidade || extrairCidadeDeEndereco(formData.endereco),
         possui_cnh: formData.possuiCnh === 'sim',
         categoria_cnh: formData.categoriaCnh || null,
         vencimento_cnh: formData.vencimentoCnh || null,
         tem_filhos: formData.temFilhos === 'sim',
         quantos_filhos: formData.quantosFilhos ? parseInt(formData.quantosFilhos) : null,
         idades_filhos: formData.idadesFilhos || null,
-        aceita_treinamento: formData.aceitaTreinamento === 'sim',
-        turno_treinamento: formData.turnoTreinamento || null,
         inicio_imediato: formData.inicioImediato === 'sim',
         data_disponivel: formData.dataDisponivel || null,
         eventos_noturnos: formData.eventosNoturnos || null,
         fim_semana: formData.fimSemana || null,
-        dormir_fim_semana: formData.dormirFimSemana || null,
         viagens: formData.viagens || null,
         passaporte: formData.passaporte || null,
-        vencimento_passaporte: formData.vencimentoPassaporte || null,
-        pretensao_salarial: converterSalario(formData.pretensaoSalarial),
-        regime_trabalho: validarRegimeTrabalho(formData.regimeTrabalho),
-        salario_negociavel: formData.negociavel === 'sim',
+        morar_local: formData.morarLocal || null,
+        dormir_local: formData.dormirLocal || null,
+        pretensao_salarial: formData.pretensaoSalarial ? parseFloat(formData.pretensaoSalarial.replace(/[^\d,]/g, '').replace(',', '.')) : null,
+        regime_trabalho: formData.regimeTrabalho || null,
         tempo_experiencia: formData.tempoExperiencia || null,
         experiencia_alto_padrao: formData.experienciaAltoPadrao === 'sim',
         tempo_alto_padrao: formData.tempoAltoPadrao || null,
-        possui_referencias: formData.possuiReferencias === 'sim',
+        possui_referencias: formData.possuiReferencias === 'sim' || !!formData.ref1Nome,
         restricao_saude: formData.restricaoSaude === 'sim',
         especificar_restricao: formData.especificarRestricao || null,
         fuma: formData.fuma === 'sim',
         consome_alcool: formData.consumeAlcool || null,
         veiculo_proprio: formData.veiculoProprio === 'sim',
         tipo_veiculo: formData.tipoVeiculo || null,
-        observacoes_adicionais: formData.observacoesAdicionais || null
-    };
-    
-    // Dados específicos por tipo
-    const dadosEspecificos = extrairDadosEspecificos(formData);
-    
-    // Referências
-    const referencias = extrairReferencias(formData, formData.formulario_id);
-    
-    return {
-        ...dadosUniversais,
-        dados_especificos: dadosEspecificos,
-        referencias: referencias
+        observacoes_adicionais: formData.observacoesAdicionais || null,
+        
+        // ===== JSONB: ultimo_emprego =====
+        ultimo_emprego: formData.ultimoEmpregoEmpresa ? {
+            empresa: formData.ultimoEmpregoEmpresa,
+            cargo: formData.ultimoEmpregoCargo || null,
+            tempo: formData.ultimoEmpregoTempo || null,
+            salario: formData.ultimoEmpregoSalario || null,
+            atividades: formData.ultimoEmpregoAtividades || null,
+            aprendizados: formData.ultimoEmpregoAprendizados || null,
+            dificuldades: formData.ultimoEmpregoDificuldades || null
+        } : null,
+        
+        // ===== JSONB: dados_especificos =====
+        dados_especificos: extrairDadosEspecificos(formData, formularioId),
+        
+        // ===== JSONB: referencias =====
+        referencias: extrairReferencias(formData, formularioId)
     };
 }
 
-// ========================================
-// 📝 FUNÇÕES DE VALIDAÇÃO FALTANDO
-// ========================================
+/**
+ * Extrai dados específicos por função (vai para JSONB)
+ */
+function extrairDadosEspecificos(formData, formularioId) {
+    // Lista de campos universais (NÃO vão para dados_especificos)
+    const camposUniversais = [
+        'formulario_id', 'nomeCompleto', 'dataNascimento', 'cpf', 'rg',
+        'estadoCivil', 'telefone', 'whatsapp', 'email', 'endereco',
+        'ruaNumero', 'complemento', 'bairro', 'cep', 'cidade',
+        'possuiCnh', 'categoriaCnh', 'vencimentoCnh',
+        'temFilhos', 'quantosFilhos', 'idadesFilhos',
+        'inicioImediato', 'dataDisponivel', 'eventosNoturnos', 'fimSemana',
+        'viagens', 'passaporte', 'morarLocal', 'dormirLocal',
+        'pretensaoSalarial', 'regimeTrabalho',
+        'tempoExperiencia', 'experienciaAltoPadrao', 'tempoAltoPadrao',
+        'possuiReferencias', 'restricaoSaude', 'especificarRestricao',
+        'fuma', 'consumeAlcool', 'veiculoProprio', 'tipoVeiculo',
+        'observacoesAdicionais',
+        'ultimoEmpregoEmpresa', 'ultimoEmpregoCargo', 'ultimoEmpregoTempo',
+        'ultimoEmpregoSalario', 'ultimoEmpregoAtividades',
+        'ref1Nome', 'ref1Telefone', 'ref1Inicio', 'ref1Fim', 'ref1Relacao',
+        'ref1OutroEspecificar', 'ref1MotivoSaida', 'ref1IdadesCriancas',
+        'ref2Nome', 'ref2Telefone', 'ref2Inicio', 'ref2Fim', 'ref2Relacao',
+        'ref2OutroEspecificar', 'ref2MotivoSaida', 'ref2IdadesCriancas'
+    ];
+    
+    const especificos = {};
+    
+    for (let [key, value] of Object.entries(formData)) {
+        if (!camposUniversais.includes(key)) {
+            // Converter camelCase para snake_case
+            const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+            especificos[snakeKey] = value;
+        }
+    }
+    
+    return especificos;
+}
+
+/**
+ * Estrutura especial para CASAL
+ */
+
+/**
+ * Extrai cidade do endereço
+ */
+function extrairCidadeDeEndereco(endereco) {
+    if (!endereco) return null;
+    
+    // Tenta extrair cidade do formato "Rua X, 123 - Bairro, Cidade, Estado"
+    const partes = endereco.split(',');
+    
+    if (partes.length >= 3) {
+        // Última parte antes do estado
+        const cidadeEstado = partes[partes.length - 1].trim();
+        const cidade = cidadeEstado.split('-')[0].trim();
+        return cidade;
+    }
+    
+    return null;
+}
+
+function estruturarDadosCasal(formData) {
+    return {
+        formulario_id: 'candi-casal',
+        nome_completo: `${formData.nomeCompletoEle} e ${formData.nomeCompletoEla}`,
+        
+        // Campos comuns
+        cep: formData.cep,
+        endereco: formData.enderecoCompleto,
+        cidade: formData.cidade || extrairCidadeDeEndereco(formData.endereco),
+        inicio_imediato: formData.inicioImediato === 'sim',
+        data_disponivel: formData.dataDisponivel || null,
+        fim_semana: formData.fimSemana || null,
+        pretensao_salarial: formData.pretensaoSalarialCasal ? parseFloat(formData.pretensaoSalarialCasal.replace(/[^\d,]/g, '').replace(',', '.')) : null,
+        regime_trabalho: formData.regimeDesejado || null,
+        tempo_experiencia: formData.tempoExperiencia || null,
+        experiencia_alto_padrao: formData.experienciaAltoPadrao === 'sim',
+        tempo_alto_padrao: formData.tempoAltoPadrao || null,
+        restricao_saude: formData.restricaoSaude === 'sim',
+        especificar_restricao: formData.especificarRestricao || null,
+        fuma: formData.fumam === 'sim',
+        veiculo_proprio: formData.veiculoProprio === 'sim',
+        observacoes_adicionais: formData.observacoesAdicionais || null,
+        
+        // JSONB: dados_casal
+        dados_casal: {
+            ele: {
+                nome_completo: formData.nomeCompletoEle,
+                data_nascimento: formData.dataNascimentoEle,
+                cpf: formData.cpfEle,
+                email: formData.emailEle,
+                telefone: formData.telefoneEle,
+                whatsapp: formData.whatsappEle,
+                possui_cnh: formData.possuiCnhEle === 'sim',
+                competencias: formData.competenciasEle || null,
+                outros_conhecimentos: formData.outrosConhecimentosEle || null
+            },
+            ela: {
+                nome_completo: formData.nomeCompletoEla,
+                data_nascimento: formData.dataNascimentoEla,
+                cpf: formData.cpfEla,
+                email: formData.emailEla,
+                telefone: formData.telefoneEla,
+                whatsapp: formData.whatsappEla,
+                possui_cnh: formData.possuiCnhEla === 'sim',
+                competencias: formData.competenciasEla || null,
+                outros_conhecimentos: formData.outrosConhecimentosEla || null
+            },
+            info_casal: {
+                estado_civil: formData.estadoCivil,
+                tempo_juntos: formData.tempoJuntos,
+                tem_filhos: formData.temFilhos === 'sim',
+                quantos_filhos: formData.quantosFilhos ? parseInt(formData.quantosFilhos) : null,
+                idades_filhos: formData.idadesFilhos || null,
+                possui_pets: formData.possuiPets === 'sim',
+                tipo_pet: formData.tipoPet || null,
+                porque_juntos: formData.porqueJuntos || null,
+                diferencial_casal: formData.diferencialCasal || null
+            }
+        },
+        
+        // JSONB: dados_especificos (habilidades)
+        dados_especificos: extrairDadosEspecificos(formData, 'candi-casal'),
+        
+        // JSONB: referencias (separadas Ele/Ela)
+        referencias: extrairReferenciasCasal(formData),
+        
+        // JSONB: ultimo_emprego
+        ultimo_emprego: formData.ultimoEmpregoEmpresa ? {
+            empresa: formData.ultimoEmpregoEmpresa,
+            cargo: formData.ultimoEmpregoCargo || null,
+            tempo: formData.ultimoEmpregoTempo || null,
+            atividades: formData.ultimoEmpregoAtividades || null
+        } : null
+    };
+}
+
+/**
+ * Extrai referências do casal (Ele + Ela)
+ */
+function extrairReferenciasCasal(formData) {
+    const referencias = [];
+    
+    // Referências ELE
+    if (formData.refEle1Nome) {
+        referencias.push({
+            pessoa: 'ele',
+            tipo: 'referencia_1',
+            nome: formData.refEle1Nome,
+            telefone: formData.refEle1Telefone,
+            periodo_inicio: formData.refEle1Inicio,
+            periodo_fim: formData.refEle1Fim,
+            relacao: formData.refEle1Relacao,
+            motivo_saida: formData.refEle1MotivoSaida || null
+        });
+    }
+    
+    if (formData.refEle2Nome) {
+        referencias.push({
+            pessoa: 'ele',
+            tipo: 'referencia_2',
+            nome: formData.refEle2Nome,
+            telefone: formData.refEle2Telefone,
+            periodo_inicio: formData.refEle2Inicio,
+            periodo_fim: formData.refEle2Fim,
+            relacao: formData.refEle2Relacao,
+            motivo_saida: formData.refEle2MotivoSaida || null
+        });
+    }
+    
+    // Referências ELA
+    if (formData.refEla1Nome) {
+        referencias.push({
+            pessoa: 'ela',
+            tipo: 'referencia_1',
+            nome: formData.refEla1Nome,
+            telefone: formData.refEla1Telefone,
+            periodo_inicio: formData.refEla1Inicio,
+            periodo_fim: formData.refEla1Fim,
+            relacao: formData.refEla1Relacao,
+            motivo_saida: formData.refEla1MotivoSaida || null
+        });
+    }
+    
+    if (formData.refEla2Nome) {
+        referencias.push({
+            pessoa: 'ela',
+            tipo: 'referencia_2',
+            nome: formData.refEla2Nome,
+            telefone: formData.refEla2Telefone,
+            periodo_inicio: formData.refEla2Inicio,
+            periodo_fim: formData.refEla2Fim,
+            relacao: formData.refEla2Relacao,
+            motivo_saida: formData.refEla2MotivoSaida || null
+        });
+    }
+    
+    return referencias.length > 0 ? referencias : null;
+}
+
 
 /**
  * Valida CPF brasileiro
@@ -1871,113 +2084,48 @@ function extrairDadosArrumadeira(formData) {
     };
 }
 
+
 /**
- * Extrai referências do formulário
+ * Extrai referências para JSONB (exceto casal, que tem função própria)
  */
 function extrairReferencias(formData, formularioId) {
-    console.log('📋 Extraindo referências para:', formularioId);
+    console.log('📋 Extraindo referências...');
     
     const referencias = [];
     
-    // ===== CASAL - REFERÊNCIAS SEPARADAS =====
-    if (formularioId === 'candi-casal') {
-   
-   // REFERÊNCIAS DELE
-   if (formData.refEle1Nome) {
-       referencias.push({
-           pessoa: 'ele',
-           tipo: 'referencia_1',
-           nome: formData.refEle1Nome,
-           telefone: formData.refEle1Telefone,
-           periodo_inicio: formData.refEle1Inicio,
-           periodo_fim: formData.refEle1Fim,
-           relacao: formData.refEle1Relacao,
-           outro_especificar: formData.refEle1OutroEspecificar || null,
-           motivo_saida: formData.refEle1MotivoSaida || null
-       });
-   }
-   
-   if (formData.refEle2Nome) {
-       referencias.push({
-           pessoa: 'ele',
-           tipo: 'referencia_2',
-           nome: formData.refEle2Nome,
-           telefone: formData.refEle2Telefone,
-           periodo_inicio: formData.refEle2Inicio,
-           periodo_fim: formData.refEle2Fim,
-           relacao: formData.refEle2Relacao,
-           outro_especificar: formData.refEle2OutroEspecificar || null,
-           motivo_saida: formData.refEle2MotivoSaida || null
-       });
-   }
-   
-   // REFERÊNCIAS DELA
-   if (formData.refEla1Nome) {
-       referencias.push({
-           pessoa: 'ela',
-           tipo: 'referencia_1',
-           nome: formData.refEla1Nome,
-           telefone: formData.refEla1Telefone,
-           periodo_inicio: formData.refEla1Inicio,
-           periodo_fim: formData.refEla1Fim,
-           relacao: formData.refEla1Relacao,
-           outro_especificar: formData.refEla1OutroEspecificar || null,
-           motivo_saida: formData.refEla1MotivoSaida || null
-       });
-   }
-   
-   if (formData.refEla2Nome) {
-       referencias.push({
-           pessoa: 'ela',
-           tipo: 'referencia_2',
-           nome: formData.refEla2Nome,
-           telefone: formData.refEla2Telefone,
-           periodo_inicio: formData.refEla2Inicio,
-           periodo_fim: formData.refEla2Fim,
-           relacao: formData.refEla2Relacao,
-           outro_especificar: formData.refEla2OutroEspecificar || null,
-           motivo_saida: formData.refEla2MotivoSaida || null
-       });
-   }
-   
-} else {
-   // ===== OUTROS FORMULÁRIOS - PADRÃO =====
-   if (formData.possuiReferencias === 'sim') {
-       
-       // Referência 1
-       if (formData.ref1Nome) {
-           referencias.push({
-               tipo: 'referencia_1',
-               nome: formData.ref1Nome,
-               telefone: formData.ref1Telefone,
-               periodo_inicio: formData.ref1Inicio,
-               periodo_fim: formData.ref1Fim,
-               idades_criancas: formData.ref1IdadesCriancas || null,
-               relacao: formData.ref1Relacao,
-               outro_especificar: formData.ref1OutroEspecificar || null,
-               motivo_saida: formData.ref1MotivoSaida || null
-           });
-       }
-       
-       // Referência 2
-       if (formData.ref2Nome) {
-           referencias.push({
-               tipo: 'referencia_2',
-               nome: formData.ref2Nome,
-               telefone: formData.ref2Telefone,
-               periodo_inicio: formData.ref2Inicio,
-               periodo_fim: formData.ref2Fim,
-               idades_criancas: formData.ref2IdadesCriancas || null,
-               relacao: formData.ref2Relacao,
-               outro_especificar: formData.ref2OutroEspecificar || null,
-               motivo_saida: formData.ref2MotivoSaida || null
-           });
-       }
-   }
-}
+    // Referência 1
+    if (formData.ref1Nome) {
+        referencias.push({
+            tipo: 'referencia_1',
+            nome: formData.ref1Nome,
+            telefone: formData.ref1Telefone,
+            periodo_inicio: formData.ref1Inicio || null,
+            periodo_fim: formData.ref1Fim || null,
+            relacao: formData.ref1Relacao,
+            outro_especificar: formData.ref1OutroEspecificar || null,
+            motivo_saida: formData.ref1MotivoSaida || null,
+            // Campos específicos (se existirem)
+            idades_criancas: formData.ref1IdadesCriancas || null
+        });
+    }
     
-    console.log(`✅ ${referencias.length} referências extraídas para ${formularioId}`);
-    return referencias;
+    // Referência 2
+    if (formData.ref2Nome) {
+        referencias.push({
+            tipo: 'referencia_2',
+            nome: formData.ref2Nome,
+            telefone: formData.ref2Telefone,
+            periodo_inicio: formData.ref2Inicio || null,
+            periodo_fim: formData.ref2Fim || null,
+            relacao: formData.ref2Relacao,
+            outro_especificar: formData.ref2OutroEspecificar || null,
+            motivo_saida: formData.ref2MotivoSaida || null,
+            idades_criancas: formData.ref2IdadesCriancas || null
+        });
+    }
+    
+    console.log(`✅ ${referencias.length} referências extraídas`);
+    return referencias.length > 0 ? referencias : null;
 }
 
 /**
@@ -2002,10 +2150,6 @@ async function enviarParaSupabase(dados) {
     console.log('✅ Dados salvos:', data);
     return data;
 }
-
-// ========================================
-// 🎨 SISTEMA DE MODAL DE SUCESSO
-// ========================================
 
 /**
  * Mostra modal de sucesso

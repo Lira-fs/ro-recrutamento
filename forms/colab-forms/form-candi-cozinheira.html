@@ -514,31 +514,19 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
-    <!-- SCRIPTS - ORDEM CORRETA -->
-    <script type="module" src="../../components/supabase-config.js"></script>
+
     <script src="../../components/components.js"></script>
     <script src="../global-section.js"></script>
     <script src="../config-titulos.js"></script>
+    <script type="module" src="../../components/supabase-config.js"></script>
+    <script type="module">
 
-<script type="module">
-
-document.addEventListener('DOMContentLoaded', () => {
-            aplicarTitulosDinamicos();
-            carregarTodasSecoesPadrao();
-        });
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Inicializando formulário Cozinheira (usando global-section.js)...');
+    document.addEventListener('DOMContentLoaded', () => {
+    // Aplicar títulos dinâmicos
+    aplicarTitulosDinamicos();
     
-    // ✅ USAR FUNÇÃO GLOBAL para carregar todas as seções padrão
+    // Carregar seções universais
     carregarTodasSecoesPadrao();
-    
-    // ✅ Aguardar seções carregarem e inicializar campos específicos
-    setTimeout(() => {
-        initializeCozinheiraSpecificFields();
-        console.log('✅ Cozinheira: Campos específicos inicializados');
-        console.log('ℹ️ O envio será gerenciado automaticamente pelo global-section.js');
-    }, 1000);
 });
 
 // ===== APENAS OS CAMPOS ESPECÍFICOS DA COZINHEIRA =====

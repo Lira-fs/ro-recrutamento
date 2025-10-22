@@ -1,0 +1,55 @@
+Estrutura de Banco de Dados - Tabela Candidatos
+===============================
+
+-- ESTRUTURA FINAL DA TABELA CANDIDATOS:
+-- 
+-- ✅ COLUNAS UNIVERSAIS (35 colunas):
+-- 1. IDs e Controle (7)
+--    - id, formulario_id, status_candidato
+--    - created_at, updated_at, ficha_emitida, data_ficha_gerada
+--
+-- 2. Dados Pessoais (6)
+--    - nome_completo, data_nascimento, cpf, rg, estado_civil
+--
+-- 3. Contato Criptografado (8)
+--    - email, telefone, whatsapp
+--    - endereco, rua_numero, complemento, bairro, cep, cidade
+--
+-- 4. CNH (3)
+--    - possui_cnh, categoria_cnh, vencimento_cnh
+--
+-- 5. Filhos (3)
+--    - tem_filhos, quantos_filhos, idades_filhos
+--
+-- 6. Disponibilidade (5)
+--    - inicio_imediato, data_disponivel, eventos_noturnos
+--    - fim_semana, viagens, passaporte
+--    - morar_local, dormir_local
+--
+-- 7. Pretensões (3)
+--    - pretensao_salarial, regime_trabalho
+--
+-- 8. Experiência (3)
+--    - tempo_experiencia, experiencia_alto_padrao, tempo_alto_padrao
+--    - ultimo_emprego (JSONB)
+--
+-- 9. Saúde/Hábitos (5)
+--    - restricao_saude, especificar_restricao
+--    - fuma, consome_alcool
+--    - veiculo_proprio, tipo_veiculo
+--
+-- 10. Outros (2)
+--    - possui_referencias, observacoes_adicionais
+--
+-- ✅ JSONB (3 campos):
+-- 1. dados_especificos - Campos específicos por função
+--    Babá: faixas_etarias, atividades_ludicas, primeiros_socorros, etc
+--    Caseiro: manutencao_eletrica, cuidados_jardim, etc
+--    Cozinheira: culinarias, dietas_especiais, etc
+--    ... e assim por diante
+--
+-- 2. referencias - Referências profissionais
+--    Array de objetos: [{nome, telefone, periodo, relacao, motivo_saida}, ...]
+--
+-- 3. dados_casal - Específico para casal
+--    {ele: {...}, ela: {...}, info_casal: {...}}
