@@ -11,11 +11,6 @@ body {
     padding-top: 80px; /* Compensa header fixo */
 }
 
-/* ========================================
-   HEADER DO FORMULÁRIO
-   ======================================== */
-
-
 .form-brand {
     display: flex;
     align-items: center;
@@ -53,6 +48,24 @@ body {
 /* ========================================
    MAIN DO FORMULÁRIO
    ======================================== */
+
+.card-title {
+    background: rgba(166, 94, 46,);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    box-shadow: var(--sombra-bronze);
+    border: 2px solid var(--cor-borda);
+    transition: var(--transicao);
+}
+
+.card-title:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(166, 94, 46, 0.5);
+    background: rgba(166, 94, 46,);
+}
+
+
 .form-main {
     padding-top: 120px;
     padding-bottom: var(--spacing-4xl);
@@ -67,6 +80,38 @@ body {
 /* ========================================
    SEÇÕES DO FORMULÁRIO
    ======================================== */
+
+.legenda-required {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+    border-left: 4px solid #d32f2f;
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    flex: 1 1 100%; /* ADICIONAR ISTO */
+    box-sizing: border-box;
+}
+
+.legenda-required i {
+    color: #d32f2f;
+    font-size: 20px;
+}
+
+.legenda-required p {
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.required-mark {
+    color: #d32f2f;
+    font-weight: bold;
+    font-size: 16px;
+}
+
 .form-section {
     background: rgba(166, 94, 46, 0.1);
     backdrop-filter: blur(10px);
@@ -391,6 +436,16 @@ textarea {
     margin-bottom: 0;
     font-weight: 600;
     font-size: 1.1rem;
+}
+
+.alert-box{
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 10px 12px;
+    height: auto;
+    margin-top: 10px;
+    background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107;
 }
 
 /* Animação de entrada */

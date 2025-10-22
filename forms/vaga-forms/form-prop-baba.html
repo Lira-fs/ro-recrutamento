@@ -28,6 +28,8 @@
                 <!-- SEÇÃO: ACEITAR TERMOS (Importada) -->
                 <div id="aceitar-termos-container"></div>
 
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+
                 <!-- SEÇÃO: DADOS DO PROPRIETÁRIO (Importada) -->
                 <div id="dados-proprietario-container"></div>
 
@@ -274,11 +276,13 @@
      <script type="module" src="../../components/supabase-config.js"></script>
     <script src="../global-section-prop.js"></script>
     <script src="../../components/components.js"></script>
+    <script src="../config-titulos.js"></script>
     <script>
-      // ===================================
-// SCRIPT PARA FORM-PROP-BABA.HTML
-// Substituir todo o <script> existente no HTML
-// ===================================
+
+document.addEventListener('DOMContentLoaded', () => {
+            aplicarTitulosDinamicos();
+            carregarTodasSecoesPadrao();
+        });
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Carregando formulário de vaga - Babá');

@@ -57,11 +57,16 @@ const ownerFormSections = {
                 </div>
             </div>
 
+            <div class="legenda-required">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Campos marcados com <span class="required-mark">*</span> são obrigatórios para envio do formulário.</p>
+            </div>
+
             <div class="rejection-message">
                 <div class="alert-box">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
                     <div>
-                        <h4>Termos Obrigatórios</h4>
+                        <h4 style="text-align: center; color: #ffc107">Termos Obrigatórios</h4>
                         <p>Para utilizar nossos serviços, é <strong>obrigatório</strong> aceitar os termos de serviço.</p>
                         <p>Os termos garantem a segurança e qualidade do processo de recrutamento para ambas as partes.</p>
                         <p><strong>Reconsidere sua decisão para continuar o cadastro da vaga.</strong></p>
@@ -330,6 +335,24 @@ const ownerFormSections = {
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>Necessidade de condução própria?</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="conducaoPropria" value="sim" required>
+                            <span>Sim</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="conducaoPropria" value="nao" required>
+                            <span>Não</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="conduca   oPropria" value="desejavel" required>
+                            <span>Desejável</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-group full-width">
                     <label for="horarioTrabalho">Horário previsto de trabalho (dias úteis | seg - sex)</label>
                     <input type="text" id="horarioTrabalho" name="horarioTrabalho" placeholder="Ex: 7h às 16h, 8h às 17h" required>
@@ -396,20 +419,11 @@ const ownerFormSections = {
                 Oferta Salarial
             </h2>
             
+            
             <div class="form-grid">
                 <div class="form-group">
                     <label for="salarioOferecido">Salário oferecido (mensal/bruto) <span class="required-asterisk">*</span></label>
                     <input type="text" id="salarioOferecido" name="salarioOferecido" placeholder="R$ 0.000,00" required>
-                </div>
-                
-                <div class="form-group full-width">
-                    <div class="alert-box" style="background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107;">
-                        <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
-                        <div>
-                            <h4 style="color: #ffc107;">ATENÇÃO:</h4>
-                            <p>Lembrando que profissionais que realmente se preocupam em entregar um bom trabalho, também se preocupam com o retorno dele!</p>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="form-group full-width">
@@ -453,6 +467,17 @@ const ownerFormSections = {
                     </div>
                 </div>
             </div>
+
+            <div class="form-group full-width">
+                <div class="alert-box">
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                    <div>
+                        <h4 style="color: #ffc107; text-align: center;">ATENÇÃO:</h4>
+                        <p style="text-align: center"><i>Lembrando que profissionais que realmente se preocupam em entregar um bom trabalho, também se preocupam com o retorno dele!</i></p>
+                    </div>
+                </div>
+            </div>
+                
         </section>
     `,
     
@@ -588,13 +613,18 @@ const ownerFormSections = {
                             <h4>O que inclui o treinamento personalizado:</h4>
                             <ul style="margin: 10px 0; padding-left: 20px; color: var(--text-light);">
                                 <li>Análise da rotina específica da sua residência</li>
-                                <li>Treinamento adaptado às suas necessidades</li>
-                                <li>Protocolos personalizados de atendimento</li>
-                                <li>Orientações sobre equipamentos específicos</li>
-                                <li>Padrões de qualidade customizados</li>
+                                <li>Treinamento adaptado às suas necessidades e rotina</li>
+                                <li>Orientações sobre padrões comportamentais</li>
                                 <li>Acompanhamento durante período de adaptação</li>
                             </ul>
                             <p><strong>Investimento:</strong> Consulte valores conforme complexidade</p>
+
+                            <div style="margin-top: 15px;">
+                            <button type="button" class="btn-info-treinamento" onclick="window.open('https://roconsultoria.com.br', '_blank')">
+                                <i class="fa-solid fa-flag"></i>
+                                Conhecer a R.O Consultoria
+                            </button>
+                        </div>
                         </div>
                     </div>
                 </div>

@@ -256,6 +256,11 @@ const secoes = {
             </div>
         </div>
 
+        <div class="legenda-required">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Campos marcados com <span class="required-mark">*</span> são obrigatórios para envio do formulário.</p>
+        </div>
+
         <div class="turno-selection">
             <div class="form-group">
                 <label for="turnoTreinamento">Qual turno você pode participar? <span class="required-asterisk">*</span></label>
@@ -508,11 +513,10 @@ const secoes = {
     </section>
     `,
 
-    'experiencias': `
+    'experiencias':`
     <section class="form-section">
                     <h2 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Experiência Profissional - {ROTEAR}
+                        <i class="fas fa-briefcase"></i> Experiência Profissional
                     </h2>
                     
                     <div class="form-grid">
@@ -890,13 +894,6 @@ function configurarCamposCondicionaisDisponibilidade() {
         });
     }
 }
-
-/**
- * Configura treinamento obrigatório
- */
-/**
- * Configura treinamento obrigatório - VERSÃO CORRIGIDA
- */
 
 
 //DESCOMENTAR ANTES DE SUBIR
@@ -2280,34 +2277,3 @@ window.loadAllStandardSections = carregarTodasSecoesPadrao;
 window.isTrainingAccepted = isTreinamentoAceito;
 window.closeModal = fecharModal;
 window.showSuccessModal = mostrarModalSucesso;
-
-/* ===================================
-   📋 SISTEMA COMPLETO E FUNCIONAL
-   =================================== 
-
-   ✅ Sistema limpo e otimizado
-   ✅ 100% Supabase (sem API antiga)
-   ✅ Estruturação automática por tipo
-   ✅ Validações robustas
-   ✅ Modal de sucesso universal
-   ✅ Máscaras de input automáticas
-   ✅ Campos condicionais inteligentes
-    ✅ Tratamento de erros abrangente
-   ✅ Preparado para futuras implementações
-   ✅ Compatibilidade com código existente
-   ✅ Sistema de loading responsivo
-   ✅ Logs detalhados para debug
-
-   🚀 PRÓXIMOS PASSOS:
-   - Implementar outros tipos (copeiro, cozinheira, etc.)
-   - Adicionar validações específicas por tipo
-   - Sistema de upload de arquivos
-   - Notificações por email
-   - Dashboard administrativo
-
-   📝 ESTRUTURA DE DADOS SUPABASE:
-   - Dados universais: campos comuns a todos
-   - dados_especificos: JSON com campos únicos por tipo
-   - referencias: Array JSON com referências profissionais
-
-   =================================== */

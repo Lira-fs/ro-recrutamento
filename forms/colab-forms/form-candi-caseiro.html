@@ -65,6 +65,9 @@
                 
                 <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
                 <div id="treinamento-obrigatorio-container"></div>
+
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+
                 <div id="dados-pessoais-container"></div>
                 <div id="contato-container"></div>
 
@@ -341,7 +344,15 @@
 
     <script src="../global-section.js"></script>
 
+    <script src="../config-titulos.js"></script>
+
     <script type="module">
+    
+    document.addEventListener('DOMContentLoaded', () => {
+            aplicarTitulosDinamicos();
+            carregarTodasSecoesPadrao();
+        });
+        
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Inicializando formulário Caseiro (usando global-section.js)...');
         

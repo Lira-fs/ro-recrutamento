@@ -76,6 +76,9 @@
             <input type="hidden" name="formulario_id" value="candi-baba">
                 <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
                 <div id="treinamento-obrigatorio-container"></div>
+
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+                
                 <div id="dados-pessoais-container"></div>
                 <div id="contato-container"></div>
                 <div id="experiencia-container"></div>
@@ -642,9 +645,17 @@
     <script src="../../components/components.js"></script>
 
     <script src="../global-section.js"></script>
+    <script src="../config-titulos.js"></script>
 
 <!-- ✅ CONFIGURAÇÃO SUPABASE - INLINE PARA GARANTIR CARREGAMENTO -->
 <script type="module">
+
+    
+document.addEventListener('DOMContentLoaded', () => {
+    aplicarTitulosDinamicos();
+    carregarTodasSecoesPadrao();
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando formulário Babá...');
     
