@@ -225,10 +225,12 @@
         </div>
 
     <!-- JavaScript -->
-     <script type="module" src="../../components/supabase-config.js"></script>
+     
     <script src="../global-section-prop.js"></script>
     <script src="../../components/components.js"></script>
     <script src="../config-titulos.js"></script>
+    <script type="module" src="../../components/supabase-config.js"></script>
+
     <script>
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -263,100 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeSpecificSections();
     }, 500);
 });
-
-// ===================================
-// COLETA DE DADOS ESPECÍFICOS - CASEIRO
-// ===================================
-function collectSpecificFormData(form) {
-    const formData = new FormData(form);
-    
-    return {
-        cuidar_jardim: formData.get('cuidarJardim'),
-        cuidar_piscina: formData.get('cuidarPiscina'),
-        morar_residencia: formData.get('morarResidencia'),
-        saber_churrasco: formData.get('saberChurrasco'),
-        saber_drinks: formData.get('saberDrinks'),
-        perfil_desejado: formData.get('perfilDesejadoCaseiro'),
-        caracteristicas_evitar: formData.get('caracteristicasEvitarCaseiro')
-    };
-}
-
-// ===================================
-// CONFIGURAR ENVIO DO FORMULÁRIO
-// ===================================
-function setupFormSubmission() {
-    const form = document.getElementById('vagaCopeiroForm');
-    if (!form) {
-        console.error('❌ Formulário não encontrado');
-        return;
-    }
-    
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('📤 Submit do formulário de caseiro iniciado');
-        
-        // Validar termos aceitos
-        if (!isTermsAccepted()) {
-            alert('❌ Você deve aceitar os termos de serviço para continuar.');
-            return;
-        }
-        
-        // Validar campos obrigatórios
-        if (!validateRequiredFields('vagaCopeiroForm')) {
-            alert('❌ Por favor, preencha todos os campos obrigatórios.');
-            return;
-        }
-        
-        try {
-            // Coletar dados básicos
-            const basicData = collectBasicVagaFormData('vagaCopeiroForm');
-            if (!basicData) {
-                throw new Error('Erro ao coletar dados do formulário');
-            }
-            
-            // Definir tipo de formulário
-            basicData.formulario_id = 'vaga-caseiro';
-            
-            // Coletar dados específicos do caseiro
-            const specificData = collectSpecificFormData(form);
-            
-            // Montar dados finais
-            const vagaData = {
-                ...basicData,
-                dados_especificos: specificData,
-                status: 'ativa'
-            };
-            
-            console.log('📋 Dados da vaga de caseiro preparados:', vagaData);
-            
-            // Enviar para Supabase
-            const result = await submitVagaToSupabase(vagaData);
-            
-            if (result.success) {
-                console.log('✅ Vaga de caseiro cadastrada com sucesso!');
-                showSuccessModal();
-            } else {
-                console.error('❌ Erro ao cadastrar vaga:', result.error);
-                showErrorModal(result.error);
-            }
-            
-        } catch (error) {
-            console.error('❌ Erro no envio:', error);
-            showErrorModal(error.message || 'Erro desconhecido ao processar formulário');
-        }
-    });
-    
-    console.log('✅ Envio do formulário de caseiro configurado');
-}
-
-// ===================================
-// INICIALIZAR FUNCIONALIDADES ESPECÍFICAS
-// ===================================
-function initializeSpecificSections() {
-    // Não há campos condicionais específicos para caseiro
-    // Apenas log para confirmar inicialização
-    console.log('✅ Funcionalidades específicas do caseiro inicializadas');
-}
 
 // ===================================
 // FECHAR MODAL

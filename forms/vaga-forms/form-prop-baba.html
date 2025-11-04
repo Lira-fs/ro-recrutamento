@@ -251,7 +251,7 @@
                     <h2>Vaga Cadastrada com Sucesso!</h2>
                 </div>
                 <div class="modal-body">
-                    <p>Sua vaga para <strong>Copeiro</strong> foi cadastrada em nossa plataforma.</p>
+                    <p>Sua vaga para <strong>Babá</strong> foi cadastrada em nossa plataforma.</p>
                     <p>Nossa equipe analisará os candidatos disponíveis e entrará em contato em até <strong>24 horas</strong>.</p>
                     <div class="next-steps">
                         <h3>Próximos passos:</h3>
@@ -273,10 +273,12 @@
         </div>
 
     <!-- JavaScript -->
-     <script type="module" src="../../components/supabase-config.js"></script>
+     
     <script src="../global-section-prop.js"></script>
     <script src="../../components/components.js"></script>
     <script src="../config-titulos.js"></script>
+    <script type="module" src="../../components/supabase-config.js"></script>
+
     <script>
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -311,96 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeSpecificSections();
     }, 500);
 });
-
-// ===================================
-// COLETA DE DADOS ESPECÍFICOS - BABÁ
-// ===================================
-function collectSpecificFormData(form) {
-    const formData = new FormData(form);
-    
-    return {
-        quantidade_criancas: formData.get('quantidadeCriancas'),
-        idades_criancas: formData.get('idadesCriancas'),
-        formacao_necessaria: formData.get('formacaoNecessaria'),
-        cuidados_especiais: formData.get('cuidadosEspeciais'),
-        especificar_cuidados: formData.get('especificarCuidados'),
-        preparar_refeicoes: formData.get('prepararRefeicoes'),
-        dormir_trabalho: formData.get('dormirTrabalho'),
-        acompanhar_viagens: formData.get('acompanharViagens'),
-        outro_idioma: formData.get('outroIdioma'),
-        especificar_idioma: formData.get('especificarIdioma'),
-        perfil_desejado: formData.get('perfilDesejadoBaba'),
-        caracteristicas_evitar: formData.get('caracteristicasEvitarBaba')
-    };
-}
-
-// ===================================
-// CONFIGURAR ENVIO DO FORMULÁRIO
-// ===================================
-function setupFormSubmission() {
-    const form = document.getElementById('vagaCopeiroForm');
-    if (!form) {
-        console.error('❌ Formulário não encontrado');
-        return;
-    }
-    
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('📤 Submit do formulário de babá iniciado');
-        
-        // Validar termos aceitos
-        if (!isTermsAccepted()) {
-            alert('❌ Você deve aceitar os termos de serviço para continuar.');
-            return;
-        }
-        
-        // Validar campos obrigatórios
-        if (!validateRequiredFields('vagaCopeiroForm')) {
-            alert('❌ Por favor, preencha todos os campos obrigatórios.');
-            return;
-        }
-        
-        try {
-            // Coletar dados básicos
-            const basicData = collectBasicVagaFormData('vagaCopeiroForm');
-            if (!basicData) {
-                throw new Error('Erro ao coletar dados do formulário');
-            }
-            
-            // Definir tipo de formulário
-            basicData.formulario_id = 'vaga-baba';
-            
-            // Coletar dados específicos da babá
-            const specificData = collectSpecificFormData(form);
-            
-            // Montar dados finais
-            const vagaData = {
-                ...basicData,
-                dados_especificos: specificData,
-                status: 'ativa'
-            };
-            
-            console.log('📋 Dados da vaga de babá preparados:', vagaData);
-            
-            // Enviar para Supabase
-            const result = await submitVagaToSupabase(vagaData);
-            
-            if (result.success) {
-                console.log('✅ Vaga de babá cadastrada com sucesso!');
-                showSuccessModal();
-            } else {
-                console.error('❌ Erro ao cadastrar vaga:', result.error);
-                showErrorModal(result.error);
-            }
-            
-        } catch (error) {
-            console.error('❌ Erro no envio:', error);
-            showErrorModal(error.message || 'Erro desconhecido ao processar formulário');
-        }
-    });
-    
-    console.log('✅ Envio do formulário de babá configurado');
-}
 
 // ===================================
 // INICIALIZAR FUNCIONALIDADES ESPECÍFICAS - BABÁ

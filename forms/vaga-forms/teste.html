@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+        <section class="form-section">
+            <h2 class="section-title">
+                <i class="fas fa-phone"></i>
+                Contato
+            </h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="telefone">Telefone Principal <span class="required-asterisk">*</span></label>
+                    <!-- Campo visível (mascarado) - CORRIGIR O NAME -->
+                    <input type="tel" id="telefone" name="telefone_display" placeholder="(11) 99999-9999" required>
+                    <!-- Campo escondido (vai para o banco com DDI) -->
+                    <input type="hidden" id="telefone_hidden" name="telefone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp <span class="required-asterisk">*</span></label>
+                    <!-- Campo visível (mascarado) - CORRIGIR O NAME -->
+                    <input type="tel" id="whatsapp" name="whatsapp_display" placeholder="(11) 99999-9999" required>
+                    <!-- Campo escondido (vai para o banco com DDI) -->
+                    <input type="hidden" id="whatsapp_hidden" name="whatsapp">
+                </div>
+            </div>
+
+                
+                <div class="form-group full-width">
+                    <label for="email">E-mail <span class="required-asterisk">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cep" >CEP <span class="required-asterisk">*</span></label>
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" required onblur="pesquisacep(this.value);">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="uf">UF <span class="required-asterisk">*</span></label>
+                    <input type="text" id="uf" name="uf" placeholder="SP" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="cidade">Cidade <span class="required-asterisk">*</span></label>
+                    <input type="text" id="cidade" name="cidade" placeholder="Bragança Paulista" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="rua">Rua <span class="required-asterisk">*</span></label>
+                    <input type="text" id="rua" name="rua" placeholder="Rua das pitangueiras, 830" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="bairro">Bairro <span class="required-asterisk">*</span></label>
+                    <input type="text" id="bairro" name="bairro" placeholder="Rua, número, bairro, cidade, estado" required>
+                </div>
+                
+            </div>
+
+            
+                </div>
+            </div>
+        </section>
+
+        <script>
+
+    function limpa_formulario_cep() {
+            //Limpa valores do formulário de cep.
+            document.getElementById('rua').value=("");
+            document.getElementById('bairro').value=("");
+            document.getElementById('cidade').value=("");
+            document.getElementById('uf').value=("");
+    }
+
+    function meu_callback(conteudo) {
+        if (!("erro" in conteudo)) {
+            //Atualiza os campos com os valores.
+            document.getElementById('rua').value=(conteudo.logradouro);
+            document.getElementById('bairro').value=(conteudo.bairro);
+            document.getElementById('cidade').value=(conteudo.localidade);
+            document.getElementById('uf').value=(conteudo.uf);
+        } //end if.
+        else {
+            //CEP não Encontrado.
+            limpa_formulario_cep();
+            alert("CEP não encontrado.");
+        }
+    }
+      
+
+    function pesquisacep(valor) {
+
+        //Nova variável "cep" somente com dígitos.
+        var cep = valor.replace(/\D/g, '');
+
+        //Verifica se campo cep possui valor informado.
+        if (cep != "") {
+
+            //Expressão regular para validar o CEP.
+            var validacep = /^[0-9]{8}$/;
+
+            //Valida o formato do CEP.
+            if(validacep.test(cep)) {
+
+                //Preenche os campos com "..." enquanto consulta webservice.
+                document.getElementById('rua').value="...";
+                document.getElementById('bairro').value="...";
+                document.getElementById('cidade').value="...";
+                document.getElementById('uf').value="...";
+
+                //Cria um elemento javascript.
+                var script = document.createElement('script');
+
+                //Sincroniza com o callback.
+                script.src = 'https://viacep.com.br/ws/'+ cep + '/json/?callback=meu_callback';
+
+                //Insere script no documento e carrega o conteúdo.
+                document.body.appendChild(script);
+
+            } //end if.
+            else {
+                //cep é inválido.
+                limpa_formulario_cep();
+                alert("Formato de CEP inválido.");
+            }
+        } //end if.
+        else {
+            //cep sem valor, limpa formulário.
+            limpa_formulario_cep();
+        }
+};
+        </script>
+</body>
+</html>
