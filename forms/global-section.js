@@ -50,16 +50,6 @@ const secoes = {
                 </div>
                 
                 <div class="form-group">
-                    <label for="cpf">CPF <span class="required-asterisk">*</span></label>
-                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="rg">RG <span class="required-asterisk">*</span></label>
-                    <input type="text" id="rg" name="rg" required>
-                </div>
-                
-                <div class="form-group">
                     <label for="estadoCivil">Estado Civil <span class="required-asterisk">*</span></label>
                     <select id="estadoCivil" name="estadoCivil" required>
                         <option value="">Selecione</option>
@@ -162,9 +152,9 @@ const secoes = {
             
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="telefone">Telefone Principal <span class="required-asterisk">*</span></label>
+                    <label for="telefone">Telefone Principal</label>
                     <!-- Campo visível (mascarado) - CORRIGIR O NAME -->
-                    <input type="tel" id="telefone" name="telefone_display" placeholder="(11) 99999-9999" required>
+                    <input type="tel" id="telefone" name="telefone_display" placeholder="(11) 99999-9999">
                     <!-- Campo escondido (vai para o banco com DDI) -->
                     <input type="hidden" id="telefone_hidden" name="telefone">
                 </div>
@@ -181,21 +171,34 @@ const secoes = {
                 
                 <div class="form-group full-width">
                     <label for="email">E-mail <span class="required-asterisk">*</span></label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email">
                 </div>
-                
-                <div class="form-group full-width">
-                    <label for="endereco">Endereço Completo <span class="required-asterisk">*</span></label>
-                    <input type="text" id="endereco" name="endereco" placeholder="Rua, número, bairro, cidade, estado" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="cep">CEP <span class="required-asterisk">*</span></label>
-                    <input type="text" id="cep" name="cep" placeholder="00000-000" required>
-                </div>
-            </div>
 
-            
+                <div class="form-group">
+                    <label for="cep" >CEP <span class="required-asterisk">*</span></label>
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" required onblur="pesquisacep(this.value);">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="uf">UF <span class="required-asterisk">*</span></label>
+                    <input type="text" id="uf" name="uf" placeholder="SP" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="cidade">Cidade <span class="required-asterisk">*</span></label>
+                    <input type="text" id="cidade" name="cidade" placeholder="Bragança Paulista" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="bairro">Bairro <span class="required-asterisk">*</span></label>
+                    <input type="text" id="bairro" name="bairro" placeholder="São Pedro" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="rua">Rua <span class="required-asterisk">*</span></label>
+                    <input type="text" id="rua" name="rua" placeholder="Rua das pitangueiras, 830" required>
+                </div>
+
                 </div>
             </div>
         </section>
@@ -256,10 +259,7 @@ const secoes = {
             </div>
         </div>
 
-        <div class="legenda-required">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>Campos marcados com <span class="required-mark">*</span> são obrigatórios para envio do formulário.</p>
-        </div>
+
 
         <div class="turno-selection">
             <div class="form-group">
@@ -271,6 +271,11 @@ const secoes = {
                     <option value="noite">Noite (18h às 22h)</option>
                 </select>
             </div>
+        </div>
+
+        <div class="legenda-required">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Campos marcados com <span class="required-mark">*</span> são obrigatórios para envio do formulário.</p>
         </div>
 
         <div class="rejection-message">
@@ -316,11 +321,11 @@ const secoes = {
                     <label>Salário negociável?</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="negociavel" value="nao" required>
+                            <input type="radio" name="negociavel" value="nao">
                             <span>Não</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="negociavel" value="sim" required>
+                            <input type="radio" name="negociavel" value="sim">
                             <span>Sim</span>
                         </label>
                     </div>
@@ -363,15 +368,15 @@ const secoes = {
                     <label>Disponibilidade para eventos noturnos?</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="eventosNoturnos" value="sim" required>
+                            <input type="radio" name="eventosNoturnos" value="sim" >
                             <span>Sim</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="eventosNoturnos" value="nao" required>
+                            <input type="radio" name="eventosNoturnos" value="nao" >
                             <span>Não</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="eventosNoturnos" value="ocasionalmente" required>
+                            <input type="radio" name="eventosNoturnos" value="ocasionalmente" >
                             <span>Ocasionalmente</span>
                         </label>
                     </div>
@@ -518,19 +523,7 @@ const secoes = {
                     <h2 class="section-title">
                         <i class="fas fa-briefcase"></i> Experiência Profissional
                     </h2>
-                    
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="tempoExperiencia">Tempo total de experiência como copeiro <span class="required-asterisk">*</span></label>
-                            <select id="tempoExperiencia" name="tempoExperiencia" required>
-                                <option value="">Selecione</option>
-                                <option value="1-2-anos">1-2 anos</option>
-                                <option value="2-3-anos">2-3 anos</option>
-                                <option value="3-5-anos">3-5 anos</option>
-                                <option value="5-10-anos">5-10 anos</option>
-                                <option value="mais-10-anos">Mais de 10 anos</option>
-                            </select>
-                        </div>
+                
                         
                         <div class="form-group">
                             <label>Experiência em residência de alto padrão?</label>
@@ -575,10 +568,23 @@ const secoes = {
                                     <input type="text" id="ultimoEmpregoSalario" name="ultimoEmpregoSalario" placeholder="Ex: R$ 2.500,00">
                                 </div>
                             </div>
+
+                                                <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="tempoExperiencia">Tempo total de experiência  <span class="required-asterisk">*</span></label>
+                            <select id="tempoExperiencia" name="tempoExperiencia" required>
+                                <option value="">Selecione</option>
+                                <option value="1-2-anos">1-2 anos</option>
+                                <option value="2-3-anos">2-3 anos</option>
+                                <option value="3-5-anos">3-5 anos</option>
+                                <option value="5-10-anos">5-10 anos</option>
+                                <option value="mais-10-anos">Mais de 10 anos</option>
+                            </select>
+                        </div>
                             
                             <div class="form-group full-width">
-                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas <span class="required-asterisk">*</span></label>
-                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." required></textarea>
+                                <label for="ultimoEmpregoAtividades">Principais atividades desenvolvidas</label>
+                                <textarea id="ultimoEmpregoAtividades" name="ultimoEmpregoAtividades" rows="3" placeholder="Descreva as principais atividades que você realizava no seu último emprego..." ></textarea>
                             </div>
                             
                             <div class="form-group full-width">
@@ -833,6 +839,74 @@ function configurarMascaraCEP() {
         });
     }
 }
+
+/* Funções para preenchimento automático de endereço */
+
+function limpa_formulario_cep() {
+            //Limpa valores do formulário de cep.
+            document.getElementById('rua').value=("");
+            document.getElementById('bairro').value=("");
+            document.getElementById('cidade').value=("");
+            document.getElementById('uf').value=("");
+    }
+
+function meu_callback(conteudo) {
+    if (!("erro" in conteudo)) {
+        //Atualiza os campos com os valores.
+        document.getElementById('rua').value=(conteudo.logradouro);
+        document.getElementById('bairro').value=(conteudo.bairro);
+        document.getElementById('cidade').value=(conteudo.localidade);
+        document.getElementById('uf').value=(conteudo.uf);
+    } //end if.
+    else {
+        //CEP não Encontrado.
+        limpa_formulario_cep();
+        alert("CEP não encontrado.");
+    }
+}
+      
+
+function pesquisacep(valor) {
+
+    //Nova variável "cep" somente com dígitos.
+    var cep = valor.replace(/\D/g, '');
+
+    //Verifica se campo cep possui valor informado.
+    if (cep != "") {
+
+        //Expressão regular para validar o CEP.
+        var validacep = /^[0-9]{8}$/;
+
+        //Valida o formato do CEP.
+        if(validacep.test(cep)) {
+
+            //Preenche os campos com "..." enquanto consulta webservice.
+            document.getElementById('rua').value="Carregando...";
+            document.getElementById('bairro').value="Carregando...";
+            document.getElementById('cidade').value="Carregando...";
+            document.getElementById('uf').value="Carregando...";
+
+            //Cria um elemento javascript.
+            var script = document.createElement('script');
+
+            //Sincroniza com o callback.
+            script.src = 'https://viacep.com.br/ws/'+ cep + '/json/?callback=meu_callback';
+
+            //Insere script no documento e carrega o conteúdo.
+            document.body.appendChild(script);
+
+        } //end if.
+        else {
+            //cep é inválido.
+            limpa_formulario_cep();
+            alert("Formato de CEP inválido.");
+        }
+    } //end if.
+    else {
+        //cep sem valor, limpa formulário.
+        limpa_formulario_cep();
+    }
+};
 
 /**
  * Configura campos condicionais da CNH

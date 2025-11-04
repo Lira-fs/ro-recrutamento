@@ -135,37 +135,12 @@ const ownerFormSections = {
             
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="nome">Nome <span class="required-asterisk">*</span></label>
-                    <input type="text" id="nome" name="nome" required>
+                    <label for="nome">Nome Completo<span class="required-asterisk">*</span></label>
+                    <input type="text" id="nomeCompleto" name="nomeCompleto" required>
                 </div>
-                
-                <div class="form-group">
-                    <label for="sobrenome">Sobrenome <span class="required-asterisk">*</span></label>
-                    <input type="text" id="sobrenome" name="sobrenome" required>
-                </div>
-                
-                <div class="form-group full-width">
-                    <label for="email">E-mail <span class="required-asterisk">*</span></label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="cidade">Cidade <span class="required-asterisk">*</span></label>
-                    <input type="text" id="cidade" name="cidade" placeholder="Ex: São Paulo" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="condominio">Condomínio</label>
-                    <input type="text" id="condominio" name="condominio" placeholder="Nome do condomínio (se houver)">
-                </div>
-                
-                <div class="form-group full-width">
-                    <label for="ruaNumero">Rua e Número <span class="required-asterisk">*</span></label>
-                    <input type="text" id="ruaNumero" name="ruaNumero" placeholder="Ex: Rua das Flores, 123" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="telefonePrincipal">Telefone Principal <span class="required-asterisk">*</span></label>
+
+                 <div class="form-group">
+                    <label for="telefonePrincipal">Telefone Principal <i>(whatsapp)</i> <span class="required-asterisk">*</span></label>
                     <input type="tel" id="telefonePrincipal" name="telefonePrincipal" placeholder="(11) 99999-9999" required>
                 </div>
                 
@@ -173,6 +148,27 @@ const ownerFormSections = {
                     <label for="telefoneOpcional">Telefone Adicional</label>
                     <input type="tel" id="telefoneOpcional" name="telefoneOpcional" placeholder="(11) 99999-9999">
                 </div>
+                
+                <div class="form-group full-width">
+                    <label for="email">E-mail <span class="required-asterisk">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+            
+                <div class="form-group full-width">
+                    <label for="condominio">Condomínio</label>
+                    <input type="text" id="condominio" name="condominio" placeholder="Nome do condomínio">
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="ruaNumero">Alameda e Número <span class="required-asterisk">*</span></label>
+                    <input type="text" id="ruaNumero" name="ruaNumero" placeholder="Ex: Alameda das Flores, 123" required>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="cidade">Cidade <span class="required-asterisk">*</span></label>
+                    <input type="text" id="cidade" name="cidade" placeholder="Ex: São Paulo" required>
+                </div>
+                
             </div>
         </section>
     `,
@@ -204,11 +200,11 @@ const ownerFormSections = {
                         <label>Frequência de uso da casa de veraneio</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="frequenciaVeraneio" value="todos-fins-semana" required>
+                                <input type="radio" name="frequenciaVeraneio" value="todos-fins-semana">
                                 <span>Todos os fins de semana</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="frequenciaVeraneio" value="pelo-menos-3" required>
+                                <input type="radio" name="frequenciaVeraneio" value="pelo-menos-3">
                                 <span>Pelo menos 3 fins de semana por mês</span>
                             </label>
                             <label class="radio-label">
@@ -339,15 +335,15 @@ const ownerFormSections = {
                     <label>Necessidade de condução própria?</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="conducaoPropria" value="sim" required>
+                            <input type="radio" name="conducaoPropria" value="sim" >
                             <span>Sim</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="conducaoPropria" value="nao" required>
+                            <input type="radio" name="conducaoPropria" value="nao" >
                             <span>Não</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="conduca   oPropria" value="desejavel" required>
+                            <input type="radio" name="conduca   oPropria" value="desejavel">
                             <span>Desejável</span>
                         </label>
                     </div>
@@ -724,135 +720,410 @@ function checkSupabaseConnection() {
 // Substitua completamente no global-section-prop.js
 // ===================================
 
-function collectBasicVagaFormData(formId) {
-    console.log('📝 Coletando dados básicos do formulário:', formId);
-    
-    const form = document.getElementById(formId);
-    if (!form) {
-        console.error('❌ Formulário não encontrado:', formId);
-        return null;
-    }
+/**
+ * Coleta dados do formulário de vaga
+ * @param {HTMLFormElement} form - Elemento do formulário
+ * @returns {Object} Dados coletados
+ */
+function collectSpecificFormData (form) {
+    console.log('📋 Coletando dados do formulário...');
     
     const formData = new FormData(form);
-    const data = {};
+    const dados = {};
     
-    // 🔥 MAPEAMENTO CORRETO HTML -> BANCO
-    const fieldMapping = {
-        // Dados do proprietário
-        'nome': 'nome',
-        'sobrenome': 'sobrenome', 
-        'email': 'email',
-        'cidade': 'cidade',
-        'condominio': 'condominio',
-        'ruaNumero': 'rua_numero',
-        'telefonePrincipal': 'telefone_principal',
-        'telefoneOpcional': 'telefone_opcional',
+    // Coletar TODOS os campos do FormData
+    for (let [key, value] of formData.entries()) {
+        // Se já existe, transformar em array (checkboxes múltiplos)
+        if (dados[key]) {
+            if (Array.isArray(dados[key])) {
+                dados[key].push(value);
+            } else {
+                dados[key] = [dados[key], value];
+            }
+        } else {
+            dados[key] = value;
+        }
+    }
+    
+    // Coletar arrays explicitamente (caso não venham no FormData)
+    const beneficiosCheckboxes = form.querySelectorAll('input[name="beneficios"]:checked');
+    if (beneficiosCheckboxes.length > 0) {
+        dados.beneficios = Array.from(beneficiosCheckboxes).map(cb => cb.value);
+    }
+    
+    const horarioContatoCheckboxes = form.querySelectorAll('input[name="horarioContato"]:checked');
+    if (horarioContatoCheckboxes.length > 0) {
+        dados.horarioContato = Array.from(horarioContatoCheckboxes).map(cb => cb.value);
+    }
+    
+    console.log('✅ Dados coletados:', dados);
+    return dados;
+}
+
+/**
+ * Estrutura dados de vaga para Supabase (FORMATO HÍBRIDO)
+ * @param {Object} formData - Dados brutos do formulário
+ * @returns {Object} Dados estruturados para o banco
+ */
+function estruturarDadosVaga(formData) {
+    console.log('🗂️ Estruturando dados de vaga...');
+    
+    const formularioId = formData.formulario_id || formData.formularioId;
+    
+    // CASAL tem estrutura especial
+    if (formularioId === 'vaga-casal') {
+        return estruturarDadosVagaCasal(formData);
+    }
+    
+    // OUTRAS VAGAS (padrão)
+    return {
+        // ===== COLUNAS FIXAS =====
+        formulario_id: formularioId,
+        nome: formData.nome,
+        sobrenome: formData.sobrenome,
+        email: formData.email,
+        telefone_principal: limparTelefone(formData.telefonePrincipal),
+        telefone_opcional: limparTelefone(formData.telefoneOpcional) || null,
         
-        // Características da residência
-        'tipoResidencia': 'tipo_residencia',
-        'frequenciaVeraneio': 'frequencia_veraneio',
-        'temPets': 'tem_pets',
-        'tiposPets': 'tipos_pets', 
-        'cuidadosPets': 'cuidados_pets',
-        'estiloCasa': 'estilo_casa',
+        cidade: formData.cidade,
+        condominio: formData.condominio || null,
+        rua_numero: formData.ruaNumero || null,
         
-        // Detalhes da vaga
-        'inicioUrgente': 'inicio_urgente',
-        'regimeTrabalho': 'regime_trabalho',
-        'folgasSemana': 'folgas_semana',
-        'horarioTrabalho': 'horario_trabalho',
-        'horarioFimSemana': 'horario_fim_semana',
-        'fimSemanaMensalFolga': 'fim_semana_mensal_folga',
-        'dormirTrabalho': 'dormir_trabalho',
-        'restricoesVaga': 'restricoes_vaga',
+        salario_oferecido: limparSalario(formData.salarioOferecido),
+        regime_trabalho: formData.regimeTrabalho || null,
+        inicio_urgente: formData.inicioUrgente === 'imediato',
         
-        // Oferta salarial
-        'salarioOferecido': 'salario_oferecido',
-        'outrosBeneficios': 'outros_beneficios',
+        folgas_semana: formData.folgasSemana || null,
+        horario_trabalho: formData.horarioTrabalho || null,
+        horario_fim_semana: formData.horarioFimSemana || null,
+        fim_semana_mensal_folga: formData.fimSemanaMensalFolga || null,
+        dormir_trabalho: formData.dormirTrabalho || null,
         
-        // Requisitos básicos
-        'cnhObrigatoria': 'cnh_obrigatoria',
-        'experienciaObrigatoria': 'experiencia_obrigatoria', 
-        'experienciaMinima': 'experiencia_minima',
-        'temIdadeMinima': 'tem_idade_minima',
-        'idadeMinima': 'idade_minima',
-        'referenciasObrigatorias': 'referencias_obrigatorias',
+        tipo_residencia: formData.tipoResidencia || null,
+        frequencia_veraneio: formData.frequenciaVeraneio || null,
+        estilo_casa: formData.estiloCasa || null,
+        tem_pets: formData.temPets === 'sim',
+        tipos_pets: formData.tiposPets || null,
+        cuidados_pets: formData.cuidadosPets || null,
         
-        // Observações e treinamento
-        'interesseTreinamento': 'interesse_treinamento',
-        'observacoes': 'observacoes',
-        'contatoPreferido': 'contato_preferido',
+        cnh_obrigatoria: formData.cnhObrigatoria || null,
+       experiencia_obrigatoria: formData.experienciaObrigatoria || null,
+        experiencia_minima: formData.experienciaMinima || null,
+        tem_idade_minima: formData.temIdadeMinima === 'sim',
+        idade_minima: formData.idadeMinima || null,
+        referencias_obrigatorias: formData.referenciasObrigatorias || null,
         
-        // Aceitar termos
-        'aceitaTermos': 'aceita_termos'
+        beneficios: formData.beneficios || [],
+        outros_beneficios: formData.outrosBeneficios || null,
+        
+        interesse_treinamento: formData.interesseTreinamento || null,
+        restricoes_vaga: formData.restricoesVaga || null,
+        observacoes: formData.observacoes || null,
+        observacoes_adicionais: formData.observacoesAdicionais || null,
+        
+        contato_preferido: formData.contatoPreferido || null,
+        horario_contato: formData.horarioContato || [],
+        
+        status_detalhado: 'ativa',
+        
+        // ===== JSONB: dados_residencia =====
+        dados_residencia: {
+            tipo_residencia: formData.tipoResidencia || null,
+            frequencia_veraneio: formData.frequenciaVeraneio || null,
+            estilo_casa: formData.estiloCasa || null,
+            tem_pets: formData.temPets === 'sim',
+            tipos_pets: formData.tiposPets || null,
+            cuidados_pets: formData.cuidadosPets || null
+        },
+        
+        // ===== JSONB: dados_especificos =====
+        dados_especificos: extrairDadosEspecificosVaga(formData, formularioId)
     };
+}
+
+/**
+ * Extrai dados específicos por tipo de vaga
+ * @param {Object} formData - Dados do formulário
+ * @param {String} formularioId - Tipo da vaga
+ * @returns {Object} Dados específicos
+ */
+function extrairDadosEspecificosVaga(formData, formularioId) {
+    // Campos universais (NÃO vão para dados_especificos)
+    const camposUniversais = [
+        'formulario_id', 'formularioId', 'nome', 'sobrenome', 'email',
+        'telefonePrincipal', 'telefoneOpcional', 'cidade', 'condominio',
+        'ruaNumero', 'salarioOferecido', 'regimeTrabalho', 'inicioUrgente',
+        'folgasSemana', 'horarioTrabalho', 'horarioFimSemana', 'fimSemanaMensalFolga',
+        'dormirTrabalho', 'tipoResidencia', 'frequenciaVeraneio', 'estiloCasa',
+        'temPets', 'tiposPets', 'cuidadosPets', 'cnhObrigatoria',
+        'experienciaObrigatoria', 'experienciaMinima', 'temIdadeMinima', 'idadeMinima',
+        'referenciasObrigatorias', 'beneficios', 'outrosBeneficios',
+        'interesseTreinamento', 'restricoesVaga', 'observacoes', 'observacoesAdicionais',
+        'contatoPreferido', 'horarioContato', 'aceitaTermos'
+    ];
     
-    // Coletar campos com mapeamento
-    Object.keys(fieldMapping).forEach(htmlName => {
-        const dbName = fieldMapping[htmlName];
-        const value = formData.get(htmlName);
-        if (value !== null && value !== '') {
-            data[dbName] = value;
+    const especificos = {};
+    
+    for (let [key, value] of Object.entries(formData)) {
+        if (!camposUniversais.includes(key) && value !== null && value !== '') {
+            // Converter camelCase → snake_case
+            const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+            especificos[snakeKey] = value;
+        }
+    }
+    
+    return especificos;
+}
+
+/**
+ * Estrutura especial para VAGA DE CASAL
+ * @param {Object} formData - Dados do formulário
+ * @returns {Object} Dados estruturados
+ */
+function estruturarDadosVagaCasal(formData) {
+    return {
+        formulario_id: 'vaga-casal',
+        nome: formData.nome,
+        sobrenome: formData.sobrenome,
+        email: formData.email,
+        telefone_principal: limparTelefone(formData.telefonePrincipal),
+        telefone_opcional: limparTelefone(formData.telefoneOpcional) || null,
+        
+        cidade: formData.cidade,
+        condominio: formData.condominio || null,
+        rua_numero: formData.ruaNumero || null,
+        
+        salario_oferecido: limparSalario(formData.salarioOferecido),
+        regime_trabalho: formData.regimeTrabalho || null,
+        inicio_urgente: formData.inicioUrgente === 'imediato',
+        
+        status_detalhado: 'ativa',
+        
+        // JSONB: dados_casal
+        dados_casal: {
+            ele_cuidar_jardim: formData.eleCuidarJardim || null,
+            ele_cuidar_piscina: formData.eleCuidarPiscina || null,
+            ele_saber_churrasco: formData.eleSaberChurrasco || null,
+            ele_saber_drinks: formData.eleSaberDrinks || null,
+            ele_saber_pizza: formData.eleSaberPizza || null,
+            
+            ela_saber_cozinhar: formData.elaSaberCozinhar || null,
+            nivel_culinaria_casal: formData.nivelCulinariaCasal || null,
+            ela_lavar_passar: formData.elaLavarPassar || null,
+            ela_limpeza_geral: formData.elaLimpezaGeral || null,
+            
+            casal_morar_residencia: formData.casalMorarResidencia || null,
+            casal_dormir_fim_semana: formData.casalDormirFimSemana || null,
+            
+            perfil_desejado_ele: formData.perfilDesejadoEle || null,
+            perfil_desejado_ela: formData.perfilDesejadoEla || null,
+            perfil_desejado_casal: formData.perfilDesejadoCasal || null,
+            caracteristicas_evitar_casal: formData.caracteristicasEvitarCasal || null
+        },
+        
+        // JSONB: dados_residencia
+        dados_residencia: {
+            tipo_residencia: formData.tipoResidencia || null,
+            frequencia_veraneio: formData.frequenciaVeraneio || null,
+            tem_pets: formData.temPets === 'sim',
+            tipos_pets: formData.tiposPets || null
+        },
+        
+        // JSONB: dados_especificos (outros campos não mapeados)
+        dados_especificos: extrairDadosEspecificosVaga(formData, 'vaga-casal')
+    };
+}
+
+/**
+ * Envia vaga para Supabase
+ * @param {Object} dados - Dados estruturados
+ * @returns {Promise} Resultado do envio
+ */
+async function enviarVagaSupabase(dados) {
+    console.log('📤 Enviando vaga para Supabase...');
+    
+    if (!window.supabase) {
+        throw new Error('Supabase não inicializado');
+    }
+    
+    const { data, error } = await window.supabase
+        .from('vagas')
+        .insert([dados])
+        .select();
+    
+    if (error) {
+        console.error('❌ Erro Supabase:', error);
+        throw new Error(error.message);
+    }
+    
+    console.log('✅ Vaga salva:', data);
+    return data;
+}
+
+/**
+ * Remove required de campos escondidos
+ * @param {HTMLFormElement} form - Formulário
+ */
+function ajustarCamposCondicionais(form) {
+    // Encontrar todos os campos required
+    const camposRequired = form.querySelectorAll('[required]');
+    
+    camposRequired.forEach(campo => {
+        // Se o campo está escondido (ou pai está escondido)
+        const estaVisivel = campo.offsetParent !== null;
+        
+        if (!estaVisivel) {
+            // Remover required temporariamente
+            campo.removeAttribute('required');
+            campo.setAttribute('data-was-required', 'true');
+            console.log('⚠️ Required removido de campo escondido:', campo.name);
         }
     });
+}
+
+/**
+ * Processa envio completo de vaga
+ * @param {HTMLFormElement} form - Formulário
+ */
+async function processarEnvioVaga(form) {
+    console.log('📤 Processando envio de vaga...');
     
-    // 🔥 COLETAR ARRAYS (checkboxes múltiplos)
-    data.beneficios = collectArrayFields(form, 'beneficios');
-    data.horario_contato = collectArrayFields(form, 'horarioContato');
-    
-    // 🔥 CONVERSÕES PARA BOOLEAN
-    data.tem_pets = data.tem_pets === 'sim';
-    data.tem_idade_minima = data.tem_idade_minima === 'sim'; 
-    data.aceita_termos = data.aceita_termos === 'sim';
-    
-    // 🔥 LIMPEZA DE FORMATAÇÃO
-    data.telefone_principal = cleanPhoneFormat(data.telefone_principal);
-    data.telefone_opcional = cleanPhoneFormat(data.telefone_opcional);
-    data.salario_oferecido = cleanSalaryFormat(data.salario_oferecido);
-    
-    // 🔥 VALIDAÇÕES CRÍTICAS
-    if (!data.nome) {
-        console.error('❌ Nome é obrigatório');
-        return null;
+    try {
+
+        ajustarCamposCondicionais(form);
+
+        // 1. Validações
+        if (!validarFormularioVaga(form)) return;
+        
+        // 2. Loading (se existir)
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        }
+        
+        // 3. Coletar
+        const dadosFormulario = collectSpecificFormData (form);
+        console.log('📋 Dados coletados:', dadosFormulario);
+        
+        // 4. Estruturar
+        const dadosEstruturados = estruturarDadosVaga(dadosFormulario);
+        console.log('📊 Dados estruturados:', dadosEstruturados);
+        
+        // 5. Enviar
+        await enviarVagaSupabase(dadosEstruturados);
+        
+        // 6. Sucesso
+        mostrarModalSucessoVaga(dadosFormulario.formulario_id || dadosFormulario.formularioId);
+        
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        alert(`❌ Erro ao cadastrar vaga: ${error.message}\n\nTente novamente.`);
+    } finally {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Cadastrar Vaga';
+        }
+    }
+}
+
+/**
+ * Valida formulário de vaga
+ * @param {HTMLFormElement} form - Formulário
+ * @returns {Boolean}
+ */
+function validarFormularioVaga(form) {
+    // Termos aceitos
+    if (!isTermsAccepted()) {
+        alert('❌ Você deve aceitar os termos de serviço.');
+        return false;
     }
     
-    if (!data.sobrenome) {
-        console.error('❌ Sobrenome é obrigatório');
-        return null;
+    // Campos obrigatórios
+    const invalidos = form.querySelectorAll(':invalid');
+    if (invalidos.length > 0) {
+        alert('❌ Preencha todos os campos obrigatórios.');
+        invalidos[0].focus();
+        return false;
     }
     
-    if (!data.email) {
-        console.error('❌ Email é obrigatório');
-        return null;
-    }
+    return true;
+}
+
+/**
+ * Modal de sucesso para vagas
+ * @param {String} formularioId - Tipo de vaga
+ */
+function mostrarModalSucessoVaga(formularioId) {
+    const nomes = {
+        'vaga-baba': 'Babá',
+        'vaga-caseiro': 'Caseiro(a)',
+        'vaga-copeiro': 'Copeiro(a)',
+        'vaga-cozinheira': 'Cozinheira(o)',
+        'vaga-governanta': 'Governanta',
+        'vaga-arrumadeira': 'Arrumadeira',
+        'vaga-casal': 'Casal de Caseiros'
+    };
     
-    if (!data.aceita_termos) {
-        console.error('❌ Aceitar termos é obrigatório');
-        return null;
-    }
+    const nome = nomes[formularioId] || 'Profissional';
     
-    console.log('✅ Dados básicos coletados:', data);
-    return data;
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    } else {
+        alert(`✅ Vaga de ${nome} cadastrada com sucesso!\n\nEntraremos em contato em breve.`);
+        setTimeout(() => {
+            window.location.href = '../../index.html';
+        }, 2000);
+    }
+}
+
+/**
+ * Inicializar sistema de envio de vagas
+ */
+function inicializarSistemaEnvioVagas() {
+    console.log('🚀 Inicializando sistema de envio de vagas...');
+    
+    const forms = document.querySelectorAll('form[id*="vaga"], form[id*="Vaga"]');
+    
+    forms.forEach(form => {
+        if (form.hasAttribute('data-envio-configurado')) return;
+        
+        form.setAttribute('data-envio-configurado', 'true');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await processarEnvioVaga(form);
+        });
+    });
+    
+    console.log(`✅ ${forms.length} formulário(s) de vaga configurados`);
+}
+
+// Funções auxiliares
+function limparTelefone(tel) {
+    if (!tel) return null;
+    return tel.replace(/\D/g, '');
+}
+
+function limparSalario(sal) {
+    if (!sal) return null;
+    return parseFloat(sal.replace(/[^\d,]/g, '').replace(',', '.'));
+}
+
+// Auto-inicializar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarSistemaEnvioVagas);
+} else {
+    inicializarSistemaEnvioVagas();
 }
 
 // ===================================
 // CORREÇÃO: Script da Arrumadeira
 // Também precisa ser atualizado
 // ===================================
-
-function collectSpecificFormData(form) {
-    const formData = new FormData(form);
-    
-    const specificData = {
-        organizacao_closet: formData.get('organizacaoCloset'),
-        lavar_passar: formData.get('lavarPassar'),
-        perfil_desejado: formData.get('perfilDesejadoArrumadeira'),
-        caracteristicas_evitar: formData.get('caracteristicasEvitarArrumadeira')
-    };
-    
-    console.log('📋 Dados específicos da arrumadeira:', specificData);
-    return specificData;
-}
 
 function collectArrayFields(form, fieldName) {
     const checkboxes = form.querySelectorAll(`input[name="${fieldName}"]:checked`);
