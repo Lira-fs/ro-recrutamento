@@ -1,0 +1,28 @@
+# ============================================
+# R.O RECRUTAMENTO - DEPENDÊNCIAS DO PROJETO
+# ============================================
+
+# ===== BANCO DE DADOS =====
+supabase>=2.0.0
+
+# ReportLab (fallback para Windows)
+reportlab>=4.0.0
+
+# Templates
+jinja2>=3.1.2
+
+# ===== GOOGLE DRIVE API =====
+google-api-python-client>=2.108.0
+google-auth>=2.25.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
+# ===== UTILIDADES =====
+pandas>=2.0.0
+pillow>=10.0.0
+pytz>=2024.1
+
+# ===== OPCIONAL - AGENDAMENTO DE BACKUPS =====
+schedule>=1.2.0
+apscheduler>=3.10.4
+

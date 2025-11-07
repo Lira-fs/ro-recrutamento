@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Candidato - Governanta | R.O Recrutamento</title>
+    <meta name="description" content="Cadastre-se como governanta na R.O Recrutamento. Formulário para profissionais qualificados em gestão e organização de residências de alto padrão.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS - CAMINHOS CORRETOS -->
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/form-style.css">
+
+    <style>
+        .alto-padrao-details,
+        .equipes-details,
+        .outros-residencia,
+        .outros-certificacoes,
+        .eventos-details,
+        .restricao-details,
+        .alergia-details,
+        .ref1-outro,
+        .ref2-outro {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Mostrar campos quando ativados */
+        .alto-padrao-details.show,
+        .equipes-details.show,
+        .outros-residencia.show,
+        .outros-certificacoes.show,
+        .eventos-details.show,
+        .restricao-details.show,
+        .alergia-details.show,
+        .ref1-outro.show,
+        .ref2-outro.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+</style>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Formulário Principal -->
+    <main class="form-main">
+        <div class="container">
+            <form id="formGovernanta" class="candidate-form">
+                <input type="hidden" name="formulario_id" value="candi-governanta">
+                
+                <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
+                <div id="treinamento-obrigatorio-container"></div>
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+
+                <div id="dados-pessoais-container"></div>
+                <div id="contato-container"></div>
+                <div id="experiencia-container"></div>
+                <section class="form-section">
+                    <div class="form-group">
+                        <h2 class="section-title">
+                        <i class="fas fa-person"></i>
+                        Mais um pouco sobre seu trabalho
+                        </h2>
+                            <label>Já coordenou equipes domésticas?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="coordenouEquipes" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="coordenouEquipes" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="equipes-details">
+                            <div class="form-group">
+                                <label for="tamanhoEquipe">Tamanho da equipe coordenada</label>
+                                <input type="text" id="tamanhoEquipe" name="tamanhoEquipe" placeholder="Ex: 5 pessoas">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Ja foi responsável por rotina da casa?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="responRotinaCompras" value="nao" required>
+                                    <span>Não</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="responRotinaCompras" value="sim" required>
+                                    <span>Sim</span>
+                                </label>
+                            </div>
+                        </div><br>
+
+                    <div class="form-group full-width">
+                        <label>Tipos de residência onde trabalhou (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="nenhuma">
+                                <span>Nenhuma antes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="apartamentos">
+                                <span>Apartamentos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="casas-campo">
+                                <span>Casas de campo</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="mansoes-urbanas">
+                                <span>Mansões urbanas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="coberturas">
+                                <span>Coberturas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposResidencia" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-residencia">
+                            <div class="form-group">
+                                <label for="outrosResidenciaEspecificar">Especificar outros tipos de residência</label>
+                                <input type="text" id="outrosResidenciaEspecificar" name="outrosResidenciaEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <div id="referencias-container"></div>
+                
+                
+                <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS TÉCNICAS GOVERNANTA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-crown"></i>
+                        Competências Técnicas - Governanta
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="organizacaoLideranca">Organização e liderança de equipe doméstica</label>
+                            <select id="organizacaoLideranca" name="organizacaoLideranca">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="controleEstoque">Controle de estoque e compras</label>
+                            <select id="controleEstoque" name="controleEstoque">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="organizacaoRotina">Organização de rotina e cronograma da casa</label>
+                            <select id="organizacaoRotina" name="organizacaoRotina">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="atendimentoMoradores">Atendimento a moradores e hóspedes</label>
+                            <select id="atendimentoMoradores" name="atendimentoMoradores">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="planejamentoRefeicoes">Planejamento de refeições</label>
+                            <select id="planejamentoRefeicoes" name="planejamentoRefeicoes">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="etiquetaProtocolo">Etiqueta e protocolo social</label>
+                            <select id="etiquetaProtocolo" name="etiquetaProtocolo">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="preparacaoEventos">Preparação de casa para eventos e visitas</label>
+                            <select id="preparacaoEventos" name="preparacaoEventos">
+                                <option value="">Selecione</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - CERTIFICAÇÕES RELEVANTES -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        Certificações Relevantes
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Possui certificações ou cursos relevantes? (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="governanca">
+                                <span>Governança</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="hotelaria">
+                                <span>Hotelaria</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="personal-organizer">
+                                <span>Personal Organizer</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="primeiros-socorros">
+                                <span>Primeiros Socorros</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="gestao-pessoas">
+                                <span>Gestão de Pessoas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-certificacoes">
+                            <div class="form-group">
+                                <label for="outrosCertificacoesEspecificar">Especificar outras certificações</label>
+                                <input type="text" id="outrosCertificacoesEspecificar" name="outrosCertificacoesEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - PERFIL E POSTURA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-tie"></i>
+                        Perfil e Postura
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="organizaEquipe">Como você organiza a equipe e lida com conflitos?</label>
+                        <textarea id="organizaEquipe" name="organizaEquipe" rows="4" placeholder="Descreva sua abordagem para organizar equipes e resolver conflitos..."></textarea>
+                    </div><br>
+
+                    <div class="form-group">
+                        <label>Já participou da organização de eventos sociais? <i>(residênciais ou corporativos)</i></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="participouEventos" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="participouEventos" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="eventos-details">
+                        <div class="form-group full-width">
+                            <label for="descricaoEventos">Descreva sua experiência com eventos sociais</label>
+                            <textarea id="descricaoEventos" name="descricaoEventos" rows="3" placeholder="Descreva os tipos de eventos que já organizou ou participou da organização..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="disponibilidade-container"></div>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="pretensoes-condicoes-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - SAÚDE E BEM-ESTAR -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informações Complementares:
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Alguma restrição de saúde?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="restricao-details">
+                        <div class="form-group">
+                            <label for="especificarRestricao">Especifique a restrição de saúde</label>
+                            <input type="text" id="especificarRestricao" name="especificarRestricao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fuma?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Consome bebidas alcoólicas?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="socialmente" required>
+                                <span>Socialmente</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
+                        <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - EXPECTATIVAS E DIFERENCIAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-star"></i>
+                        Expectativas e Diferenciais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="porquePessoaCerta">Por que você acredita ser a pessoa certa para essa função?</label>
+                        <textarea id="porquePessoaCerta" name="porquePessoaCerta" rows="4" placeholder="Descreva por que você é a candidata ideal para a função de governanta..."></textarea>
+                    </div><br>
+
+                    <div class="form-group full-width">
+                        <label for="diferencialGovernanta">O que considera ser seu diferencial como governanta?</label>
+                        <textarea id="diferencialGovernanta" name="diferencialGovernanta" rows="4" placeholder="Descreva seus principais diferenciais profissionais..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Botão de Envio -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura
+                    </button>
+                    <p style="margin-top: var(--spacing-md); color: var(--text-muted); font-size: 0.9rem;">
+                        Ao enviar este formulário, você concorda com o processamento de seus dados pessoais conforme nossa política de privacidade.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="../../components/components.js"></script>
+    <script src="../../js/global-section.js"></script>
+    <script src="../../js/config-titulos.js"></script>
+
+<script type="module">
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Aplicar títulos dinâmicos
+        aplicarTitulosDinamicos();
+        
+        // Carregar seções universais
+        carregarTodasSecoesPadrao();
+    });
+
+// ===== APENAS OS CAMPOS ESPECÍFICOS DA GOVERNANTA =====
+function initializeGovernantaSpecificFields() {
+    console.log('🔧 Configurando campos específicos da governanta...');
+    
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA CHECKBOXES "OUTROS"
+    const setupConditionalCheckbox = (groupName, targetClass, triggerValue = 'outros') => {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value === triggerValue) {
+                    checkbox.addEventListener('change', function() {
+                        targetDiv.classList.toggle('show', this.checked);
+                    });
+                }
+            });
+        }
+    };
+
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA RADIO BUTTONS
+    const setupConditionalRadio = (radioName, targetClass, showValue = 'sim') => {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    targetDiv.classList.toggle('show', this.value === showValue);
+                });
+            });
+        }
+    };
+
+    // ✅ CONFIGURAR TODOS OS CAMPOS ESPECÍFICOS DA GOVERNANTA
+    setupConditionalCheckbox('tiposResidencia', 'outros-residencia');
+    setupConditionalCheckbox('certificacoes', 'outros-certificacoes');
+    
+    setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
+    setupConditionalRadio('coordenouEquipes', 'equipes-details');
+    setupConditionalRadio('possuiReferencias', 'referencias-section');
+    setupConditionalRadio('participouEventos', 'eventos-details');
+    setupConditionalRadio('restricaoSaude', 'restricao-details');
+    setupConditionalRadio('alergiaLimpeza', 'alergia-details');
+
+    // ✅ REFERÊNCIAS "OUTRO"
+    ['ref1Relacao', 'ref2Relacao'].forEach(selectId => {
+        const select = document.getElementById(selectId);
+        const targetDiv = document.querySelector(`.${selectId.replace('Relacao', '-outro')}`);
+        
+        if (select && targetDiv) {
+            select.addEventListener('change', function() {
+                targetDiv.classList.toggle('show', this.value === 'outro');
+            });
+        }
+    });
+    
+    console.log('✅ Campos específicos da governanta configurados');
+}
+</script>
+</body>
+</html>

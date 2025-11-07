@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Candidato - Arrumadeira | R.O Recrutamento</title>
+    <meta name="description" content="Cadastre-se como arrumadeira na R.O Recrutamento. Formulário para profissionais qualificados em limpeza e organização residencial de alto padrão.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS - CAMINHOS CORRETOS -->
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/form-style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos específicos para campos condicionais -->
+    <style>
+        /* Campos condicionais inicialmente ocultos */
+        .outros-residencia,
+        .outros-equipamentos,
+        .outros-tecnicas,
+        .outros-produtos,
+        .outros-metodos,
+        .outros-certificacoes,
+        .outros-animais,
+        .animais-details,
+        .alergia-details,
+        .restricao-details,
+        .problemas-details,
+        .veiculo-details,
+        .alto-padrao-details,
+        .ref1-outro,
+        .ref2-outro {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Mostrar campos quando ativados */
+        .outros-residencia.show,
+        .outros-equipamentos.show,
+        .outros-tecnicas.show,
+        .outros-produtos.show,
+        .outros-metodos.show,
+        .outros-certificacoes.show,
+        .outros-animais.show,
+        .animais-details.show,
+        .alergia-details.show,
+        .restricao-details.show,
+        .problemas-details.show,
+        .veiculo-details.show,
+        .alto-padrao-details.show,
+        .ref1-outro.show,
+        .ref2-outro.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Formulário Principal -->
+    <main class="form-main">
+        <div class="container">
+            <form id="formArrumadeira" class="candidate-form">
+                <input type="hidden" name="formulario_id" value="candi-arrumadeira">
+                
+                <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
+                <div id="treinamento-obrigatorio-container"></div>
+
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+
+                <div id="dados-pessoais-container"></div>
+                <div id="contato-container"></div>
+                <div id="experiencia-container"></div>
+                <div id="referencias-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - COMPETÊNCIAS TÉCNICAS ARRUMADEIRA -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-broom"></i>
+                        Competências Técnicas - Arrumadeira
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        
+                        <div class="outros-equipamentos">
+                            <div class="form-group">
+                                <label for="outrosEquipamentosEspecificar">Especificar outros equipamentos</label>
+                                <input type="text" id="outrosEquipamentosEspecificar" name="outrosEquipamentosEspecificar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="organizacaoClosets">Experiência em organização de closets e armários de luxo</label>
+                        <select id="organizacaoClosets" name="organizacaoClosets">
+                            <option value="nao">Não tenho experiência</option>
+                            <option value="basico">Básico (organização simples)</option>
+                            <option value="intermediario">Intermediário (técnicas de dobra e armazenamento)</option>
+                            <option value="avancado">Avançado (organização profissional completa)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="montagemCama">Experiência em montagem de camas (padrão hotelaria)</label>
+                        <select id="montagemCama" name="montagemCama">
+                            <option value="nao">Não tenho experiência</option>
+                            <option value="basico">Básico (montagem simples)</option>
+                            <option value="intermediario">Intermediário (montagem com diferentes formas)</option>
+                            <option value="avancado">Avançado (montagem padrão hotelaria nível profissional)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="tecnicasLavanderia">Conhecimento em técnicas de lavanderia para tecidos finos</label>
+                        <select id="tecnicasLavanderia" name="tecnicasLavanderia">
+                            <option value="nao">Não tenho conhecimento</option>
+                            <option value="basico">Básico (separação por cores e tipos)</option>
+                            <option value="intermediario">Intermediário (tecidos delicados)</option>
+                            <option value="avancado">Avançado (seda, linho, cashmere, alta costura)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="habilidadePassar">Habilidade em passar roupas delicadas e de alta costura</label>
+                        <select id="habilidadePassar" name="habilidadePassar">
+                            <option value="nao">Não tenho conhecimento</option>
+                            <option value="basico">Básico (roupas simples)</option>
+                            <option value="intermediario">Intermediário (camisas, vestidos)</option>
+                            <option value="avancado">Avançado (peças delicadas, alta costura)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="disponibilidade-container"></div>
+                <div id="pretensoes-condicoes-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - QUALIFICAÇÕES ADICIONAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        Qualificações Adicionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Possui certificações ou cursos relevantes? (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="personal-organizer">
+                                <span>Personal Organizer</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="governanca">
+                                <span>Governança</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="hotelaria">
+                                <span>Hotelaria</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="manipulacao-limpeza">
+                                <span>Manipulação de produtos limpeza</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="primeiros-socorros">
+                                <span>Primeiros Socorros</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="outros">
+                                <span>Outros</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-certificacoes">
+                            <div class="form-group">
+                                <label for="outrosCertificacoesEspecificar">Especificar outras certificações</label>
+                                <input type="text" id="outrosCertificacoesEspecificar" name="outrosCertificacoesEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - SITUAÇÕES ESPECIAIS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-home"></i>
+                        Situações Especiais
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Tem experiência com casas que possuem animais de estimação?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaAnimais" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaAnimais" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="animais-details">
+                        <div class="form-group full-width">
+                            <label>Tipos de animais (marque todos que se aplicam):</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="caes">
+                                    <span>Cães</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="gatos">
+                                    <span>Gatos</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="passaros">
+                                    <span>Pássaros</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="tiposAnimais" value="outros">
+                                    <span>Outros</span>
+                                </label>
+                            </div>
+                            
+                            <div class="outros-animais">
+                                <div class="form-group">
+                                    <label for="outrosAnimaisEspecificar">Especificar outros animais</label>
+                                    <input type="text" id="outrosAnimaisEspecificar" name="outrosAnimaisEspecificar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem experiência com crianças pequenas na casa?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaCriancas" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaCriancas" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="experienciaCriancas" value="prefiro-evitar" required>
+                                <span>Prefiro evitar</span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES DE SAÚDE -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-heartbeat"></i>
+                        Informações de Saúde
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Tem alguma restrição de saúde que possa afetar o trabalho?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="restricao-details">
+                        <div class="form-group">
+                            <label for="especificarRestricao">Especifique a restrição</label>
+                            <input type="text" id="especificarRestricao" name="especificarRestricao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fuma?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tem problemas nas costas ou articulações?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="problemasArticulacoes" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="problemasArticulacoes" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="problemas-details">
+                        <div class="form-group">
+                            <label for="especificarProblemas">Especifique os problemas</label>
+                            <input type="text" id="especificarProblemas" name="especificarProblemas">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - PERGUNTAS ABERTAS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Questões Profissionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="maiorDiferencial">Qual considera ser seu maior diferencial como arrumadeira?</label>
+                        <textarea id="maiorDiferencial" name="maiorDiferencial" rows="4" placeholder="Descreva qual é o seu maior diferencial profissional..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="organizaRotina">Como organiza sua rotina de trabalho para ser mais eficiente?</label>
+                        <textarea id="organizaRotina" name="organizaRotina" rows="4" placeholder="Descreva como você organiza e planeja seu trabalho..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
+                        <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
+                    </div>
+
+                </section>
+
+                <!-- Botão de Envio -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura
+                    </button>
+                    <p style="margin-top: var(--spacing-md); color: var(--text-muted); font-size: 0.9rem;">
+                        Ao enviar este formulário, você concorda com o processamento de seus dados pessoais conforme nossa política de privacidade.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="../../components/components.js"></script>
+    
+    <script src="../../js/global-section.js"></script>
+
+    <script src="../../js/config-titulos.js"></script>
+
+    
+
+    <script type="module">
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aplicar títulos dinâmicos
+            aplicarTitulosDinamicos();
+            
+            // Carregar seções universais
+            carregarTodasSecoesPadrao();
+        });
+
+        function initializeArrumadeiraSpecificFields() {
+            console.log('🔧 Configurando campos específicos da arrumadeira...');
+            
+            // ✅ FUNÇÃO REUTILIZÁVEL PARA CHECKBOXES "OUTROS"
+            const setupConditionalCheckbox = (groupName, targetClass, triggerValue = 'outros') => {
+                const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+                const targetDiv = document.querySelector(`.${targetClass}`);
+                
+                if (targetDiv) {
+                    checkboxes.forEach(checkbox => {
+                        if (checkbox.value === triggerValue) {
+                            checkbox.addEventListener('change', function() {
+                                targetDiv.classList.toggle('show', this.checked);
+                            });
+                        }
+                    });
+                }
+            };
+
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA RADIO BUTTONS
+    const setupConditionalRadio = (radioName, targetClass, showValue = 'sim') => {
+        const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    targetDiv.classList.toggle('show', this.value === showValue);
+                });
+            });
+        }
+    };
+
+    // ✅ CONFIGURAR TODOS OS CAMPOS ESPECÍFICOS DA ARRUMADEIRA
+    setupConditionalCheckbox('tiposResidencia', 'outros-residencia');
+    setupConditionalCheckbox('equipamentosLimpeza', 'outros-equipamentos');
+    setupConditionalCheckbox('tecnicasOrganizacao', 'outros-tecnicas');
+    setupConditionalCheckbox('produtosLimpeza', 'outros-produtos');
+    setupConditionalCheckbox('metodosLimpeza', 'outros-metodos');
+    setupConditionalCheckbox('certificacoes', 'outros-certificacoes');
+    setupConditionalCheckbox('tiposAnimais', 'outros-animais');
+    
+    setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
+    setupConditionalRadio('alergiaLimpeza', 'alergia-details');
+    setupConditionalRadio('experienciaAnimais', 'animais-details');
+    setupConditionalRadio('restricaoSaude', 'restricao-details');
+    setupConditionalRadio('problemasArticulacoes', 'problemas-details');
+    setupConditionalRadio('veiculoProprio', 'veiculo-details');
+
+    // ✅ REFERÊNCIAS "OUTRO"
+    ['ref1Relacao', 'ref2Relacao'].forEach(selectId => {
+        const select = document.getElementById(selectId);
+        const targetDiv = document.querySelector(`.${selectId.replace('Relacao', '-outro')}`);
+        
+        if (select && targetDiv) {
+            select.addEventListener('change', function() {
+                targetDiv.classList.toggle('show', this.value === 'outro');
+            });
+        }
+    });
+    
+    console.log('✅ Campos específicos da arrumadeira configurados');
+}
+</script>
+</body>
+</html>

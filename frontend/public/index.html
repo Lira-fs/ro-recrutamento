@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R.O Recrutamento - Em Manutenção</title>
+    <meta name="description" content="Site em manutenção - R.O Recrutamento">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Estilos específicos para a página de manutenção */
+        body {
+            /* Manter o padding-top para o header não sobrepor */
+            padding-top: 80px;
+            /* Não usar flex no body para não quebrar o header */
+        }
+
+        /* Container principal que vai centralizar o conteúdo */
+        .maintenance-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 80px); /* Subtrai o padding-top */
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .maintenance-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            margin-top: 100px;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .maintenance-icon {
+            font-size: 4rem;
+            color: var(--bronze-light);
+            margin-bottom: 1.5rem;
+            animation: iconSpin 2s linear infinite;
+        }
+
+        @keyframes iconSpin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .maintenance-title {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-weight: var(--font-weight-bold);
+            background: linear-gradient(135deg, #b8763d, #d39666, #a65e2e, #d39666, #b8763d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .maintenance-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .maintenance-description {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            background: rgba(166, 94, 46, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--cor-borda);
+            box-shadow: var(--sombra-bronze);
+        }
+
+        .maintenance-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .status-text {
+            color: #2ecc71;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--cor-borda);
+        }
+
+        .contact-info h3 {
+            color: var(--bronze-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--bronze-light);
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--border-radius-lg);
+            background: rgba(166, 94, 46, 0.1);
+            transition: var(--transicao);
+        }
+
+        .contact-link:hover {
+            background: rgba(166, 94, 46, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-bronze);
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(166, 94, 46, 0.2);
+            border-radius: 3px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--bronze-solid), var(--bronze-light));
+            border-radius: 3px;
+            animation: progress 4s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            50% {
+                width: 75%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px; /* Header mobile é menor */
+            }
+            
+            .maintenance-wrapper {
+                min-height: calc(100vh - 70px);
+            }
+            
+            .maintenance-title {
+                font-size: 2rem;
+            }
+            
+            .maintenance-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .contact-link {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .maintenance-container {
+                padding: 1rem;
+            }
+            
+            .maintenance-title {
+                font-size: 1.8rem;
+            }
+            
+            .maintenance-description {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER CONTAINER (será carregado via JS) -->
+    <div id="header-container"></div>
+
+    <!-- Wrapper para centralizar o conteúdo -->
+    <div class="maintenance-wrapper">
+        <div class="maintenance-container">
+        
+        <!-- Ícone de manutenção -->
+        <div class="maintenance-icon">
+            <i class="fas fa-cog"></i>
+        </div>
+        
+        <!-- Título principal -->
+        <h1 class="maintenance-title">Estamos em Manutenção</h1>
+        
+        <!-- Subtítulo -->
+        <p class="maintenance-subtitle">
+            Estamos trabalhando para melhorar sua experiência
+        </p>
+        
+        <!-- Descrição -->
+        <div class="maintenance-description">
+            <p>
+                Nossa equipe está realizando atualizações importantes para oferecer 
+                uma experiência ainda melhor na conexão entre <span class="highlight">talentos únicos</span> 
+                e <span class="highlight">residências excepcionais</span>.
+            </p>
+            <p style="margin-bottom: 0;">
+                Em breve estaremos de volta com novidades incríveis!
+            </p>
+        </div>
+        
+        <!-- Status -->
+        <div class="maintenance-status">
+            <div class="status-indicator"></div>
+            <span class="status-text">Trabalhando nas melhorias</span>
+        </div>
+        
+        <!-- Barra de progresso -->
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <!-- Informações de contato -->
+        <div class="contact-info">
+            <h3>
+                <i class="fas fa-headset"></i>
+                Precisa falar conosco?
+            </h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Nossa equipe continua disponível para atendê-lo
+            </p>
+            
+            <div class="contact-links">
+                <a href="https://wa.me/551151072131" class="contact-link" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                </a>
+                <a href="mailto:contato@roconsultoria.com.br" class="contact-link">
+                    <i class="fas fa-envelope"></i>
+                    E-mail
+                </a>
+                <a href="tel:+5511999999999" class="contact-link">
+                    <i class="fas fa-phone"></i>
+                    Telefone
+                </a>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER CONTAINER (será carregado via JS) -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="components/components.js"></script>
+    <script>
+        // Animação de entrada suave
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.maintenance-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'opacity 1s ease, transform 1s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

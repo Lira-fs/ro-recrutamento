@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Candidato - Copeiro | R.O Recrutamento</title>
+    <meta name="description" content="Cadastre-se como copeiro na R.O Recrutamento. Formulário para profissionais qualificados em serviços de mesa e bebidas.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS - CAMINHOS CORRETOS -->
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/form-style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Formulário Principal -->
+    <main class="form-main">
+        <div class="container">
+            <form id="formCopeiro" class="candidate-form">
+                <input type="hidden" name="formulario_id" value="candi-copeiro">
+                
+                <!-- SEÇÕES UNIVERSAIS - IMPORTADAS -->
+
+                <div id="treinamento-obrigatorio-container"></div>
+
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+
+                <div id="dados-pessoais-container"></div>
+                
+                <div id="contato-container"></div>
+
+                <div id="experiencia-container"></div>
+
+                <!-- SESSÃO DE REFERENCIAS-->
+                 <div id="referencias-container"></div>
+
+
+
+                <!-- SEÇÃO ESPECÍFICA DO COPEIRO -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-wine-glass"></i>
+                        Competências Técnicas - Copeiro
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="conhecimentoVinhos">Conhecimento em vinhos e harmonização</label>
+                            <small class="field-note">Não obrigatório, apenas diferencial</small>
+                            <select id="conhecimentoVinhos" name="conhecimentoVinhos">
+                                <option value="nao">Não tenho conhecimento</option>
+                                <option value="basico">Básico (tipos principais de vinho)</option>
+                                <option value="intermediario">Intermediário (harmonização com pratos)</option>
+                                <option value="avancado">Avançado (sommelier, degustação)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="habilidadeCoqueteis">Habilidade em preparação de coquetéis e bebidas</label>
+                            <select id="habilidadeCoqueteis" name="habilidadeCoqueteis">
+                                <option value="nao">Não tenho conhecimento</option>
+                                <option value="basico">Básico (drinks simples)</option>
+                                <option value="intermediario">Intermediário (coquetéis clássicos)</option>
+                                <option value="avancado">Avançado (bartender, criação de drinks)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="montagemMesas">Habilidade em montagem de mesas formais</label>
+                            <select id="montagemMesas" name="montagemMesas">
+                                <option value="basico">Nenhuma</option>
+                                <option value="basico">Básico (arrumação simples)</option>
+                                <option value="intermediario">Intermediário (protocolo básico)</option>
+                                <option value="avancado">Avançado (etiqueta formal completa)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="decoracaoMesa">Experiência com decoração de mesa temática <i style="color: rgb(177, 177, 177);">(Natal, Páscoa, Eventos comemorativos...)</i></label>
+                            <select id="decoracaoMesa" name="decoracaoMesa">
+                                <option value="nao">Não tenho experiência</option>
+                                <option value="basico">Básico (arranjos simples)</option>
+                                <option value="intermediario">Intermediário (temas específicos)</option>
+                                <option value="avancado">Avançado (criação e execução completa)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="gestaoEstoque">Gestão e manutenção de estoque de louças, cristais e talheres</label>
+                            <select id="gestaoEstoque" name="gestaoEstoque">
+                                <option value="nao">Não tenho experiência</option>
+                                <option value="basico">Básico (organização simples)</option>
+                                <option value="intermediario">Intermediário (controle e inventário)</option>
+                                <option value="avancado">Avançado (gestão completa, compras)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="etiquetaProtocolo">Conhecimento em etiqueta e protocolo</label>
+                            <select id="etiquetaProtocolo" name="etiquetaProtocolo">
+                                <option value="basico">Nenhum</option>
+                                <option value="basico">Básico</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO ESPECÍFICA - TIPOS DE EVENTOS -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-glass-cheers"></i>
+                        Experiência em Tipos de Eventos
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Tipos de eventos que já trabalhou (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposEventos" value="eventos-corporativos">
+                                <span>Eventos corporativos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposEventos" value="festas-aniversario">
+                                <span>Festas de aniversário e/ou formaturas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposEventos" value="casamentos">
+                                <span>Casamentos</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposEventos" value="eventos-beneficentes">
+                                <span>Eventos beneficentes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="tiposEventos" value="outros">
+                                <span>Outros</span>
+                            </label>
+                                <label class="checkbox-label">
+                                <input type="checkbox" name="tiposEventos" value="nenhum">
+                                <span>Nenhum desses, sou novo na área</span>
+                            </label>
+                        </div>
+                        
+                        <div class="outros-eventos">
+                            <div class="form-group">
+                                <label for="outrosEventosEspecificar">Especificar outros eventos</label>
+                                <input type="text" id="outrosEventosEspecificar" name="outrosEventosEspecificar">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="frequenciaEventos">Frequência de eventos na última experiência</label>
+                        <select id="frequenciaEventos" name="frequenciaEventos">
+                            <option value="">Selecione</option>
+                            <option value="raro">Raro (algumas vezes por ano)</option>
+                            <option value="mensal">Mensal</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="diario">Diário</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO UNIVERSAL - IMPORTADA -->
+                <div id="disponibilidade-container"></div>
+
+                <div id="pretensoes-condicoes-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA - INFORMAÇÕES COMPLEMENTARES -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informações Complementares
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>Tem alguma restrição de saúde que possa afetar o trabalho?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="restricaoSaude" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="restricao-details">
+                        <div class="form-group">
+                            <label for="especificarRestricao">Especifique a restrição</label>
+                            <input type="text" id="especificarRestricao" name="especificarRestricao">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fuma?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="fuma" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Consome bebidas alcoólicas?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="consumeAlcool" value="sim" required>
+                                <span>Sim</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="consumeAlcool" value="raramente" required>
+                                <span>Raramente</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="consumeAlcool" value="socialmente" required>
+                                <span>Socialmente</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="consumeAlcool" value="nao" required>
+                                <span>Não</span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- SEÇÃO ESPECÍFICA - QUALIFICAÇÕES -->
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        Qualificações Adicionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label>Possui certificações ou cursos relevantes? (marque todos que se aplicam):</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="sommelier">
+                                <span>Sommelier</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="bartender">
+                                <span>Bartender</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="barista">
+                                <span>Barista</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="etiqueta-protocolo">
+                                <span>Etiqueta e Protocolo</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="primeiros-socorros">
+                                <span>Primeiros Socorros</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="idiomas">
+                                <span>Idiomas</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="certificacoes" value="outros-cursos">
+                                <span>Outros cursos profissionalizantes</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="observacoesAdicionais">Observações adicionais ou informações relevantes</label>
+                        <textarea id="observacoesAdicionais" name="observacoesAdicionais" rows="4" placeholder="Descreva qualquer informação adicional que considere relevante para sua candidatura..."></textarea>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Questões Profissionais
+                    </h2>
+                    
+                    <div class="form-group full-width">
+                        <label for="maiorDiferencial">Qual considera ser seu maior diferencial como copeiro?</label>
+                        <textarea id="maiorDiferencial" name="maiorDiferencial" rows="4" placeholder="Descreva qual é o seu maior diferencial profissional..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="organizaRotina">Como organiza sua rotina de trabalho para ser mais eficiente?</label>
+                        <textarea id="organizaRotina" name="organizaRotina" rows="4" placeholder="Descreva como você organiza e planeja seu trabalho..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Botão de Envio -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Candidatura
+                    </button>
+                    <p style="margin-top: var(--spacing-md); color: var(--text-muted); font-size: 0.9rem;">
+                        Ao enviar este, você concorda com o processamento de seus dados pessoais conforme nossa política de privacidade.
+                    </p>
+                </div>
+            </form>
+        </div>
+</main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts - ORDEM CORRETA -->
+
+    <script src="../../js/global-section.js"></script>
+    <script src="../../js/config-titulos.js"></script>
+    <script src="../../components/components.js"></script>
+
+    <script type="module">
+
+        document.addEventListener('DOMContentLoaded', () => {
+    // Aplicar títulos dinâmicos
+    aplicarTitulosDinamicos();
+    
+    // Carregar seções universais
+    carregarTodasSecoesPadrao();
+});
+
+function initializeCopeiroSpecificFields() {
+    console.log('🔧 Configurando campos específicos do copeiro...');
+    
+    // ✅ FUNÇÃO REUTILIZÁVEL PARA CHECKBOXES "OUTROS"
+    const setupConditionalCheckbox = (groupName, targetClass, triggerValue = 'outros') => {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+        const targetDiv = document.querySelector(`.${targetClass}`);
+        
+        if (targetDiv) {
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value === triggerValue) {
+                    checkbox.addEventListener('change', function() {
+                        targetDiv.classList.toggle('show', this.checked);
+                    });
+                }
+            });
+        }
+    };
+
+    // ✅ CONFIGURAR CAMPO ESPECÍFICO DO COPEIRO
+    setupConditionalCheckbox('tiposEventos', 'outros-eventos');
+    
+    console.log('✅ Campos específicos do copeiro configurados');
+}
+</script>
+</body>
+</html>

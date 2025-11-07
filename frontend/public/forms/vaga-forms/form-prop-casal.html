@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaga: Casal - R.O Recrutamento</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../components/components.css">
+    <link rel="stylesheet" href="../../css/form-style.css">
+</head>
+<body>
+    <!-- Header será importado via JS -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <main class="form-main">
+        <div class="container">
+            <form id="vagaCopeiroForm" class="candidate-form" novalidate>
+                <input type="hidden" name="formulario_id" value="vaga-casal">
+
+                <!-- SEÇÃO: ACEITAR TERMOS (Importada) -->
+                <div id="aceitar-termos-container"></div>
+
+                <h1 data-titulo-dinamico class="section-title card-title" >Carregando...</h1>
+
+                <!-- SEÇÃO: DADOS DO PROPRIETÁRIO (Importada) -->
+                <div id="dados-proprietario-container"></div>
+
+                <!-- SEÇÃO: CARACTERÍSTICAS DA RESIDÊNCIA (Importada) -->
+                <div id="caracteristicas-residencia-container"></div>
+
+               <!--SESSÃO ESPECÍFICA DO COPEIRO-->
+
+                <!-- SEÇÃO: DETALHES DA VAGA (Importada) -->
+                <div id="detalhes-vaga-container"></div>
+
+                <!-- SEÇÃO: OFERTA SALARIAL (Importada) -->
+                <div id="oferta-salarial-container"></div>
+
+                <!-- SEÇÃO: REQUISITOS BÁSICOS (Importada) -->
+                <div id="requisitos-basicos-container"></div>
+
+                <!-- SEÇÃO ESPECÍFICA: CASAL DE CASEIROS -->
+<section class="form-section">
+   <h2 class="section-title">
+       <i class="fas fa-users"></i>
+       Requisitos Específicos para Casal de Caseiros
+   </h2>
+   
+   <!-- SUBSEÇÃO: ELE -->
+   <div class="form-subsection">
+       <h3 style="color: var(--bronze-light); margin-bottom: var(--spacing-lg); font-size: 1.3rem;">
+           <i class="fas fa-male"></i> Requisitos para Ele
+       </h3>
+       
+       <div class="form-grid">
+           <div class="form-group">
+               <label>Necessário cuidar de jardim?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="eleCuidarJardim" value="sim" required>
+                       <span>Sim, necessário</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleCuidarJardim" value="desejavel" required>
+                       <span>Desejável</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleCuidarJardim" value="nao" required>
+                       <span>Não necessário</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="form-group">
+               <label>Necessário cuidar de piscina?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="eleCuidarPiscina" value="sim" required>
+                       <span>Sim, necessário</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleCuidarPiscina" value="desejavel" required>
+                       <span>Desejável</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleCuidarPiscina" value="nao" required>
+                       <span>Não necessário</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="form-group">
+               <label>Saber assar churrasco?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberChurrasco" value="sim" required>
+                       <span>Sim, necessário</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberChurrasco" value="desejavel" required>
+                       <span>Desejável</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberChurrasco" value="nao" required>
+                       <span>Não necessário</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="form-group">
+               <label>Saber fazer pizza?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberPizza" value="sim" required>
+                       <span>Sim, necessário</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberPizza" value="desejavel" required>
+                       <span>Desejável</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberPizza" value="nao" required>
+                       <span>Não necessário</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="form-group">
+               <label>Saber fazer drinks?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberDrinks" value="sim" required>
+                       <span>Sim, necessário</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberDrinks" value="desejavel" required>
+                       <span>Desejável</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="eleSaberDrinks" value="nao" required>
+                       <span>Não necessário</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="form-group full-width">
+               <label for="perfilDesejadoEle">O que espera do seu futuro administrador de residência? </label>
+               <textarea id="perfilDesejadoEle" name="perfilDesejadoEle" rows="4" placeholder="Descreva as atividades que ele deverá realizar na residência durante a jornada de trabalho"></textarea>
+           </div>
+
+       </div>
+   </div>
+
+   <!-- SUBSEÇÃO: ELA -->
+   <div class="form-subsection">
+       <h3 style="color: var(--bronze-light); margin-bottom: var(--spacing-lg); font-size: 1.3rem;">
+           <i class="fas fa-female"></i> Requisitos para Ela
+       </h3>
+       
+       <div class="form-grid">
+           <div class="form-group">
+               <label>Saber cozinhar?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="elaSaberCozinhar" value="sim" required>
+                       <span>Sim</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="elaSaberCozinhar" value="nao" required>
+                       <span>Não</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="culinaria-details">
+               <div class="form-group full-width">
+                   <label for="tipoCulinariaCasal">Especifique o nível de culinária</label>
+                   <input type="text" id="tipoCulinariaCasal" name="nivelCulinariaCasal" placeholder="Ex: Forno e Fogão, Simples, Profissional, etc...">
+               </div>
+           </div>
+
+           <div class="form-group">
+               <label>Lavar e passar roupas?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="elaLavarPassar" value="sim" required>
+                       <span>Sim, necessário</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="elaLavarPassar" value="desejavel" required>
+                       <span>Desejável</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="elaLavarPassar" value="nao" required>
+                       <span>Não necessário</span>
+                   </label>
+               </div>
+           </div><br>
+
+           <div class="form-group full-width">
+               <label for="perfilDesejadoEla">O que espera do sua futura candidata? </label>
+               <textarea id="perfilDesejadoEla" name="perfilDesejadoEla" rows="4" placeholder="Descreva as atividades que ela deverá realizar na residência durante a jornada de trabalho"></textarea>
+           </div>
+       </div>
+   </div>
+
+   <!-- SUBSEÇÃO: AMBOS -->
+   <div class="form-subsection">
+       <h3 style="color: var(--bronze-light); margin-bottom: var(--spacing-lg); font-size: 1.3rem;">
+           <i class="fas fa-home"></i> Requisitos para Ambos
+       </h3>
+       
+       <div class="form-grid">
+           <div class="form-group">
+               <label>Necessário morar na residência?</label>
+               <div class="radio-group">
+                   <label class="radio-label">
+                       <input type="radio" name="casalMorarResidencia" value="sim" required>
+                       <span>Sim</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="casalMorarResidencia" value="nao" required>
+                       <span>Não</span>
+                   </label>
+                   <label class="radio-label">
+                       <input type="radio" name="casalMorarResidencia" value="negociar" required>
+                       <span>Negociar</span>
+                   </label>
+               </div>
+           </div>
+
+           <div class="dormir-fim-semana-details">
+               <div class="form-group">
+                   <label>Fins de semana necessário dormir na residência?</label>
+                   <div class="radio-group">
+                       <label class="radio-label">
+                           <input type="radio" name="casalDormirFimSemana" value="sim" required>
+                           <span>Sim</span>
+                       </label>
+                       <label class="radio-label">
+                           <input type="radio" name="casalDormirFimSemana" value="nao" required>
+                           <span>Não</span>
+                       </label>
+                       <label class="radio-label">
+                           <input type="radio" name="casalDormirFimSemana" value="ocasional" required>
+                           <span>Ocasionalmente</span>
+                       </label>
+                   </div>
+               </div>
+           </div>
+
+           <div class="form-group full-width">
+               <label for="perfilDesejadoCasal">O que busca no perfil de um casal de caseiros?</label>
+               <textarea id="perfilDesejadoCasal" name="perfilDesejadoCasal" rows="4" placeholder="Descreva as características, habilidades e qualidades que considera importantes para um casal de caseiros ideal..."></textarea>
+           </div>
+
+           <div class="form-group full-width">
+               <label for="caracteristicasEvitarCasal">O que devemos evitar?</label>
+               <textarea id="caracteristicasEvitarCasal" name="caracteristicasEvitarCasal" rows="3" placeholder="Descreva comportamentos, características ou situações que devem ser evitadas na seleção..."></textarea>
+           </div>
+       </div>
+   </div>
+</section>
+
+                <!-- OBSERVAÇÕES ADICIONAIS -->
+                <div id="observacoes-adicionais-container"></div>
+
+                <!-- TREINAMENTO PERSONALIZADO -->
+                <div id="treinamento-personalizado-container"></div>
+
+                <!-- Submit Button -->
+                <div class="form-submit">
+                    <button type="submit" class="btn-submit" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                        Cadastrar Vaga de Casal de Caseiros
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer será importado via JS -->
+    <div id="footer-container"></div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-check-circle success-icon"></i>
+                    <h2>Vaga Cadastrada com Sucesso!</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Sua vaga para <strong>Casal de Caseiros</strong> foi cadastrada em nossa plataforma.</p>
+                    <p>Nossa equipe analisará os candidatos disponíveis e entrará em contato em até <strong>24 horas</strong>.</p>
+                    <div class="next-steps">
+                        <h3>Próximos passos:</h3>
+                        <ul>
+                            <li>Análise dos candidatos compatíveis</li>
+                            <li>Pré-seleção baseada nos seus critérios</li>
+                            <li>Contato com os candidatos escolhidos</li>
+                            <li>Agendamento de entrevistas ou testes.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal()" class="btn-primary">
+                        <i class="fas fa-home"></i>
+                        Voltar ao Início
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+    <script src="../../js/global-section-prop.js"></script>
+    <script src="../../components/components.js"></script>
+    <script src="../../js/config-titulos.js"></script>
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+            aplicarTitulosDinamicos();
+            carregarTodasSecoesPadrao();
+        });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Carregando formulário de vaga - Casal de Caseiros');
+    
+    // Carregar header e footer (se existirem)
+    if (typeof loadHeader === 'function') {
+        loadHeader('header-container');
+    }
+    if (typeof loadFooter === 'function') {
+        loadFooter('footer-container');
+    }
+    
+    // Carregar todas as seções padrão
+    loadOwnerFormSection('aceitar-termos', 'aceitar-termos-container');
+    loadOwnerFormSection('dados-proprietario', 'dados-proprietario-container');
+    loadOwnerFormSection('caracteristicas-residencia', 'caracteristicas-residencia-container');
+    loadOwnerFormSection('detalhes-vaga', 'detalhes-vaga-container');
+    loadOwnerFormSection('oferta-salarial', 'oferta-salarial-container');
+    loadOwnerFormSection('requisitos-basicos', 'requisitos-basicos-container');
+    loadOwnerFormSection('observacoes-adicionais', 'observacoes-adicionais-container');
+    loadOwnerFormSection('treinamento-personalizado', 'treinamento-personalizado-container');
+    
+    // Aguardar seções carregarem e configurar formulário
+    setTimeout(function() {
+        setupFormSubmission();
+        initializeSpecificSections();
+    }, 500);
+});
+
+// ===================================
+// INICIALIZAR FUNCIONALIDADES ESPECÍFICAS - CASAL
+// ===================================
+function initializeSpecificSections() {
+    setTimeout(function() {
+        // Campo condicional - Ela saber cozinhar
+        const elaCozinharSim = document.querySelector('input[name="elaSaberCozinhar"][value="sim"]');
+        const elaCozinharNao = document.querySelector('input[name="elaSaberCozinhar"][value="nao"]');
+        const culinariaDetails = document.querySelector('.culinaria-details');
+        
+        if (elaCozinharSim && elaCozinharNao && culinariaDetails) {
+            elaCozinharSim.addEventListener('change', function() {
+                if (this.checked) {
+                    culinariaDetails.style.display = 'block';
+                    culinariaDetails.classList.add('show');
+                }
+            });
+            
+            elaCozinharNao.addEventListener('change', function() {
+                if (this.checked) {
+                    culinariaDetails.style.display = 'none';
+                    culinariaDetails.classList.remove('show');
+                }
+            });
+        }
+
+        // Campo condicional - Morar na residência
+        const casalMorarNao = document.querySelector('input[name="casalMorarResidencia"][value="nao"]');
+        const casalMorarNegociar = document.querySelector('input[name="casalMorarResidencia"][value="negociar"]');
+        const casalMorarSim = document.querySelector('input[name="casalMorarResidencia"][value="sim"]');
+        const dormirFimSemanaDetails = document.querySelector('.dormir-fim-semana-details');
+        
+        if (dormirFimSemanaDetails) {
+            if (casalMorarNao) {
+                casalMorarNao.addEventListener('change', function() {
+                    if (this.checked) {
+                        dormirFimSemanaDetails.style.display = 'block';
+                        dormirFimSemanaDetails.classList.add('show');
+                    }
+                });
+            }
+            
+            if (casalMorarNegociar) {
+                casalMorarNegociar.addEventListener('change', function() {
+                    if (this.checked) {
+                        dormirFimSemanaDetails.style.display = 'block';
+                        dormirFimSemanaDetails.classList.add('show');
+                    }
+                });
+            }
+            
+            if (casalMorarSim) {
+                casalMorarSim.addEventListener('change', function() {
+                    if (this.checked) {
+                        dormirFimSemanaDetails.style.display = 'none';
+                        dormirFimSemanaDetails.classList.remove('show');
+                    }
+                });
+            }
+        }
+        
+        console.log('✅ Campos condicionais do casal configurados');
+    }, 500);
+}
+
+// ===================================
+// FECHAR MODAL
+// ===================================
+function closeModal() {
+    const successModal = document.getElementById('successModal');
+    const errorModal = document.getElementById('errorModal');
+    
+    if (successModal) {
+        successModal.style.display = 'none';
+        window.location.href = '/';
+    }
+    
+    if (errorModal) {
+        errorModal.style.display = 'none';
+    }
+    
+    document.body.style.overflow = 'auto';
+}
+    </script>
+</body>
+</html>
