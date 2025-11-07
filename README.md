@@ -1,7 +1,6 @@
-```mermaid
 flowchart TD
 
-A[Frontend\n- Formulários (14)\n- Dashboard\n- HTML/CSS/JS] --> B[Routes]
+A[Frontend: Formulários + Dashboard] --> B[Routes]
 
 B --> C[Controllers]
 
@@ -13,10 +12,10 @@ D --> E
 E --> F[Models]
 E --> P[PDF Module]
 
-F --> G[(Postgres DB\n- candidatos\n- vagas\n- casal\n- JSONB)]
+F --> G[(Postgres: candidatos, vagas, casal, JSONB)]
 
 P --> H[Templates HTML]
-H --> I[Puppeteer]
+H --> I[Puppeteer Renderer]
 I --> A
 
-A -->|GET :id/pdf| B
+A -->|GET /:id/pdf| B
