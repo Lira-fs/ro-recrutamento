@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
 
 A[Frontend: Formulários + Dashboard] --> B[Routes]
@@ -19,3 +20,4 @@ H --> I[Puppeteer Renderer]
 I --> A
 
 A -->|GET /:id/pdf| B
+```
