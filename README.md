@@ -1,23 +1,39 @@
 ```mermaid
 flowchart TD
+    %% FRONTEND
+    A[Frontend<br/>- Formulários (14)<br/>- Dashboard<br/>- HTML/CSS/JS] --> B[Routes]
 
-A[Frontend: Formulários + Dashboard] --> B[Routes]
+    %% ROUTES -> CONTROLLERS
+    B --> C[Candidatos Controller]
+    B --> D[Vagas Controller]
+    B --> E[PDF Controller]
 
-B --> C[Controllers]
+    %% CONTROLLERS -> VALIDATORS
+    C --> F[Candidato Validator]
+    D --> G[Vaga Validator]
 
-C --> D[Validators]
-C --> E[Services]
+    %% CONTROLLERS -> SERVICES
+    C --> H[Candidato Service]
+    D --> I[Vaga Service]
+    E --> J[PDF Service]
 
-D --> E
+    %% SERVICES -> MODEL
+    H --> K[Candidato Model]
+    I --> L[Vaga Model]
+    J --> K
+    J --> L
 
-E --> F[Models]
-E --> P[PDF Module]
+    %% MODEL -> DATABASE
+    K --> M[(Postgres DB<br/>Tabela candidatos<br/>- universais<br/>- dados_especificos JSONB<br/>- tipo_formulario)]
+    L --> N[(Postgres DB<br/>Tabela vagas<br/>- universais<br/>- dados_especificos JSONB<br/>- tipo_formulario)]
 
-F --> G[(Postgres: candidatos, vagas, casal, JSONB)]
+    %% PDF MODULE DETAILS
+    J --> O[Templates HTML<br/>caseiro, arrumadeira, etc]
+    O --> P[Puppeteer Renderer]
+    P --> A
 
-P --> H[Templates HTML]
-H --> I[Puppeteer Renderer]
-I --> A
-
-A -->|GET /:id/pdf| B
+    %% CASAL TABLE
+    C --> Q[Candidato Casal Service]
+    Q --> R[Candidato Casal Model]
+    R --> S[(Postgres DB<br/>casal_candidatos<br/>pessoa1 JSONB<br/>pessoa2 JSONB)]
 ```
