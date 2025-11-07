@@ -1,80 +1,22 @@
-                                       ┌───────────────────────────────┐
-                                       │           FRONTEND             │
-                                       │───────────────────────────────│
-                                       │  • Formulários (14)           │
-                                       │  • Dashboard                  │
-                                       │  • HTML/CSS/JS                │
-                                       └───────────────┬───────────────┘
-                                                       │  HTTP Request
-                                                       ▼
-                             ┌────────────────────────────────────────────────┐
-                             │                 BACKEND API                     │
-                             │────────────────────────────────────────────────│
-                             │                    ROUTES                      │
-                             │  - /api/candidatos                             │
-                             │  - /api/vagas                                  │
-                             │  - /api/:id/pdf                                │
-                             └───────────────┬────────────────────────────────┘
-                                             │ chama
-                                             ▼
-                        ┌────────────────────────────────────────────┐
-                        │               CONTROLLERS                  │
-                        │────────────────────────────────────────────│
-                        │ - recebe req/res                           │
-                        │ - chama validator                          │
-                        │ - chama service                            │
-                        └───────────────┬────────────────────────────┘
-                                        │ valida entrada
-                                        ▼
-                           ┌───────────────────────────────────┐
-                           │            VALIDATORS             │
-                           │───────────────────────────────────│
-                           │ - Zod/Yup                         │
-                           │ - valida formatos                 │
-                           └──────────────┬────────────────────┘
-                                          │ envia data limpo
-                                          ▼
-                   ┌──────────────────────────────────────────────────────────┐
-                   │                          SERVICES                        │
-                   │──────────────────────────────────────────────────────────│
-                   │ - regras de negócio                                      │
-                   │ - extrai dados universais                                │
-                   │ - extrai dados específicos                               │
-                   │ - chama model                                            │
-                   │ - chama módulo PDF                                       │
-                   └───────────────┬──────────────────────────────────────────┘
-                                   │ executa regras
-                                   ▼
-                     ┌────────────────────────────────────────────────┐
-                     │                    MODELS                      │
-                     │────────────────────────────────────────────────│
-                     │ - faz SELECT, INSERT, UPDATE, DELETE           │
-                     │ - queries SQL + JSONB                          │
-                     └──────────────┬─────────────────────────────────┘
-                                    │ queries SQL
-                                    ▼
-        ┌──────────────────────────────────────────────────────────────────────────────┐
-        │                                POSTGRES (DB)                                 │
-        │──────────────────────────────────────────────────────────────────────────────│
-        │  TABELAS:                                                                    │
-        │   • candidatos                                                               │
-        │       - universais (colunas)                                                 │
-        │       - dados_especificos JSONB                                               │
-        │       - tipo_formulario                                                       │
-        │                                                                               │
-        │   • vagas                                                                     │
-        │       - universais (colunas)                                                  │
-        │       - dados_especificos JSONB                                               │
-        │       - tipo_formulario                                                       │
-        │                                                                               │
-        │   • casal_candidatos                                                          │
-        │       - pessoa1 JSONB                                                         │
-        │       - pessoa2 JSONB                                                         │
-        │                                                                               │
-        └──────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
 
+A[Frontend\n- Formulários (14)\n- Dashboard\n- HTML/CSS/JS] --> B[Routes]
 
-                                         PDF FLOW
-                                         ────────
-Dashboard → GET /api/candidatos/:id/pdf → Controller → Service → PDF Module →
-Template HTML → Puppeteer → PDF final → Return to Dashboard
+B --> C[Controllers]
+
+C --> D[Validators]
+C --> E[Services]
+
+D --> E
+
+E --> F[Models]
+E --> P[PDF Module]
+
+F --> G[(Postgres DB\n- candidatos\n- vagas\n- casal\n- JSONB)]
+
+P --> H[Templates HTML]
+H --> I[Puppeteer]
+I --> A
+
+A -->|GET :id/pdf| B
