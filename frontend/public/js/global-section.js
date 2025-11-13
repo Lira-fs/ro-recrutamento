@@ -603,7 +603,6 @@ const secoes = {
 function carregarSecao(nomeSecao, containerId) {
     return new Promise((resolve, reject) => {
         try {
-            console.log(`🔄 Carregando seção: ${nomeSecao} -> ${containerId}`);
             
             const container = document.getElementById(containerId);
             if (!container) {
@@ -615,7 +614,6 @@ function carregarSecao(nomeSecao, containerId) {
             }
             
             container.innerHTML = secoes[nomeSecao];
-            console.log(`✅ Seção ${nomeSecao} carregada`);
             
             setTimeout(() => {
                 inicializarFuncionalidadesSecao(nomeSecao);
@@ -647,7 +645,6 @@ function carregarTodasSecoesPadrao() {
     totalSecoes = secoesParaCarregar.length;
     secoesCarregadas = 0;
     
-    console.log(`🚀 Carregando ${totalSecoes} seções...`);
     
     const promises = secoesParaCarregar.map(secao => 
         carregarSecao(secao.nome, secao.container)
@@ -664,15 +661,9 @@ function carregarTodasSecoesPadrao() {
  * Inicializa funcionalidades após carregar seções
  */
 function inicializarFuncionalidadesSecao(nomeSecao) {
-    console.log(`🔧 Inicializando: ${nomeSecao}`);
     
     switch(nomeSecao) {
-        case 'dados-pessoais':
-            configurarMascaraCPF();
-            break;
         case 'contato':
-            configurarMascarasTelefone();
-            configurarMascaraCEP();
             configurarCamposCondicionaisCNH();
             configurarCamposCondicionaisFilhos();
             break;
@@ -814,7 +805,6 @@ function configurarCamposCondicionaisDisponibilidade() {
          return;
      }
     
-     console.log('🎓 Configurando treinamento obrigatório...');
     
      // ✅ INICIALIZAR ESTADO - garantir que elementos existam e estejam ocultos
      if (turnoSelection) {
@@ -831,17 +821,14 @@ function configurarCamposCondicionaisDisponibilidade() {
     
      aceitaTreinamento.forEach(radio => {
          radio.addEventListener('change', function() {
-             console.log(`🔄 Treinamento mudou para: ${this.value}`);
             
              if (this.value === 'sim') {
                  // ✅ ACEITO O TREINAMENTO
-                 console.log('✅ Treinamento aceito, mostrando seleção de turno...');
                 
                  // Mostrar seleção de turno
                  if (turnoSelection) {
                      turnoSelection.style.display = 'block';
                      turnoSelection.classList.add('show');
-                     console.log('📅 Seleção de turno exibida');
                  }
                 
                  // Ocultar mensagem de recusa
@@ -853,22 +840,18 @@ function configurarCamposCondicionaisDisponibilidade() {
                  // Tornar turno obrigatório
                  if (turnoSelect) {
                      turnoSelect.required = true;
-                     console.log('⚡ Campo turno marcado como obrigatório');
                  }
                 
                  // SE JÁ TEM TURNO SELECIONADO, LIBERAR IMEDIATAMENTE
                  if (turnoSelect && turnoSelect.value) {
-                     console.log('🚀 Turno já selecionado, liberando formulário...');
                      desbloquearOutrasSecoes();
                  } else {
-                     console.log('⏳ Aguardando seleção de turno...');
                      // Manter bloqueado até selecionar turno
                      bloquearOutrasSecoes();
                  }
                 
              } else {
                  // ❌ NÃO ACEITO O TREINAMENTO
-                 console.log('❌ Treinamento rejeitado');
                 
                  // Ocultar seleção de turno
                  if (turnoSelection) {
@@ -880,7 +863,6 @@ function configurarCamposCondicionaisDisponibilidade() {
                  if (rejectionMessage) {
                      rejectionMessage.style.display = 'block'; // MOSTRAR AGORA
                      rejectionMessage.classList.add('show');
-                     console.log('⚠️ Mensagem de rejeição exibida');
                  }
                 
                  // Remover obrigatoriedade do turno
@@ -898,16 +880,14 @@ function configurarCamposCondicionaisDisponibilidade() {
      // ✅ EVENTO PARA SELEÇÃO DE TURNO
      if (turnoSelect) {
          turnoSelect.addEventListener('change', function() {
-             console.log(`🕐 Turno selecionado: ${this.value}`);
+
            
              const treinamentoAceito = isTreinamentoAceito();
-             console.log(`🎓 Treinamento aceito: ${treinamentoAceito}`);
             
              if (this.value && treinamentoAceito) {
-                 console.log('🎉 CONDIÇÕES ATENDIDAS: Liberando formulário!');
+
                  desbloquearOutrasSecoes();
              } else if (!this.value && treinamentoAceito) {
-                 console.log('⚠️ Turno removido, bloqueando formulário...');
                  bloquearOutrasSecoes();
              }
          });
@@ -917,13 +897,9 @@ function configurarCamposCondicionaisDisponibilidade() {
          if (estadoInicial) {
              console.log(`📄 Estado inicial do turno: ${estadoInicial}`);
          }
-     }
-    
-     console.log('✅ Treinamento obrigatório configurado com sucesso');
+     }   
  }
 
-
- //Função para toggle do "Saiba Mais" do treinamento
 
 
 function toggleInfoTreinamento() {
@@ -961,8 +937,6 @@ function bloquearOutrasSecoes() {
     const secoes = document.querySelectorAll('.form-section:not(.treinamento-section)');
     const containers = document.querySelectorAll('[id$="-container"]:not(#treinamento-obrigatorio-container)');
     const submitBtn = document.querySelector('.btn-submit, button[type="submit"]');
-    
-    console.log(`🔒 Bloqueando ${secoes.length} seções + ${containers.length} containers`);
     
     // Usar pointer-events e opacity ao invés de sobrepor o header
     secoes.forEach(secao => {
@@ -1002,7 +976,6 @@ function bloquearOutrasSecoes() {
     // Mostrar mensagem visual mais sutil
     mostrarMensagemBloqueio();
     
-    console.log('🔒 Outras seções bloqueadas (navegação permanece liberada)');
 }
 
 /**
@@ -1013,7 +986,6 @@ function desbloquearOutrasSecoes() {
     const containers = document.querySelectorAll('[id$="-container"]:not(#treinamento-obrigatorio-container)');
     const submitBtn = document.querySelector('.btn-submit, button[type="submit"]');
     
-    console.log(`🔓 Desbloqueando ${secoes.length} seções + ${containers.length} containers`);
     
     // Restaurar interação completa
     secoes.forEach(secao => {
@@ -1038,7 +1010,6 @@ function desbloquearOutrasSecoes() {
     // Remover mensagem de bloqueio
     removerMensagemBloqueio();
     
-    console.log('✅ Formulário desbloqueado! Treinamento aceito e turno selecionado.');
 }
 
 
@@ -1049,12 +1020,10 @@ function desbloquearOutrasSecoes() {
 function isTreinamentoAceito() {
     const aceita = document.querySelector('input[name="aceitaTreinamento"]:checked');
     const resultado = aceita && aceita.value === 'sim';
-    console.log(`🎓 Verificação treinamento: ${resultado ? 'ACEITO' : 'NÃO ACEITO'}`);
     return resultado;
 }
 
 function validarFormulario(form) {
-    console.log('🔍 Validando formulário...');
     
     const erros = [];
     
@@ -1085,7 +1054,6 @@ function validarFormulario(form) {
             erros.push(`Tipo de formulário inválido: ${formularioId.value}`);
         }
         
-        console.log(`✅ Formulário identificado como: ${formularioId.value}`);
     }
     
     // 3. Validar email
@@ -1109,8 +1077,7 @@ function validarFormulario(form) {
         mostrarErrosValidacao(erros);
         return false;
     }
-    
-    console.log('✅ Formulário válido');
+
     return true;
 }
 
@@ -1131,7 +1098,6 @@ function garantirFormularioId(form) {
             formularioId.value = tipo;
             form.appendChild(formularioId);
             
-            console.log(`✅ Campo formulario_id criado com valor: ${tipo}`);
         } else {
             console.error('❌ Não foi possível detectar o tipo do formulário');
             throw new Error('Tipo de formulário não identificado');
@@ -1145,7 +1111,6 @@ function garantirFormularioId(form) {
 // DAQUI PRA BAIXI VER O UQE PODE SER REUTILIZADO EM OUTROS FORMULÁRIOS
 
 function estruturarDadosSupabase(formData) {
-    console.log('🗂️ Estruturando dados híbridos...');
     
     const formularioId = formData.formulario_id;
     
@@ -1681,7 +1646,6 @@ function extrairDadosArrumadeira(formData) {
      * Extrai dados específicos do casal (placeholder para futuras implementações)
      */
     function extrairDadosCasal(formData) {
-        console.log('📊 Extraindo dados específicos do casal...');
         
     return {
     // ===== DADOS PESSOAIS - ELE =====
@@ -1772,7 +1736,6 @@ function extrairDadosArrumadeira(formData) {
  * Extrai referências para JSONB (exceto casal, que tem função própria)
  */
 function extrairReferencias(formData, formularioId) {
-    console.log('📋 Extraindo referências...');
     
     const referencias = [];
     
@@ -1807,7 +1770,6 @@ function extrairReferencias(formData, formularioId) {
         });
     }
     
-    console.log(`✅ ${referencias.length} referências extraídas`);
     return referencias.length > 0 ? referencias : null;
 }
 
@@ -1816,7 +1778,6 @@ function extrairReferencias(formData, formularioId) {
  * Mostra modal de sucesso
  */
 function mostrarModalSucesso(tipoFormulario) {
-    console.log(`🎉 Mostrando modal de sucesso: ${tipoFormulario}`);
     
     let modal = document.getElementById('successModal');
     
@@ -1986,15 +1947,6 @@ function aguardarCarregamentoSecoes() {
  * Inicialização principal do sistema
  */
 async function inicializarSistema() {
-    console.log('🚀 Inicializando sistema global...');
-    
-    try {
-        await aguardarCarregamentoSecoes();
-        inicializarSistemaEnvio();
-        console.log('🎉 Sistema inicializado com sucesso!');
-    } catch (error) {
-        console.error('💥 Erro na inicialização:', error);
-    }
 }
 
 // ========================================

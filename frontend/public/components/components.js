@@ -1,5 +1,85 @@
 // components/components.js
 class ComponentLoader {
+
+    // BASE PATH FIXO (simples e correto)
+    static getBasePath() {
+        return "/components/";
+    }
+
+    static async loadComponent(elementId, componentPath) {
+        try {
+            const response = await fetch(componentPath);
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            const html = await response.text();
+
+            const container = document.getElementById(elementId);
+            if (container) {
+                container.innerHTML = html;
+                console.log(`✅ Componente ${elementId} carregado de: ${componentPath}`);
+                return true;
+            } else {
+                console.warn(`⚠️ Elemento com ID '${elementId}' não encontrado`);
+                return false;
+            }
+
+        } catch (error) {
+            console.error(`❌ Erro ao carregar ${componentPath}:`, error);
+            return false;
+        }
+    }
+
+    static async loadAllComponents() {
+
+        // AGORA O caminho é fixo e sempre funciona
+        const basePath = this.getBasePath();
+
+        const components = [
+            { id: 'header-container', path: `${basePath}header.html` },
+            { id: 'footer-container', path: `${basePath}footer.html` }
+        ];
+
+        try {
+            console.log('🔄 Iniciando carregamento dos componentes...');
+
+            const loadPromises = components.map(comp =>
+                this.loadComponent(comp.id, comp.path)
+            );
+
+            await Promise.all(loadPromises);
+
+            this.initializeComponents();
+
+            console.log('✅ Todos os componentes carregados com sucesso!');
+
+        } catch (error) {
+            console.error('❌ Erro ao carregar componentes:', error);
+        }
+    }
+
+    static initializeComponents() {
+        setTimeout(() => {
+            this.initMobileMenu();
+            this.initNewsletter();
+            this.initWhatsApp();
+            this.initScrollHeader();
+        }, 100);
+    }
+
+    /* … resto do arquivo igual … */
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    ComponentLoader.loadAllComponents();
+});
+
+
+// Para arquivos sem roteamento
+
+/* // components/components.js
+class ComponentLoader {
     static getBasePath() {
     // Caminho do arquivo atual
     const current = window.location.pathname;
@@ -225,4 +305,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.trackEvent = function(eventName, data = {}) {
     console.log('📊 Event tracked:', eventName, data);
     // Aqui você pode integrar com Google Analytics, etc.
-};
+}; */

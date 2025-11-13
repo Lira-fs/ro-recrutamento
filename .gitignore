@@ -111,3 +111,21 @@ cert.pem
 .pids
 .pm2
 dump.pm2
+
+
+# Node
+node_modules/
+.env
+dist/
+build/
+coverage/
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/

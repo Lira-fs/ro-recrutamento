@@ -12,8 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- CSS - CAMINHOS CORRETOS -->
-    <link rel="stylesheet" href="../../css/global.css">
-    <link rel="stylesheet" href="../../css/form-style.css">
+    <link rel="stylesheet" href="/../../css/global.css">
+    <link rel="stylesheet" href="/../../css/form-style.css">
     <style>
         .alto-padrao-details,
         .outros-equipamentos-jardim,
@@ -338,9 +338,9 @@
 
     <!-- Scripts - ORDEM CORRETA -->
 
-    <script src="../../js/global-section.js"></script>
-    <script src="../../js/config-titulos.js"></script>
-    <script src="../../components/components.js"></script>
+    <script src="/../../js/global-section.js"></script>
+    <script src="/../../js/config-titulos.js"></script>
+    <script src="/../../components/components.js"></script>
 
     <script type="module">
     
@@ -389,7 +389,6 @@
         // ✅ CONFIGURAR TODOS OS CAMPOS ESPECÍFICOS DO CASEIRO
         setupConditionalCheckbox('equipamentosJardinagem', 'outros-equipamentos-jardim');
         setupConditionalCheckbox('certificacoes', 'outros-certificacoes');
-        
         setupConditionalRadio('experienciaAltoPadrao', 'alto-padrao-details');
         setupConditionalRadio('possuiReferencias', 'referencias-section');
         setupConditionalRadio('restricaoSaude', 'restricao-details');
@@ -409,6 +408,31 @@
         
         console.log('✅ Campos específicos do caseiro configurados');
     }
+</script>
+
+<script>
+    //scrip de envio de dados via FETCH()
+
+    document.getElementById('formCaseiro').addEventListener('submit', async function(event)     {
+
+        e.preventDefault(); // Evita o envio padrão do formulário   
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const data = Object.fromEntries(formData.entries());
+
+        const res = await fetch('/api/candidatos/caseiro', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+
+        const json = await res.json();
+        console.log("Resposta do servidor:", json);
+    })
 </script>
 </body>
 </html>
